@@ -1,0 +1,7 @@
+{
+  "name": "togo-vision",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cámara + MediaPipe (pose y manos) + TFLite para reconocer señas LESSA en el teléfono",
+  "main": "index.ts"
+}

@@ -1,0 +1,45 @@
+# Lo que Docker NO copia al construir la imagen.
+# (Basado en .gitignore, como indica la guía, más lo que no sirve para la web.)
+
+# Dependencias: se instalan DENTRO del contenedor con npm install
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Expo y compilaciones
+.expo/
+web-build/
+dist/
+expo-env.d.ts
+*.tsbuildinfo
+.metro-health-check*
+
+# Proyectos nativos (Android/iOS): no se usan en la versión web y pesan mucho
+android/
+ios/
+modules/**/android/build/
+.kotlin/
+
+# Llaves y certificados: nunca dentro de una imagen
+*.jks
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+.env*.local
+
+# Editores y sistema
+.vscode/
+.idea/
+.DS_Store
+*.orig.*
+
+# Docker mismo
+Dockerfile
+.dockerignore

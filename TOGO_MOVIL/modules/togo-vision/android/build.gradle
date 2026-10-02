@@ -1,0 +1,31 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'sv.togo'
+version = '0.1.0'
+
+android {
+  namespace "expo.modules.togovision"
+  defaultConfig {
+    versionCode 1
+    versionName '0.1.0'
+  }
+  androidResources {
+    // Los modelos se leen tal cual; comprimirlos no ahorra nada y cuesta al cargar.
+    noCompress += ['tflite', 'task']
+  }
+}
+
+dependencies {
+  def camerax = "1.5.3"
+  implementation "androidx.camera:camera-core:$camerax"
+  implementation "androidx.camera:camera-camera2:$camerax"
+  implementation "androidx.camera:camera-lifecycle:$camerax"
+  implementation "androidx.camera:camera-view:$camerax"
+  // Mismos modelos .task que la extracción en Python (MediaPipe 1.0.0).
+  implementation "com.google.mediapipe:tasks-vision:1.0.0"
+  // Intérprete TFLite (LiteRT) para el LSTM de señas.
+  implementation "com.google.ai.edge.litert:litert:1.4.2"
+}

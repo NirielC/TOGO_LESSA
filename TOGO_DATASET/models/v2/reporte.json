@@ -1,0 +1,163 @@
+{
+  "precision_test_keras": 0.9783,
+  "precision_test_tflite": 0.9783,
+  "precision_test_espejo": 0.975,
+  "clases": [
+    "hola",
+    "como_estas",
+    "estoy_bien",
+    "estoy_mas_o_menos",
+    "estoy_mal",
+    "mi_nombre_es",
+    "si",
+    "a_que_hora_es",
+    "por_la_tarde",
+    "ok_adios"
+  ],
+  "matriz_confusion": [
+    [
+      59,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      60,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      60,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      59,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      59,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      58,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      56,
+      1,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      57,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      59,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      60
+    ]
+  ],
+  "tflite_kb": 622.5,
+  "tflite_ops": [
+    "ADD",
+    "FULLY_CONNECTED",
+    "LOGISTIC",
+    "MUL",
+    "PACK",
+    "RESHAPE",
+    "SOFTMAX",
+    "SPLIT",
+    "TANH",
+    "UNPACK"
+  ],
+  "entrada": [
+    1,
+    30,
+    258
+  ],
+  "precision_persona_no_vista": {
+    "persona_1": 0.882,
+    "persona_2": 0.853,
+    "persona_3": 0.846,
+    "persona_4": 0.676
+  }
+}
