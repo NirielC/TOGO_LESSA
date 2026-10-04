@@ -1,0 +1,47 @@
+{
+  "estaticas": {
+    "precision": 0.9799,
+    "clases": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "_nada"
+    ],
+    "persona_no_vista": {
+      "persona_2": 0.4617,
+      "persona_3": 0.5696
+    },
+    "muestras": 1991
+  },
+  "movimiento": {
+    "precision": 0.9792,
+    "clases": [
+      "J",
+      "Z",
+      "Ñ",
+      "_nada"
+    ],
+    "muestras": 240
+  }
+}

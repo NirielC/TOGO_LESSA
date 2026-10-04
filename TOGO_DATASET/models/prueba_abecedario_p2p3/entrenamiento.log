@@ -1,0 +1,366 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1791107299.819192   38612 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1791107303.178666   38612 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+WARNING: Logging before InitGoogle() is written to STDERR
+W0000 00:00:1791107304.634651   18968 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1791107304.641164   23572 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1791107304.664388    4172 landmark_projection_calculator.cc:81] Using NORM_RECT without IMAGE_DIMENSIONS is only supported for the square ROI. Provide IMAGE_DIMENSIONS or use PROJECTION_MATRIX.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+Extrayendo manos de las fotos...
+  _nada: 81 fotos
+  A: 119 fotos
+  B: 80 fotos
+  C: 80 fotos
+  D: 80 fotos
+  E: 80 fotos
+  F: 80 fotos
+  G: 80 fotos
+  H: 80 fotos
+  I: 80 fotos
+  K: 80 fotos
+  L: 80 fotos
+  M: 80 fotos
+  N: 80 fotos
+  O: 80 fotos
+  P: 80 fotos
+  Q: 80 fotos
+  R: 80 fotos
+  S: 80 fotos
+  T: 80 fotos
+  U: 80 fotos
+  V: 80 fotos
+  W: 80 fotos
+  X: 80 fotos
+  Y: 80 fotos
+  Fotos sin mano detectada (descartadas): 49
+Clases (25): A B C D E F G H I K L M N O P Q R S T U V W X Y _nada
+Epoch 1/150
+100/100 - 1s - 7ms/step - accuracy: 0.2611 - loss: 2.5470 - val_accuracy: 0.5188 - val_loss: 1.6297
+Epoch 2/150
+100/100 - 0s - 1ms/step - accuracy: 0.5256 - loss: 1.4820 - val_accuracy: 0.7995 - val_loss: 0.9543
+Epoch 3/150
+100/100 - 0s - 1ms/step - accuracy: 0.6522 - loss: 1.0360 - val_accuracy: 0.8145 - val_loss: 0.6890
+Epoch 4/150
+100/100 - 0s - 1ms/step - accuracy: 0.7277 - loss: 0.8098 - val_accuracy: 0.8446 - val_loss: 0.5503
+Epoch 5/150
+100/100 - 0s - 1ms/step - accuracy: 0.7699 - loss: 0.6854 - val_accuracy: 0.8897 - val_loss: 0.4696
+Epoch 6/150
+100/100 - 0s - 1ms/step - accuracy: 0.8090 - loss: 0.5734 - val_accuracy: 0.9073 - val_loss: 0.4123
+Epoch 7/150
+100/100 - 0s - 1ms/step - accuracy: 0.8362 - loss: 0.5005 - val_accuracy: 0.9273 - val_loss: 0.3539
+Epoch 8/150
+100/100 - 0s - 2ms/step - accuracy: 0.8585 - loss: 0.4434 - val_accuracy: 0.9198 - val_loss: 0.3318
+Epoch 9/150
+100/100 - 0s - 2ms/step - accuracy: 0.8734 - loss: 0.3952 - val_accuracy: 0.9373 - val_loss: 0.2920
+Epoch 10/150
+100/100 - 0s - 1ms/step - accuracy: 0.8868 - loss: 0.3520 - val_accuracy: 0.9524 - val_loss: 0.2715
+Epoch 11/150
+100/100 - 0s - 1ms/step - accuracy: 0.9008 - loss: 0.3159 - val_accuracy: 0.9499 - val_loss: 0.2594
+Epoch 12/150
+100/100 - 0s - 1ms/step - accuracy: 0.9097 - loss: 0.2802 - val_accuracy: 0.9699 - val_loss: 0.2301
+Epoch 13/150
+100/100 - 0s - 1ms/step - accuracy: 0.9194 - loss: 0.2655 - val_accuracy: 0.9574 - val_loss: 0.2319
+Epoch 14/150
+100/100 - 0s - 1ms/step - accuracy: 0.9267 - loss: 0.2458 - val_accuracy: 0.9699 - val_loss: 0.2152
+Epoch 15/150
+100/100 - 0s - 2ms/step - accuracy: 0.9326 - loss: 0.2246 - val_accuracy: 0.9749 - val_loss: 0.2014
+Epoch 16/150
+100/100 - 0s - 1ms/step - accuracy: 0.9375 - loss: 0.2054 - val_accuracy: 0.9749 - val_loss: 0.2109
+Epoch 17/150
+100/100 - 0s - 1ms/step - accuracy: 0.9436 - loss: 0.1865 - val_accuracy: 0.9724 - val_loss: 0.2016
+Epoch 18/150
+100/100 - 0s - 1ms/step - accuracy: 0.9428 - loss: 0.1827 - val_accuracy: 0.9724 - val_loss: 0.1980
+Epoch 19/150
+100/100 - 0s - 1ms/step - accuracy: 0.9488 - loss: 0.1727 - val_accuracy: 0.9774 - val_loss: 0.1946
+Epoch 20/150
+100/100 - 0s - 1ms/step - accuracy: 0.9559 - loss: 0.1523 - val_accuracy: 0.9774 - val_loss: 0.1969
+Epoch 21/150
+100/100 - 0s - 1ms/step - accuracy: 0.9551 - loss: 0.1483 - val_accuracy: 0.9799 - val_loss: 0.1811
+Epoch 22/150
+100/100 - 0s - 1ms/step - accuracy: 0.9618 - loss: 0.1353 - val_accuracy: 0.9799 - val_loss: 0.1765
+Epoch 23/150
+100/100 - 0s - 1ms/step - accuracy: 0.9598 - loss: 0.1346 - val_accuracy: 0.9799 - val_loss: 0.1772
+Epoch 24/150
+100/100 - 0s - 1ms/step - accuracy: 0.9620 - loss: 0.1254 - val_accuracy: 0.9825 - val_loss: 0.1790
+Epoch 25/150
+100/100 - 0s - 1ms/step - accuracy: 0.9644 - loss: 0.1248 - val_accuracy: 0.9799 - val_loss: 0.1808
+Epoch 26/150
+100/100 - 0s - 1ms/step - accuracy: 0.9692 - loss: 0.1100 - val_accuracy: 0.9825 - val_loss: 0.1720
+Epoch 27/150
+100/100 - 0s - 1ms/step - accuracy: 0.9684 - loss: 0.1099 - val_accuracy: 0.9825 - val_loss: 0.1722
+Epoch 28/150
+100/100 - 0s - 1ms/step - accuracy: 0.9672 - loss: 0.1120 - val_accuracy: 0.9774 - val_loss: 0.1762
+Epoch 29/150
+100/100 - 0s - 1ms/step - accuracy: 0.9678 - loss: 0.1060 - val_accuracy: 0.9774 - val_loss: 0.1647
+Epoch 30/150
+100/100 - 0s - 1ms/step - accuracy: 0.9709 - loss: 0.0956 - val_accuracy: 0.9749 - val_loss: 0.1790
+Epoch 31/150
+100/100 - 0s - 1ms/step - accuracy: 0.9720 - loss: 0.0928 - val_accuracy: 0.9799 - val_loss: 0.1749
+Epoch 32/150
+100/100 - 0s - 1ms/step - accuracy: 0.9744 - loss: 0.0908 - val_accuracy: 0.9825 - val_loss: 0.1783
+Epoch 33/150
+100/100 - 0s - 1ms/step - accuracy: 0.9755 - loss: 0.0833 - val_accuracy: 0.9774 - val_loss: 0.1953
+Epoch 34/150
+100/100 - 0s - 1ms/step - accuracy: 0.9720 - loss: 0.0858 - val_accuracy: 0.9825 - val_loss: 0.1790
+Epoch 35/150
+100/100 - 0s - 1ms/step - accuracy: 0.9735 - loss: 0.0821 - val_accuracy: 0.9749 - val_loss: 0.2100
+Epoch 36/150
+100/100 - 0s - 1ms/step - accuracy: 0.9768 - loss: 0.0785 - val_accuracy: 0.9825 - val_loss: 0.1876
+Epoch 37/150
+100/100 - 0s - 1ms/step - accuracy: 0.9763 - loss: 0.0788 - val_accuracy: 0.9875 - val_loss: 0.1581
+Epoch 38/150
+100/100 - 0s - 1ms/step - accuracy: 0.9794 - loss: 0.0703 - val_accuracy: 0.9825 - val_loss: 0.1866
+Epoch 39/150
+100/100 - 0s - 2ms/step - accuracy: 0.9788 - loss: 0.0686 - val_accuracy: 0.9825 - val_loss: 0.1849
+Epoch 40/150
+100/100 - 0s - 1ms/step - accuracy: 0.9777 - loss: 0.0676 - val_accuracy: 0.9850 - val_loss: 0.1851
+Epoch 41/150
+100/100 - 0s - 1ms/step - accuracy: 0.9791 - loss: 0.0649 - val_accuracy: 0.9825 - val_loss: 0.1841
+Epoch 42/150
+100/100 - 0s - 1ms/step - accuracy: 0.9786 - loss: 0.0693 - val_accuracy: 0.9825 - val_loss: 0.1903
+Epoch 43/150
+100/100 - 0s - 1ms/step - accuracy: 0.9808 - loss: 0.0625 - val_accuracy: 0.9799 - val_loss: 0.1918
+Epoch 44/150
+100/100 - 0s - 1ms/step - accuracy: 0.9808 - loss: 0.0626 - val_accuracy: 0.9825 - val_loss: 0.2372
+Epoch 45/150
+100/100 - 0s - 2ms/step - accuracy: 0.9845 - loss: 0.0561 - val_accuracy: 0.9900 - val_loss: 0.1842
+Epoch 46/150
+100/100 - 0s - 2ms/step - accuracy: 0.9801 - loss: 0.0634 - val_accuracy: 0.9875 - val_loss: 0.1865
+Epoch 47/150
+100/100 - 0s - 1ms/step - accuracy: 0.9851 - loss: 0.0514 - val_accuracy: 0.9875 - val_loss: 0.1900
+Epoch 48/150
+100/100 - 0s - 1ms/step - accuracy: 0.9830 - loss: 0.0561 - val_accuracy: 0.9875 - val_loss: 0.1990
+Epoch 49/150
+100/100 - 0s - 1ms/step - accuracy: 0.9865 - loss: 0.0470 - val_accuracy: 0.9850 - val_loss: 0.1999
+Epoch 50/150
+100/100 - 0s - 1ms/step - accuracy: 0.9852 - loss: 0.0457 - val_accuracy: 0.9875 - val_loss: 0.2043
+Epoch 51/150
+100/100 - 0s - 1ms/step - accuracy: 0.9841 - loss: 0.0481 - val_accuracy: 0.9875 - val_loss: 0.2045
+Epoch 52/150
+100/100 - 0s - 1ms/step - accuracy: 0.9884 - loss: 0.0417 - val_accuracy: 0.9799 - val_loss: 0.2065
+  Persona 2 fuera: 0.4889
+  Persona 3 fuera: 0.5425
+Saved artifact at 'C:\Users\elsni\AppData\Local\Temp\tmp195no915\saved'. The following endpoints are available:
+
+* Endpoint 'serve'
+  x (POSITIONAL_OR_KEYWORD): TensorSpec(shape=(1, 63), dtype=tf.float32, name='entrada')
+Output Type:
+  TensorSpec(shape=(1, 25), dtype=tf.float32, name=None)
+Captures:
+  1409169655376: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169659984: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169667088: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169658448: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169667472: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169667280: TensorSpec(shape=(), dtype=tf.resource, name=None)
+C:\Users\elsni\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\lite\python\interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+W0000 00:00:1791107348.411662   36388 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1791107348.420049   36388 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1791107348.432657   28192 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1791107348.438364   43536 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+Estáticas: precisión 0.9875 · 73 KB · ops FULLY_CONNECTED, SOFTMAX
+Extrayendo 60 clips de letras con movimiento...
+Epoch 1/150
+4/4 - 1s - 148ms/step - accuracy: 0.6016 - loss: 1.0856 - val_accuracy: 0.6250 - val_loss: 0.9465
+Epoch 2/150
+4/4 - 0s - 11ms/step - accuracy: 0.6250 - loss: 0.9029 - val_accuracy: 0.6250 - val_loss: 0.8446
+Epoch 3/150
+4/4 - 0s - 11ms/step - accuracy: 0.6562 - loss: 0.7924 - val_accuracy: 0.7500 - val_loss: 0.7635
+Epoch 4/150
+4/4 - 0s - 11ms/step - accuracy: 0.7109 - loss: 0.6923 - val_accuracy: 0.7500 - val_loss: 0.6932
+Epoch 5/150
+4/4 - 0s - 11ms/step - accuracy: 0.7188 - loss: 0.6193 - val_accuracy: 0.7500 - val_loss: 0.6068
+Epoch 6/150
+4/4 - 0s - 11ms/step - accuracy: 0.7812 - loss: 0.5252 - val_accuracy: 0.8750 - val_loss: 0.5097
+Epoch 7/150
+4/4 - 0s - 11ms/step - accuracy: 0.8281 - loss: 0.4622 - val_accuracy: 0.9062 - val_loss: 0.4263
+Epoch 8/150
+4/4 - 0s - 12ms/step - accuracy: 0.8828 - loss: 0.3734 - val_accuracy: 0.9062 - val_loss: 0.3781
+Epoch 9/150
+4/4 - 0s - 12ms/step - accuracy: 0.9609 - loss: 0.2813 - val_accuracy: 0.9062 - val_loss: 0.3196
+Epoch 10/150
+4/4 - 0s - 12ms/step - accuracy: 0.9609 - loss: 0.2603 - val_accuracy: 0.8750 - val_loss: 0.3074
+Epoch 11/150
+4/4 - 0s - 12ms/step - accuracy: 0.9688 - loss: 0.2411 - val_accuracy: 0.9375 - val_loss: 0.1861
+Epoch 12/150
+4/4 - 0s - 16ms/step - accuracy: 0.9844 - loss: 0.1506 - val_accuracy: 0.9375 - val_loss: 0.1881
+Epoch 13/150
+4/4 - 0s - 12ms/step - accuracy: 0.9766 - loss: 0.1636 - val_accuracy: 0.8750 - val_loss: 0.2116
+Epoch 14/150
+4/4 - 0s - 13ms/step - accuracy: 0.9766 - loss: 0.1215 - val_accuracy: 0.9375 - val_loss: 0.1316
+Epoch 15/150
+4/4 - 0s - 16ms/step - accuracy: 0.9844 - loss: 0.1194 - val_accuracy: 0.9062 - val_loss: 0.1857
+Epoch 16/150
+4/4 - 0s - 21ms/step - accuracy: 0.9766 - loss: 0.1253 - val_accuracy: 0.9688 - val_loss: 0.1445
+Epoch 17/150
+4/4 - 0s - 11ms/step - accuracy: 0.9766 - loss: 0.0871 - val_accuracy: 0.9688 - val_loss: 0.0745
+Epoch 18/150
+4/4 - 0s - 13ms/step - accuracy: 0.9844 - loss: 0.0743 - val_accuracy: 0.9688 - val_loss: 0.0673
+Epoch 19/150
+4/4 - 0s - 12ms/step - accuracy: 0.9922 - loss: 0.0575 - val_accuracy: 0.9688 - val_loss: 0.0495
+Epoch 20/150
+4/4 - 0s - 12ms/step - accuracy: 0.9844 - loss: 0.0625 - val_accuracy: 0.9688 - val_loss: 0.0440
+Epoch 21/150
+4/4 - 0s - 12ms/step - accuracy: 0.9844 - loss: 0.0621 - val_accuracy: 0.9688 - val_loss: 0.0425
+Epoch 22/150
+4/4 - 0s - 12ms/step - accuracy: 0.9844 - loss: 0.0693 - val_accuracy: 0.9688 - val_loss: 0.1016
+Epoch 23/150
+4/4 - 0s - 12ms/step - accuracy: 0.9766 - loss: 0.0614 - val_accuracy: 1.0000 - val_loss: 0.0461
+Epoch 24/150
+4/4 - 0s - 11ms/step - accuracy: 1.0000 - loss: 0.0311 - val_accuracy: 1.0000 - val_loss: 0.0360
+Epoch 25/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0340 - val_accuracy: 1.0000 - val_loss: 0.0316
+Epoch 26/150
+4/4 - 0s - 14ms/step - accuracy: 1.0000 - loss: 0.0326 - val_accuracy: 1.0000 - val_loss: 0.0305
+Epoch 27/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0246 - val_accuracy: 1.0000 - val_loss: 0.0314
+Epoch 28/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0164 - val_accuracy: 1.0000 - val_loss: 0.0341
+Epoch 29/150
+4/4 - 0s - 9ms/step - accuracy: 1.0000 - loss: 0.0149 - val_accuracy: 1.0000 - val_loss: 0.0454
+Epoch 30/150
+4/4 - 0s - 14ms/step - accuracy: 1.0000 - loss: 0.0150 - val_accuracy: 1.0000 - val_loss: 0.0293
+Epoch 31/150
+4/4 - 0s - 10ms/step - accuracy: 0.9922 - loss: 0.0362 - val_accuracy: 1.0000 - val_loss: 0.0233
+Epoch 32/150
+4/4 - 0s - 15ms/step - accuracy: 1.0000 - loss: 0.0211 - val_accuracy: 1.0000 - val_loss: 0.0400
+Epoch 33/150
+4/4 - 0s - 12ms/step - accuracy: 0.9922 - loss: 0.0421 - val_accuracy: 1.0000 - val_loss: 0.0240
+Epoch 34/150
+4/4 - 0s - 13ms/step - accuracy: 0.9922 - loss: 0.0255 - val_accuracy: 1.0000 - val_loss: 0.0263
+Epoch 35/150
+4/4 - 0s - 11ms/step - accuracy: 0.9922 - loss: 0.0266 - val_accuracy: 0.9688 - val_loss: 0.0578
+Epoch 36/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0146 - val_accuracy: 0.9688 - val_loss: 0.0767
+Epoch 37/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0113 - val_accuracy: 0.9688 - val_loss: 0.0663
+Epoch 38/150
+4/4 - 0s - 10ms/step - accuracy: 1.0000 - loss: 0.0112 - val_accuracy: 0.9688 - val_loss: 0.0495
+Epoch 39/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0113 - val_accuracy: 1.0000 - val_loss: 0.0359
+Epoch 40/150
+4/4 - 0s - 15ms/step - accuracy: 1.0000 - loss: 0.0101 - val_accuracy: 1.0000 - val_loss: 0.0270
+Epoch 41/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0091 - val_accuracy: 1.0000 - val_loss: 0.0277
+Epoch 42/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0100 - val_accuracy: 1.0000 - val_loss: 0.0328
+Epoch 43/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0070 - val_accuracy: 0.9688 - val_loss: 0.0710
+Epoch 44/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0094 - val_accuracy: 0.9688 - val_loss: 0.0521
+Epoch 45/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0078 - val_accuracy: 0.9688 - val_loss: 0.0443
+Epoch 46/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0103 - val_accuracy: 1.0000 - val_loss: 0.0120
+Epoch 47/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0080 - val_accuracy: 1.0000 - val_loss: 0.0121
+Epoch 48/150
+4/4 - 0s - 14ms/step - accuracy: 1.0000 - loss: 0.0191 - val_accuracy: 1.0000 - val_loss: 0.0260
+Epoch 49/150
+4/4 - 0s - 11ms/step - accuracy: 1.0000 - loss: 0.0170 - val_accuracy: 0.9688 - val_loss: 0.0829
+Epoch 50/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0165 - val_accuracy: 0.9688 - val_loss: 0.0337
+Epoch 51/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0112 - val_accuracy: 1.0000 - val_loss: 0.0087
+Epoch 52/150
+4/4 - 0s - 10ms/step - accuracy: 1.0000 - loss: 0.0137 - val_accuracy: 0.9062 - val_loss: 0.3823
+Epoch 53/150
+4/4 - 0s - 12ms/step - accuracy: 0.9844 - loss: 0.0883 - val_accuracy: 1.0000 - val_loss: 0.0142
+Epoch 54/150
+4/4 - 0s - 11ms/step - accuracy: 0.9922 - loss: 0.0221 - val_accuracy: 1.0000 - val_loss: 0.0212
+Epoch 55/150
+4/4 - 0s - 14ms/step - accuracy: 0.9922 - loss: 0.0292 - val_accuracy: 1.0000 - val_loss: 0.0089
+Epoch 56/150
+4/4 - 0s - 10ms/step - accuracy: 0.9922 - loss: 0.0220 - val_accuracy: 1.0000 - val_loss: 0.0199
+Epoch 57/150
+4/4 - 0s - 15ms/step - accuracy: 1.0000 - loss: 0.0157 - val_accuracy: 1.0000 - val_loss: 0.0077
+Epoch 58/150
+4/4 - 0s - 9ms/step - accuracy: 1.0000 - loss: 0.0085 - val_accuracy: 1.0000 - val_loss: 0.0054
+Epoch 59/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0091 - val_accuracy: 1.0000 - val_loss: 0.0067
+Epoch 60/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0079 - val_accuracy: 1.0000 - val_loss: 0.0084
+Epoch 61/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0080 - val_accuracy: 1.0000 - val_loss: 0.0079
+Epoch 62/150
+4/4 - 0s - 14ms/step - accuracy: 1.0000 - loss: 0.0047 - val_accuracy: 1.0000 - val_loss: 0.0053
+Epoch 63/150
+4/4 - 0s - 11ms/step - accuracy: 1.0000 - loss: 0.0043 - val_accuracy: 1.0000 - val_loss: 0.0034
+Epoch 64/150
+4/4 - 0s - 9ms/step - accuracy: 1.0000 - loss: 0.0051 - val_accuracy: 1.0000 - val_loss: 0.0027
+Epoch 65/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0028 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 66/150
+4/4 - 0s - 16ms/step - accuracy: 1.0000 - loss: 0.0045 - val_accuracy: 1.0000 - val_loss: 0.0025
+Epoch 67/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0035 - val_accuracy: 1.0000 - val_loss: 0.0024
+Epoch 68/150
+4/4 - 0s - 12ms/step - accuracy: 0.9922 - loss: 0.0106 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 69/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0041 - val_accuracy: 1.0000 - val_loss: 0.0025
+Epoch 70/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0023 - val_accuracy: 1.0000 - val_loss: 0.0032
+Epoch 71/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0035 - val_accuracy: 1.0000 - val_loss: 0.0047
+Epoch 72/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0022 - val_accuracy: 1.0000 - val_loss: 0.0040
+Epoch 73/150
+4/4 - 0s - 15ms/step - accuracy: 1.0000 - loss: 0.0026 - val_accuracy: 1.0000 - val_loss: 0.0019
+Epoch 74/150
+4/4 - 0s - 10ms/step - accuracy: 1.0000 - loss: 0.0026 - val_accuracy: 1.0000 - val_loss: 0.0019
+Epoch 75/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0030 - val_accuracy: 1.0000 - val_loss: 0.0022
+Epoch 76/150
+4/4 - 0s - 10ms/step - accuracy: 1.0000 - loss: 0.0016 - val_accuracy: 1.0000 - val_loss: 0.0023
+Epoch 77/150
+4/4 - 0s - 11ms/step - accuracy: 1.0000 - loss: 0.0033 - val_accuracy: 1.0000 - val_loss: 0.0024
+Epoch 78/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0019 - val_accuracy: 1.0000 - val_loss: 0.0024
+Epoch 79/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0016 - val_accuracy: 1.0000 - val_loss: 0.0025
+Epoch 80/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0020 - val_accuracy: 1.0000 - val_loss: 0.0025
+Epoch 81/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0013 - val_accuracy: 1.0000 - val_loss: 0.0025
+Epoch 82/150
+4/4 - 0s - 11ms/step - accuracy: 1.0000 - loss: 0.0015 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 83/150
+4/4 - 0s - 14ms/step - accuracy: 1.0000 - loss: 0.0016 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 84/150
+4/4 - 0s - 13ms/step - accuracy: 1.0000 - loss: 0.0020 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 85/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0024 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 86/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0028 - val_accuracy: 1.0000 - val_loss: 0.0026
+Epoch 87/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0025 - val_accuracy: 1.0000 - val_loss: 0.0025
+Epoch 88/150
+4/4 - 0s - 12ms/step - accuracy: 1.0000 - loss: 0.0013 - val_accuracy: 1.0000 - val_loss: 0.0024
+Saved artifact at 'C:\Users\elsni\AppData\Local\Temp\tmpiua95rd4\saved'. The following endpoints are available:
+
+* Endpoint 'serve'
+  x (POSITIONAL_OR_KEYWORD): TensorSpec(shape=(1, 40, 384), dtype=tf.float32, name='entrada')
+Output Type:
+  TensorSpec(shape=(1, 4), dtype=tf.float32, name=None)
+Captures:
+  1409169668816: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169668240: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169663824: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169655760: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169666896: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169657680: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  1409169667856: TensorSpec(shape=(), dtype=tf.resource, name=None)
+C:\Users\elsni\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\lite\python\interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+Movimiento: precisión 1.0000 · 434 KB

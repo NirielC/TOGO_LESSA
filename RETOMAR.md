@@ -58,9 +58,12 @@ La APK queda en `TOGO_MOVIL/dist/`.
   `TOGO_MOVIL/src/core/signs/vocabulary.ts` y correr `actualizar_modelo.py --apk`.
 - **Windows, rutas largas:** `build-apk.ps1` ya compila desde una unidad corta (`L:`) y la quita al terminar.
 - **Docker Desktop no arranca** ("The file cannot be accessed by the system"): ver el final de `TOGO_MOVIL/DOCKER.md`.
-- **Precisión real:** 97.8% en prueba, pero 68–88% con personas que el modelo no vio. Lo que más mejora:
-  grabar a más personas y la clase `nada`.
-- **Pendiente:** fotos del equipo.
+- **Precisión real (Alfa 0.5):** 98 % en prueba y 85.7 % con personas que el modelo no vio
+  (antes 68–88 %). Detalle de cada versión en `TOGO_DATASET/models/README.md`.
+- **APK:** `TOGO_MOVIL/dist/Togo-Alfa-0.5.apk` (modelo final) y `Togo-Alfa-0.5-modelo-anterior.apk`
+  (misma app, modelo de Alfa 0.4) para comparar.
+- **Pendiente:** videos de la persona 4; terminar los de la persona 1 (`por_la_tarde`, `ok_adios`, `nada`);
+  J, Ñ, Z del abecedario de más personas; fotos del equipo.
 
 ## 6. Juntar los datos de otra persona y sacar el modelo
 

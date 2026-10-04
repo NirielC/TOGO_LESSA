@@ -1,5 +1,5 @@
 {
-  "seq_len": 30,
+  "seq_len": 40,
   "frame_dim": 384,
   "features": "v3",
   "canonical": true,

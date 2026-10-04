@@ -1,0 +1,143 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1791106867.444706   15020 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1791106869.826768   15020 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+Dataset v3 (40 cuadros) · características v3
+  hola: 204
+  como_estas: 200
+  estoy_bien: 201
+  estoy_mas_o_menos: 201
+  estoy_mal: 200
+  mi_nombre_es: 200
+  si: 200
+  a_que_hora_es: 204
+  por_la_tarde: 203
+  ok_adios: 214
+  nada: 226
+Total: (2253, 40, 384)  clases: 11  personas: [2, 3]
+Entrenamiento (aumentado): (7885, 40, 384)  val: 338  prueba: 338
+Epoch 1/150
+124/124 - 4s - 29ms/step - accuracy: 0.7716 - loss: 1.1143 - val_accuracy: 0.9704 - val_loss: 0.6259 - learning_rate: 0.0010
+Epoch 2/150
+124/124 - 2s - 15ms/step - accuracy: 0.9787 - loss: 0.6628 - val_accuracy: 0.9941 - val_loss: 0.5529 - learning_rate: 0.0010
+Epoch 3/150
+124/124 - 2s - 16ms/step - accuracy: 0.9867 - loss: 0.6266 - val_accuracy: 0.9970 - val_loss: 0.5438 - learning_rate: 0.0010
+Epoch 4/150
+124/124 - 2s - 15ms/step - accuracy: 0.9907 - loss: 0.6102 - val_accuracy: 1.0000 - val_loss: 0.5283 - learning_rate: 0.0010
+Epoch 5/150
+124/124 - 2s - 14ms/step - accuracy: 0.9878 - loss: 0.6119 - val_accuracy: 0.9882 - val_loss: 0.5552 - learning_rate: 0.0010
+Epoch 6/150
+124/124 - 2s - 15ms/step - accuracy: 0.9932 - loss: 0.5938 - val_accuracy: 0.9941 - val_loss: 0.5373 - learning_rate: 0.0010
+Epoch 7/150
+124/124 - 2s - 16ms/step - accuracy: 0.9959 - loss: 0.5836 - val_accuracy: 1.0000 - val_loss: 0.5246 - learning_rate: 0.0010
+Epoch 8/150
+124/124 - 2s - 15ms/step - accuracy: 0.9684 - loss: 0.6334 - val_accuracy: 0.9911 - val_loss: 0.6022 - learning_rate: 0.0010
+Epoch 9/150
+124/124 - 2s - 15ms/step - accuracy: 0.9907 - loss: 0.5981 - val_accuracy: 0.9911 - val_loss: 0.5350 - learning_rate: 0.0010
+Epoch 10/150
+124/124 - 2s - 15ms/step - accuracy: 0.9975 - loss: 0.5743 - val_accuracy: 1.0000 - val_loss: 0.5222 - learning_rate: 0.0010
+Epoch 11/150
+124/124 - 2s - 15ms/step - accuracy: 0.9966 - loss: 0.5749 - val_accuracy: 0.9970 - val_loss: 0.5242 - learning_rate: 0.0010
+Epoch 12/150
+124/124 - 2s - 15ms/step - accuracy: 0.9996 - loss: 0.5656 - val_accuracy: 0.9970 - val_loss: 0.5247 - learning_rate: 0.0010
+Epoch 13/150
+124/124 - 2s - 16ms/step - accuracy: 0.9996 - loss: 0.5630 - val_accuracy: 0.9970 - val_loss: 0.5272 - learning_rate: 0.0010
+Epoch 14/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5614 - val_accuracy: 1.0000 - val_loss: 0.5213 - learning_rate: 0.0010
+Epoch 15/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5599 - val_accuracy: 1.0000 - val_loss: 0.5200 - learning_rate: 0.0010
+Epoch 16/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5600 - val_accuracy: 0.9970 - val_loss: 0.5233 - learning_rate: 0.0010
+Epoch 17/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5580 - val_accuracy: 0.9970 - val_loss: 0.5234 - learning_rate: 0.0010
+Epoch 18/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5584 - val_accuracy: 0.9970 - val_loss: 0.5283 - learning_rate: 0.0010
+Epoch 19/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5572 - val_accuracy: 0.9970 - val_loss: 0.5238 - learning_rate: 0.0010
+Epoch 20/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5564 - val_accuracy: 1.0000 - val_loss: 0.5225 - learning_rate: 0.0010
+Epoch 21/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5558 - val_accuracy: 1.0000 - val_loss: 0.5192 - learning_rate: 0.0010
+Epoch 22/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5554 - val_accuracy: 1.0000 - val_loss: 0.5181 - learning_rate: 0.0010
+Epoch 23/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5547 - val_accuracy: 1.0000 - val_loss: 0.5188 - learning_rate: 0.0010
+Epoch 24/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5550 - val_accuracy: 1.0000 - val_loss: 0.5205 - learning_rate: 0.0010
+Epoch 25/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5538 - val_accuracy: 1.0000 - val_loss: 0.5174 - learning_rate: 0.0010
+Epoch 26/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5543 - val_accuracy: 1.0000 - val_loss: 0.5190 - learning_rate: 0.0010
+Epoch 27/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5545 - val_accuracy: 0.9970 - val_loss: 0.5214 - learning_rate: 0.0010
+Epoch 28/150
+124/124 - 2s - 15ms/step - accuracy: 0.9770 - loss: 0.6174 - val_accuracy: 0.9911 - val_loss: 0.5456 - learning_rate: 0.0010
+Epoch 29/150
+124/124 - 2s - 14ms/step - accuracy: 0.9907 - loss: 0.5785 - val_accuracy: 0.9083 - val_loss: 0.8269 - learning_rate: 0.0010
+Epoch 30/150
+124/124 - 2s - 14ms/step - accuracy: 0.9947 - loss: 0.5715 - val_accuracy: 0.9970 - val_loss: 0.5291 - learning_rate: 0.0010
+Epoch 31/150
+124/124 - 2s - 14ms/step - accuracy: 0.9992 - loss: 0.5556 - val_accuracy: 1.0000 - val_loss: 0.5187 - learning_rate: 0.0010
+Epoch 32/150
+124/124 - 2s - 14ms/step - accuracy: 0.9994 - loss: 0.5552 - val_accuracy: 0.9911 - val_loss: 0.5376 - learning_rate: 0.0010
+Epoch 33/150
+124/124 - 2s - 14ms/step - accuracy: 0.9995 - loss: 0.5536 - val_accuracy: 0.9941 - val_loss: 0.5263 - learning_rate: 5.0000e-04
+Epoch 34/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5532 - val_accuracy: 0.9941 - val_loss: 0.5315 - learning_rate: 5.0000e-04
+Epoch 35/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5523 - val_accuracy: 0.9941 - val_loss: 0.5290 - learning_rate: 5.0000e-04
+Epoch 36/150
+124/124 - 2s - 15ms/step - accuracy: 0.9999 - loss: 0.5517 - val_accuracy: 0.9941 - val_loss: 0.5280 - learning_rate: 5.0000e-04
+Epoch 37/150
+124/124 - 3s - 21ms/step - accuracy: 0.9999 - loss: 0.5524 - val_accuracy: 0.9941 - val_loss: 0.5278 - learning_rate: 5.0000e-04
+Epoch 38/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5522 - val_accuracy: 0.9941 - val_loss: 0.5262 - learning_rate: 5.0000e-04
+Epoch 39/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5518 - val_accuracy: 0.9941 - val_loss: 0.5284 - learning_rate: 5.0000e-04
+Epoch 40/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5518 - val_accuracy: 0.9941 - val_loss: 0.5287 - learning_rate: 2.5000e-04
+Epoch 41/150
+124/124 - 2s - 14ms/step - accuracy: 0.9997 - loss: 0.5518 - val_accuracy: 0.9941 - val_loss: 0.5280 - learning_rate: 2.5000e-04
+Epoch 42/150
+124/124 - 2s - 14ms/step - accuracy: 1.0000 - loss: 0.5517 - val_accuracy: 0.9970 - val_loss: 0.5258 - learning_rate: 2.5000e-04
+Epoch 43/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5512 - val_accuracy: 0.9970 - val_loss: 0.5245 - learning_rate: 2.5000e-04
+Epoch 44/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5512 - val_accuracy: 0.9970 - val_loss: 0.5248 - learning_rate: 2.5000e-04
+Epoch 45/150
+124/124 - 2s - 15ms/step - accuracy: 1.0000 - loss: 0.5514 - val_accuracy: 0.9970 - val_loss: 0.5238 - learning_rate: 2.5000e-04
+Saved artifact at 'C:\Users\elsni\AppData\Local\Temp\tmpakg3mgjl\saved'. The following endpoints are available:
+
+* Endpoint 'serve'
+  x (POSITIONAL_OR_KEYWORD): TensorSpec(shape=(1, 40, 384), dtype=tf.float32, name='entrada')
+Output Type:
+  TensorSpec(shape=(1, 11), dtype=tf.float32, name=None)
+Captures:
+  2304331985360: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331979216: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304652234000: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331983248: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331984976: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331981520: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331986128: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331985936: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331984016: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331984208: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331984784: TensorSpec(shape=(), dtype=tf.resource, name=None)
+  2304331983440: TensorSpec(shape=(), dtype=tf.resource, name=None)
+C:\Users\elsni\AppData\Local\Programs\Python\Python312\Lib\site-packages\tensorflow\lite\python\interpreter.py:457: UserWarning:     Warning: tf.lite.Interpreter is deprecated and is scheduled for deletion in
+    TF 2.20. Please use the LiteRT interpreter from the ai_edge_litert package.
+    See the [migration guide](https://ai.google.dev/edge/litert/migration)
+    for details.
+    
+  warnings.warn(_INTERPRETER_DELETION_WARNING)
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+  Persona 2 no vista: 0.8317
+  Persona 3 no vista: 0.7627
+
+====================================================
+Precisión prueba: 0.9970   TFLite: 0.9970
+Más confundidas (real -> predicha):
+  por_la_tarde -> nada: 1
+Persona no vista (promedio): 0.7972
