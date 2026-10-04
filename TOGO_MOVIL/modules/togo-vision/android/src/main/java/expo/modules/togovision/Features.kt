@@ -153,4 +153,73 @@ object Features {
     val dy = (raw[L_SHOULDER * 4 + 1] - raw[R_SHOULDER * 4 + 1]) * height
     return max(0f, hypot(dx, dy) / width)
   }
+
+  // ------------------------------------------------------------ modelo v3
+  // Igual que build_features_v3() de togo_features.py:
+  //   [0:258] normalización v2 con piernas (25-32) en cero
+  //   [258:384] forma de cada mano (relativa a la muñeca, escala = palma)
+  //   + espejo de la ventana si la mano "Left" aparece más (mano dominante).
+
+  const val V3_DIM = FRAME_DIM + 2 * HAND_DIM  // 384
+  private val LEG_POINTS = 25..32
+  private val POSE_PAIRS = arrayOf(
+    1 to 4, 2 to 5, 3 to 6, 7 to 8, 9 to 10, 11 to 12, 13 to 14, 15 to 16,
+    17 to 18, 19 to 20, 21 to 22, 23 to 24, 25 to 26, 27 to 28, 29 to 30, 31 to 32,
+  )
+  private val POSE_MIRROR = IntArray(POSE_N) { it }.also { m -> for ((a, b) in POSE_PAIRS) { m[a] = b; m[b] = a } }
+
+  /** Cuadro v3: base normalizada sin piernas + forma de las dos manos. */
+  fun v3Frame(raw: FloatArray, width: Int, height: Int): FloatArray {
+    val out = FloatArray(V3_DIM)
+    val base = normalize(raw, width, height)
+    System.arraycopy(base, 0, out, 0, FRAME_DIM)
+    for (i in LEG_POINTS) for (k in 0..3) out[i * 4 + k] = 0f
+    val w = width.toFloat()
+    val h = height.toFloat()
+    for (s in 0..1) {
+      val b = POSE_DIM + s * HAND_DIM
+      if (!slotPresent(raw, s)) continue
+      val wx = raw[b] * w; val wy = raw[b + 1] * h; val wz = raw[b + 2] * w
+      val palma = hypot(raw[b + 27] * w - wx, raw[b + 28] * h - wy)
+      if (palma < 1f) continue
+      val o = FRAME_DIM + s * HAND_DIM
+      for (i in 0 until HAND_N) {
+        out[o + i * 3] = (raw[b + i * 3] * w - wx) / palma
+        out[o + i * 3 + 1] = (raw[b + i * 3 + 1] * h - wy) / palma
+        out[o + i * 3 + 2] = (raw[b + i * 3 + 2] * w - wz) / palma
+      }
+    }
+    return out
+  }
+
+  /** Espejo de un cuadro (258 o 384): invierte x, intercambia lados de la pose y las manos. */
+  fun mirrorFrame(f: FloatArray): FloatArray {
+    val out = FloatArray(f.size)
+    for (i in 0 until POSE_N) {
+      val src = POSE_MIRROR[i] * 4
+      out[i * 4] = -f[src]
+      out[i * 4 + 1] = f[src + 1]
+      out[i * 4 + 2] = f[src + 2]
+      out[i * 4 + 3] = f[src + 3]
+    }
+    val bloques = if (f.size > FRAME_DIM) intArrayOf(POSE_DIM, FRAME_DIM) else intArrayOf(POSE_DIM)
+    for (start in bloques) {
+      for (s in 0..1) {
+        val dst = start + s * HAND_DIM
+        val src = start + (1 - s) * HAND_DIM
+        for (i in 0 until HAND_N) {
+          out[dst + i * 3] = -f[src + i * 3]
+          out[dst + i * 3 + 1] = f[src + i * 3 + 1]
+          out[dst + i * 3 + 2] = f[src + i * 3 + 2]
+        }
+      }
+    }
+    return out
+  }
+
+  fun slotPresent(raw: FloatArray, slot: Int): Boolean {
+    val b = POSE_DIM + slot * HAND_DIM
+    for (k in b until b + HAND_DIM) if (raw[k] != 0f) return true
+    return false
+  }
 }

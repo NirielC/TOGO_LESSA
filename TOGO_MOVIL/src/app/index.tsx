@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { SignsScene, VoiceScene } from '@/components/Illustrations';
 import { Logo } from '@/components/Logo';
-import { MASCOT_NAME, Torogoz } from '@/components/Torogoz';
+import { MASCOT_NAME, RARE_CHANCE, SECRET_HINT, Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { useSettings } from '@/core/settings';
 import { APP_VERSION, APP_YEAR } from '@/data/equipo';
@@ -21,9 +21,13 @@ export default function Inicio() {
   const [name, setName] = useState(settings.name);
   const [editing, setEditing] = useState(!settings.name);
   const [tip, setTip] = useState(0);
+  const [rare, setRare] = useState(false);
 
   useEffect(() => {
-    const t = setInterval(() => setTip((x) => (x + 1) % HOME_TIPS.length), 5000);
+    const t = setInterval(() => {
+      setTip((x) => (x + 1) % HOME_TIPS.length);
+      setRare(Math.random() < RARE_CHANCE); // la pista del secreto de Togo, muy de vez en cuando
+    }, 5000);
     return () => clearInterval(t);
   }, []);
 
@@ -46,7 +50,8 @@ export default function Inicio() {
 
         <View style={st.hero}>
           <Torogoz state="attentive" size={124} interactive say={hello} />
-          <Text style={st.tip}>{HOME_TIPS[tip]}</Text>
+          <OfflineBadge />
+          <Text style={[st.tip, rare && { color: '#8A5A12' }]}>{rare ? SECRET_HINT : HOME_TIPS[tip]}</Text>
           <Text style={st.question}>¿Cómo vamos a conversar?</Text>
           {editing ? (
             <TextInput
@@ -93,16 +98,39 @@ export default function Inicio() {
         </View>
 
         <View style={st.footer}>
-          <View style={st.offline}>
-            <Icon name="wifi-off" size={16} color={colors.textMuted} />
-            <Text style={type.small}>Funciona sin internet</Text>
-          </View>
           <Text style={st.legal}>
             Togo™ · © {APP_YEAR} · {APP_VERSION}
           </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/** "¡No necesitas internet!": lo que hace distinta a Togo, bien a la vista. */
+function OfflineBadge() {
+  const wobble = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.delay(2600),
+        Animated.timing(wobble, { toValue: 1, duration: 140, easing: Easing.linear, useNativeDriver: true }),
+        Animated.timing(wobble, { toValue: -1, duration: 160, easing: Easing.linear, useNativeDriver: true }),
+        Animated.timing(wobble, { toValue: 0.6, duration: 140, easing: Easing.linear, useNativeDriver: true }),
+        Animated.timing(wobble, { toValue: 0, duration: 140, easing: Easing.linear, useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [wobble]);
+  const rotate = wobble.interpolate({ inputRange: [-1, 1], outputRange: ['-4deg', '4deg'] });
+  return (
+    <Animated.View style={[st.offline, { transform: [{ rotate }] }]}>
+      <View style={st.offlineIcon}>
+        <Icon name="wifi-off" size={16} color={colors.onInk} />
+      </View>
+      <Text style={st.offlineText}>¡No necesitas internet!</Text>
+    </Animated.View>
   );
 }
 
@@ -181,6 +209,8 @@ const st = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.md },
   rowIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   footer: { alignItems: 'center', gap: space.md, marginTop: space.sm },
-  offline: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: space.lg },
+  offline: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: palette.sun, borderRadius: radius.pill, paddingLeft: 5, paddingRight: space.lg, paddingVertical: 5, marginTop: 2, borderWidth: 2, borderColor: colors.ink },
+  offlineIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
+  offlineText: { fontFamily: fonts.title, fontSize: 17, color: colors.ink },
   legal: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.textMuted },
 });

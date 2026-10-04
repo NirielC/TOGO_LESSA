@@ -3,39 +3,66 @@ import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
 import { palette } from '../theme/tokens';
 
 /**
- * Escena del modo Dar voz. (La de Leer señas usa SignAvatar con datos reales.) Formas planas y redondas, la paleta completa y pocas
- * piezas: que se entienda de un vistazo qué hace el modo.
+ * Escenas de los dos modos. Formas planas y redondas, la paleta completa y
+ * pocas piezas: que se entienda de un vistazo qué hace cada modo.
  */
 
-/** LEER SEÑAS: alguien saluda, la app ve sus manos y el teléfono lo entiende. */
+/**
+ * LEER SEÑAS: el teléfono ve una mano como la ve la app, con sus puntos
+ * (muñeca, nudillos, puntas) y lo convierte en un mensaje que suena.
+ */
+const HAND: [number, number][] = [
+  [0, 30],
+  [-10, 22], [-18, 14], [-23, 7], [-27, 1],
+  [-7, 5], [-9, -6], [-10, -14], [-11, -21],
+  [0, 3], [0, -9], [0, -18], [0, -26],
+  [7, 5], [9, -5], [10, -13], [11, -20],
+  [13, 10], [17, 3], [19, -3], [21, -9],
+];
+const BONES = [
+  [0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12],
+  [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [0, 17], [17, 18], [18, 19], [19, 20],
+];
+const TIPS = new Set([4, 8, 12, 16, 20]);
+
 export function SignsScene({ width = 160, height = 120 }: { width?: number; height?: number }) {
+  const pt = (i: number) => ({ x: 58 + HAND[i][0] * 0.95, y: 64 + HAND[i][1] * 0.95 });
   return (
     <Svg width={width} height={height} viewBox="0 0 160 120">
-      <Circle cx={128} cy={26} r={20} fill={palette.sun} />
-      {/* Persona */}
-      <Rect x={22} y={70} width={52} height={50} rx={22} fill={palette.oceanTeal} />
-      <Circle cx={48} cy={50} r={17} fill={palette.deepOcean} />
-      {/* Brazo y mano saludando (mano redondeada, sin dedos sueltos) */}
-      <Path d="M68 82 C78 74 84 62 86 50" stroke={palette.oceanTeal} strokeWidth={11} strokeLinecap="round" fill="none" />
-      <Rect x={78} y={26} width={18} height={26} rx={9} fill={palette.sandyBeige} />
-      <Rect x={72} y={38} width={9} height={14} rx={4.5} fill={palette.sandyBeige} transform="rotate(-25 76 45)" />
-      {/* Movimiento */}
-      <G stroke={palette.cream} strokeWidth={2.6} strokeLinecap="round" fill="none">
-        <Path d="M100 26 q5 6 0 12" />
-        <Path d="M106 22 q8 10 0 20" opacity={0.7} />
+      <Circle cx={134} cy={92} r={20} fill={palette.sun} opacity={0.9} />
+      {/* Teléfono */}
+      <Rect x={24} y={6} width={70} height={110} rx={14} fill={palette.deepOcean} />
+      <Rect x={29} y={14} width={60} height={94} rx={9} fill={palette.cream} />
+      {/* Esquinas del visor */}
+      <G stroke={palette.seafoam} strokeWidth={2.6} strokeLinecap="round" fill="none">
+        <Path d="M34 26 v-6 h6" />
+        <Path d="M84 26 v-6 h-6" />
+        <Path d="M34 96 v6 h6" />
+        <Path d="M84 96 v6 h-6" />
       </G>
-      {/* Puntos que detecta la app */}
-      <G fill={palette.coral}>
-        <Circle cx={82} cy={30} r={2.2} />
-        <Circle cx={90} cy={29} r={2.2} />
-        <Circle cx={87} cy={44} r={2.2} />
+      {/* Mano: puntos y líneas, como la dibuja la app */}
+      <G stroke={palette.oceanTeal} strokeWidth={2.4} strokeLinecap="round">
+        {BONES.map(([a, b]) => (
+          <Path key={`${a}-${b}`} d={`M${pt(a).x} ${pt(a).y} L${pt(b).x} ${pt(b).y}`} />
+        ))}
       </G>
-      {/* Teléfono que lo entiende */}
-      <G transform="translate(128 78) rotate(10)">
-        <Rect x={-15} y={-26} width={30} height={52} rx={7} fill={palette.deepOcean} />
-        <Rect x={-11} y={-20} width={22} height={37} rx={4} fill={palette.cream} />
-        <Path d="M-6 -2 l4 4 l8 -9" stroke={palette.oceanTeal} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        <Circle cx={0} cy={21} r={1.8} fill={palette.cream} />
+      {HAND.map((_, i) => (
+        <Circle key={i} cx={pt(i).x} cy={pt(i).y} r={TIPS.has(i) ? 3 : 2.1} fill={TIPS.has(i) ? palette.coral : palette.sun} />
+      ))}
+      {/* Saludo en movimiento */}
+      <G stroke={palette.coral} strokeWidth={2} strokeLinecap="round" fill="none" opacity={0.8}>
+        <Path d="M70 30 q5 -4 9 0" />
+        <Path d="M73 24 q6 -5 12 0" />
+      </G>
+      {/* Lo que entendió: un globo que suena */}
+      <G>
+        <Rect x={102} y={18} width={48} height={34} rx={13} fill={palette.white} />
+        <Path d="M108 50 L100 62 L120 51 Z" fill={palette.white} />
+        <Rect x={111} y={28} width={30} height={5} rx={2.5} fill={palette.oceanTeal} />
+        <Rect x={111} y={38} width={20} height={5} rx={2.5} fill={palette.seafoam} />
+      </G>
+      <G stroke={palette.deepOcean} strokeWidth={2.6} fill="none" strokeLinecap="round">
+        <Path d="M154 26 q5 8 0 16" />
       </G>
     </Svg>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useConversation } from '../core/conversation/ConversationProvider';
 import type { Message } from '../core/conversation/reducer';
 import { colors, radius, space, type } from '../theme/tokens';
@@ -19,7 +19,7 @@ const META: Record<Message['source'], { icon: IconName; tag: Record<Perspective,
   sign: { icon: 'hand-back-right-outline', tag: { senas: 'SEÑA', voz: 'SEÑA' } },
   typed: { icon: 'keyboard-outline', tag: { senas: 'ESCRITO', voz: 'YO' } },
   phrase: { icon: 'lightning-bolt-outline', tag: { senas: 'FRASE', voz: 'YO' } },
-  voice: { icon: 'microphone-outline', tag: { senas: 'TÚ (VOZ)', voz: 'RESPUESTA' } },
+  voice: { icon: 'microphone-outline', tag: { senas: 'TÚ', voz: 'RESPUESTA' } },
 };
 
 export function Timeline({ perspective, empty, mascot = true }: { perspective: Perspective; empty: { title: string; text: string }; mascot?: boolean }) {
@@ -60,8 +60,17 @@ function Bubble({ m, perspective, onPress }: { m: Message; perspective: Perspect
   // Lado: en Leer señas la voz es "mía" (derecha); en Dar voz lo escrito es mío.
   const right = perspective === 'senas' ? isVoice : !isVoice;
   const time = new Date(m.at).toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' });
+  // Cada mensaje nuevo entra deslizándose desde su lado.
+  const enter = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(enter, { toValue: 1, duration: 320, easing: Easing.out(Easing.back(1.4)), useNativeDriver: true }).start();
+  }, [enter]);
+  const anim = {
+    opacity: enter,
+    transform: [{ translateX: enter.interpolate({ inputRange: [0, 1], outputRange: [right ? 24 : -24, 0] }) }, { scale: enter.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) }],
+  };
   return (
-    <View style={[st.row, right ? st.right : st.left]}>
+    <Animated.View style={[st.row, right ? st.right : st.left, anim]}>
       <Pressable onPress={onPress} style={({ pressed }) => [st.bubble, isVoice ? st.voice : st.sign, right ? st.tailRight : st.tailLeft, pressed && { opacity: 0.8 }]}>
         <View style={st.head}>
           <ChannelTag icon={meta.icon} text={meta.tag[perspective]} color={isVoice ? colors.voiceInk : colors.signInk} />
@@ -73,7 +82,7 @@ function Bubble({ m, perspective, onPress }: { m: Message; perspective: Perspect
           <Text style={[type.small, { color: isVoice ? colors.voiceInk : colors.signInk, fontSize: 12 }]}>{isVoice ? 'Ver en grande' : 'Repetir'}</Text>
         </View>
       </Pressable>
-    </View>
+    </Animated.View>
   );
 }
 

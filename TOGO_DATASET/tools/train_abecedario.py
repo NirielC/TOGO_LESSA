@@ -38,7 +38,7 @@ sys.path.insert(0, str(ROOT_DIR / "tools"))
 
 from config import ABC_IMAGENES_DIR, ABC_VIDEOS_DIR, ALTO, ANCHO, DATASET_DIR, LANDMARKS_DIR, MODELO_DIR, MODELS_DIR, persona_de_archivo  # noqa: E402
 from togo_features import (  # noqa: E402
-    FRAME_DIM, HAND_DIM, SEQ_LEN, frame_from_results, hand_letter_features, normalize_sequence,
+    HAND_DIM, SEQ_LEN, V3_DIM, build_features_v3, frame_from_results, hand_letter_features,
 )
 
 OUT_DIR = MODELO_DIR
@@ -197,7 +197,7 @@ def entrenar_movimiento(args):
             _, status, _, _ = ext._process(str(v), str(out))
             if status != "ok":
                 continue
-        X.append(normalize_sequence(np.load(out), ANCHO, ALTO))
+        X.append(build_features_v3(np.load(out), ANCHO, ALTO))  # mismo formato que el modelo de señas
         y.append(etiqueta(carpeta.name))
 
     # "_nada" = señas: el modelo aprende que una seña no es una letra.
@@ -208,7 +208,7 @@ def entrenar_movimiento(args):
     rng = np.random.default_rng(SEED)
     n_nada = min(len(senas), max(100, len(X)))
     for f in rng.choice(senas, size=n_nada, replace=False):
-        X.append(normalize_sequence(np.load(f), ANCHO, ALTO))
+        X.append(build_features_v3(np.load(f), ANCHO, ALTO))
         y.append("_nada")
 
     X = np.stack(X)
@@ -217,7 +217,7 @@ def entrenar_movimiento(args):
     i_tr, i_te = train_test_split(np.arange(len(X)), test_size=0.2, stratify=yi, random_state=SEED)
 
     m = keras.Sequential([
-        keras.Input(shape=(SEQ_LEN, FRAME_DIM)),
+        keras.Input(shape=(SEQ_LEN, V3_DIM)),
         layers.LSTM(48),
         layers.Dropout(0.3),
         layers.Dense(32, activation="relu"),
@@ -228,7 +228,7 @@ def entrenar_movimiento(args):
           callbacks=[keras.callbacks.EarlyStopping(monitor="val_loss", patience=15, restore_best_weights=True)])
     acc = float(m.evaluate(X[i_te], yi[i_te], verbose=0)[1])
 
-    tfl, ops = exportar_tflite(m, OUT_DIR / "lessa_letters_motion.tflite")
+    tfl, ops = exportar_tflite(m, OUT_DIR / "lessa_letters_motion.tflite", input_shape=(SEQ_LEN, V3_DIM))
     (OUT_DIR / "letters_motion_labels.json").write_text(json.dumps(clases, ensure_ascii=False), encoding="utf-8")
     print(f"Movimiento: precisión {acc:.4f} · {len(tfl) / 1024:.0f} KB")
     return {"precision": round(acc, 4), "clases": clases, "muestras": int(len(X))}

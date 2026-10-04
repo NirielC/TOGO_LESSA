@@ -9,6 +9,7 @@ import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
 import org.json.JSONArray
+import org.json.JSONObject
 import org.tensorflow.lite.Interpreter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -50,9 +51,18 @@ class SignEngine(context: Context) {
   private val letters: Classifier?
   private val lettersMotion: Classifier?
 
-  /** Largo de la ventana: se lee del modelo (30 hoy; si se re-entrena con 40, se adapta solo). */
+  /**
+   * Formato del modelo, de signs_meta.json (lo escribe train_senas.py).
+   * Sin ese archivo: formato v2 (258 por cuadro), el del modelo original.
+   */
+  private val frameDim: Int
+  private val v3: Boolean
+  private val canonical: Boolean
+  /** Largo de la ventana: se lee del modelo (30 en v2, 40 en v3). */
   private val seqLen: Int
   private val buffer = ArrayDeque<FloatArray>()
+  /** Por cuadro de la ventana: ¿estaba la mano "Left"/"Right"? (para la mano dominante) */
+  private val presence = ArrayDeque<BooleanArray>()
   private val handHistory = ArrayDeque<Int>()
   private var sinceLast = 0
   private var lastTs = -1L
@@ -86,7 +96,13 @@ class SignEngine(context: Context) {
       ?: throw IllegalStateException("Falta lessa_signs.tflite o signs_labels.json en assets")
     letters = Classifier.load(context, "lessa_letters.tflite", "letters_labels.json")
     lettersMotion = Classifier.load(context, "lessa_letters_motion.tflite", "letters_motion_labels.json")
-    seqLen = signs.inputSize / Features.FRAME_DIM
+    val meta = runCatching {
+      JSONObject(context.assets.open("signs_meta.json").bufferedReader().use { it.readText() })
+    }.getOrNull()
+    v3 = meta?.optString("features") == "v3"
+    canonical = meta?.optBoolean("canonical", false) ?: false
+    frameDim = meta?.optInt("frame_dim", Features.FRAME_DIM) ?: Features.FRAME_DIM
+    seqLen = signs.inputSize / frameDim
   }
 
   /** Solo procesa si pasó el tiempo mínimo: el ritmo debe parecerse a los 20 FPS del dataset. */
@@ -108,8 +124,10 @@ class SignEngine(context: Context) {
     prevNorm?.let { motionEma = 0.6f * motionEma + 0.4f * Features.wristMotion(it, norm) }
     prevNorm = norm
 
-    buffer.addLast(norm)
+    buffer.addLast(if (v3) Features.v3Frame(raw, w, hh) else norm)
     if (buffer.size > seqLen) buffer.removeFirst()
+    presence.addLast(booleanArrayOf(Features.slotPresent(raw, 0), Features.slotPresent(raw, 1)))
+    if (presence.size > seqLen) presence.removeFirst()
     handHistory.addLast(nHands)
     if (handHistory.size > seqLen / 2) handHistory.removeFirst()
     sinceLast++
@@ -140,6 +158,7 @@ class SignEngine(context: Context) {
 
   fun reset() {
     buffer.clear()
+    presence.clear()
     handHistory.clear()
     sinceLast = 0
     prevNorm = null
@@ -155,8 +174,14 @@ class SignEngine(context: Context) {
   }
 
   private fun flatten(): FloatArray {
-    val out = FloatArray(seqLen * Features.FRAME_DIM)
-    buffer.forEachIndexed { i, f -> System.arraycopy(f, 0, out, i * Features.FRAME_DIM, Features.FRAME_DIM) }
+    // Mano dominante: si en la ventana la mano "Left" aparece más que la "Right",
+    // se espeja toda la ventana (igual que dominant_is_left() al entrenar).
+    val mirror = canonical && presence.count { it[0] } > presence.count { it[1] }
+    val out = FloatArray(seqLen * frameDim)
+    buffer.forEachIndexed { i, f ->
+      val frame = if (mirror) Features.mirrorFrame(f) else f
+      System.arraycopy(frame, 0, out, i * frameDim, frameDim)
+    }
     return out
   }
 

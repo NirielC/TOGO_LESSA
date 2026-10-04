@@ -97,6 +97,8 @@ export async function deleteSaved(id: string) {
 }
 
 const NO_SPEECH = new Set(['no-speech', 'speech-timeout']);
+/** Redondea a pasos (menos cambios = menos re-dibujos). */
+const step = (x: number, s: number) => Math.round(x / s) * s;
 
 export function ConversationProvider({ children }: { children: React.ReactNode }) {
   const { settings } = useSettings();
@@ -116,6 +118,17 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
   const [voice, setVoice] = useState<VoiceUi>({ active: false, partial: '', volume: 0, error: null });
   const [flash, setFlash] = useState<'celebrating' | 'confused' | null>(null);
   const [board, setBoard] = useState<Message | null>(null);
+
+  // Solo re-dibuja si algo visible cambió: los eventos del motor llegan ~28 veces
+  // por segundo y antes cada uno re-dibujaba toda la pantalla (se sentía trabado).
+  const patchLive = useCallback((p: Partial<LiveUi>) => {
+    setLive((l) => {
+      for (const k in p) {
+        if (l[k as keyof LiveUi] !== p[k as keyof LiveUi]) return { ...l, ...p };
+      }
+      return l;
+    });
+  }, []);
 
   const signStab = useRef(new PredictionStabilizer(settings.signs));
   const letterStab = useRef(new PredictionStabilizer(settings.letters));
@@ -174,7 +187,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       const waiting = s.turn === 'signer' && s.draft.length > 0 && e.hands === 0 && !s.pending;
       const elapsed = now - lastHandsAt.current;
       const sendProgress = waiting ? Math.min(1, elapsed / cfg.finalizeAfterMs) : 0;
-      setLive((l) => ({ ...l, quality: e.quality, hands: e.hands, fps: e.fps, latencyMs: e.latencyMs, hasLetters: !!e.hasLetters, sendProgress }));
+      patchLive({ quality: e.quality, hands: e.hands, fps: Math.round(e.fps), latencyMs: step(e.latencyMs, 10), hasLetters: !!e.hasLetters, sendProgress: step(sendProgress, 0.05) });
       if (waiting && elapsed >= cfg.finalizeAfterMs) {
         dispatch({ type: 'finalize', at: now, confirm: cfg.confirmBeforeSpeak });
       }
@@ -190,7 +203,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       );
       const isSign = e.label !== cfg.signs.noSignLabel && e.confidence >= cfg.signs.confidenceThreshold;
       lastSign.current = { confident: isSign && e.handsVisible, at: now };
-      setLive((l) => ({ ...l, candidate: snap.candidate ? meaningOf(snap.candidate).text : null, progress: snap.progress }));
+      patchLive({ candidate: snap.candidate ? meaningOf(snap.candidate).text : null, progress: step(snap.progress, 0.05) });
 
       // "No te entendí": hay manos pero nada pasa el umbral durante 2.5 s.
       if (e.handsVisible && !isSign && snap.state !== 'latched' && snap.state !== 'cooldown') {
@@ -203,7 +216,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
 
       if (snap.committed) {
         dispatch({ type: 'sign', label: snap.committed.label, at: now });
-        setLive((l) => ({ ...l, lastCommitAt: now }));
+        patchLive({ lastCommitAt: now });
         letterStab.current.reset();
         Haptics.selectionAsync().catch(() => {});
         showFlash('celebrating');
@@ -217,24 +230,29 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       { label: e.label, confidence: e.confidence, margin: e.margin, handsVisible: e.handsVisible && !signBusy },
       now,
     );
-    if (!signBusy && snap.candidate) setLive((l) => ({ ...l, candidate: snap.candidate, progress: snap.progress }));
+    if (!signBusy && snap.candidate) patchLive({ candidate: snap.candidate, progress: step(snap.progress, 0.05) });
     if (snap.committed) {
       lowConfSince.current = 0;
       dispatch({ type: 'letter', letter: snap.committed.label });
-      setLive((l) => ({ ...l, lastCommitAt: now }));
+      patchLive({ lastCommitAt: now });
       Haptics.selectionAsync().catch(() => {});
       showFlash('celebrating', 500);
     }
-  }, []);
+  }, [patchLive]);
 
   // ---------- Voz ----------
   const voiceActive = useRef(false);
+  // Guarda lo último que se oyó en la sesión de voz actual. Muchos reconocedores
+  // de Android no mandan el resultado "final" (al tocar Terminar, al cortarse por
+  // silencio...): antes ese texto se perdía y nunca llegaba a la conversación.
+  const commitHeard = useRef<() => void>(() => {});
   const stopVoice = useCallback(() => {
     if (!voiceActive.current) return;
     stt.stopListening();
     // Si el reconocedor no confirma el cierre, se cierra igual.
     setTimeout(() => {
       if (!voiceActive.current) return;
+      commitHeard.current();
       stt.abortListening();
       voiceActive.current = false;
       setVoice((v) => ({ ...v, active: false, volume: 0, partial: '' }));
@@ -272,10 +290,19 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     // que terminaron. Sin texto en 8 s, o 30 s en total, se corta; y si el
     // sistema no confirma el cierre, se limpia el estado igual.
     let heard = false;
+    let lastPartial = '';
+    let committed = false;
+    const commit = (text: string) => {
+      if (committed || !text.trim()) return;
+      committed = true;
+      dispatch({ type: 'voice', text, at: Date.now() });
+    };
+    commitHeard.current = () => commit(lastPartial);
     const timers: ReturnType<typeof setTimeout>[] = [];
     const clearTimers = () => timers.splice(0).forEach(clearTimeout);
     const forceEnd = (msg: string | null) => {
       clearTimers();
+      commit(lastPartial);
       stt.abortListening();
       if (!voiceActive.current) return;
       if (msg) fail(msg);
@@ -288,6 +315,8 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     const run = () => {
       voiceActive.current = true;
       heard = false;
+      lastPartial = '';
+      committed = false;
       clearTimers();
       timers.push(setTimeout(() => !heard && forceEnd('No escuché nada. Toca el micrófono y habla cerca del teléfono.'), 8000));
       timers.push(setTimeout(() => {
@@ -301,13 +330,14 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       if (ev.type === 'end' || ev.type === 'error') clearTimers();
       switch (ev.type) {
         case 'partial':
+          if (ev.text.trim()) lastPartial = ev.text;
           setVoice((v) => ({ ...v, partial: ev.text }));
           break;
         case 'volume':
           setVoice((v) => ({ ...v, volume: ev.value }));
           break;
         case 'final':
-          if (ev.text.trim()) dispatch({ type: 'voice', text: ev.text, at: Date.now() });
+          commit(ev.text.trim() ? ev.text : lastPartial);
           setVoice((v) => ({ ...v, partial: '' }));
           // Una intervención = un resultado final; si no llega 'end', se cierra igual.
           clearTimers();
@@ -323,11 +353,19 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
             setTimeout(run, 150);
             return;
           }
+          // Se oyó algo y luego se cortó: vale lo que se alcanzó a oír.
+          if (lastPartial.trim()) {
+            commit(lastPartial);
+            voiceActive.current = false;
+            setVoice((v) => ({ ...v, active: false, volume: 0, partial: '' }));
+            return backToSigner();
+          }
           if (NO_SPEECH.has(ev.code)) return fail('No escuché nada. Toca el micrófono y habla cerca del teléfono.');
           return fail(ev.message, ev.code === 'language-not-supported');
         }
         case 'end':
           if (retried && !voiceActive.current) return; // el reintento sigue su curso
+          commit(lastPartial);
           voiceActive.current = false;
           setVoice((v) => ({ ...v, active: false, volume: 0, partial: '' }));
           backToSigner(); // terminó de hablar: vuelve el turno a quien seña

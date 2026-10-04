@@ -6,10 +6,17 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
+import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CaptureRequest
 import android.os.SystemClock
 import android.util.Log
+import android.util.Range
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.OptIn
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.camera2.interop.Camera2Interop
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -121,8 +128,14 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
         val p = future.get()
         provider = p
         val selector = if (facingBack) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
-        val previewUse = Preview.Builder().build().also { it.surfaceProvider = preview.surfaceProvider }
-        val analysis = ImageAnalysis.Builder()
+        // Cuadros por segundo de la cámara: el máximo que acepte (hasta 60) y fijo,
+        // para que la vista previa no baje a 15 FPS con poca luz. El reconocimiento
+        // sigue tomando ~20 cuadros/s (como los videos de entrenamiento).
+        val fpsRange = bestFpsRange(p, selector)
+        val previewBuilder = Preview.Builder()
+        fpsRange?.let { applyFps(previewBuilder, it) }
+        val previewUse = previewBuilder.build().also { it.surfaceProvider = preview.surfaceProvider }
+        val analysisBuilder = ImageAnalysis.Builder()
           .setResolutionSelector(
             ResolutionSelector.Builder()
               .setResolutionStrategy(ResolutionStrategy(android.util.Size(640, 480), ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER))
@@ -130,7 +143,8 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
           )
           .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
           .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
-          .build()
+        fpsRange?.let { applyFps(analysisBuilder, it) }
+        val analysis = analysisBuilder.build()
         analysis.setAnalyzer(executor!!) { img -> analyze(img) }
         p.unbindAll()
         p.bindToLifecycle(owner, selector, previewUse, analysis)
@@ -140,6 +154,25 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
         emitError("No se pudo abrir la cámara: ${e.message}")
       }
     }, ContextCompat.getMainExecutor(context))
+  }
+
+  @OptIn(ExperimentalCamera2Interop::class)
+  private fun bestFpsRange(p: ProcessCameraProvider, selector: CameraSelector): Range<Int>? = try {
+    val info = selector.filter(p.availableCameraInfos).firstOrNull()
+    val ranges = info?.let {
+      Camera2CameraInfo.from(it).getCameraCharacteristic(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
+    }
+    // Primero el tope más alto (máx. MAX_FPS); entre iguales, el que no baja (fijo).
+    ranges?.filter { it.upper <= MAX_FPS && it.lower >= MIN_FPS }
+      ?.maxWithOrNull(compareBy<Range<Int>>({ it.upper }, { it.lower }))
+  } catch (e: Throwable) {
+    Log.w(TAG, "FPS", e)
+    null
+  }
+
+  @OptIn(ExperimentalCamera2Interop::class)
+  private fun <T> applyFps(builder: androidx.camera.core.ExtendableBuilder<T>, range: Range<Int>) {
+    Camera2Interop.Extender(builder).setCaptureRequestOption(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, range)
   }
 
   private fun stop() {
@@ -230,12 +263,17 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
 
   companion object {
     private const val TAG = "TogoVision"
+    private const val MAX_FPS = 60
+    private const val MIN_FPS = 24
   }
 }
 
 /**
- * Dibuja las manos encima de la vista previa (~15 FPS). Convierte coordenadas de
- * la imagen analizada a la vista, con el mismo recorte que FILL_CENTER.
+ * Dibuja las manos encima de la vista previa. Los puntos llegan ~20 veces por
+ * segundo, pero se dibujan a la frecuencia de la pantalla deslizándose hacia la
+ * última posición: el esqueleto se mueve suave en vez de a saltos.
+ * Convierte coordenadas de la imagen analizada a la vista, con el mismo recorte
+ * que FILL_CENTER.
  */
 class HandOverlay(context: Context) : View(context) {
   private val line = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -244,30 +282,52 @@ class HandOverlay(context: Context) : View(context) {
   private val dot = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#F6C453"); style = Paint.Style.FILL }
   private val tip = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.parseColor("#F08A5D"); style = Paint.Style.FILL }
 
-  @Volatile private var points: FloatArray? = null
+  private val lock = Any()
+  private var target: FloatArray? = null          // última detección
+  private var shown: FloatArray? = null           // lo que se dibuja (se acerca a target)
   @Volatile private var imgW = 1
   @Volatile private var imgH = 1
   @Volatile private var mirror = false
-  private var lastDraw = 0L
 
   init { setWillNotDraw(false) }
 
   fun update(raw: FloatArray, w: Int, h: Int, mirrored: Boolean) {
-    val now = SystemClock.elapsedRealtime()
-    if (now - lastDraw < 66) return  // ~15 FPS
-    lastDraw = now
-    points = raw.copyOfRange(Features.POSE_DIM, Features.FRAME_DIM)
+    val next = raw.copyOfRange(Features.POSE_DIM, Features.FRAME_DIM)
+    synchronized(lock) {
+      val cur = shown
+      // Una mano que aparece (o cambia de lado) salta directo; las demás se deslizan.
+      if (cur == null) shown = next.copyOf()
+      else for (s in 0..1) {
+        val b = s * Features.HAND_DIM
+        val had = cur[b] != 0f || cur[b + 1] != 0f
+        val has = next[b] != 0f || next[b + 1] != 0f
+        if (!had || !has) System.arraycopy(next, b, cur, b, Features.HAND_DIM)
+      }
+      target = next
+    }
     imgW = w; imgH = h; mirror = mirrored
-    postInvalidate()
+    postInvalidateOnAnimation()
   }
 
   fun clear() {
-    points = null
-    postInvalidate()
+    synchronized(lock) { target = null; shown = null }
+    postInvalidateOnAnimation()
   }
 
   override fun onDraw(canvas: Canvas) {
-    val pts = points ?: return
+    var moving = false
+    val pts: FloatArray = synchronized(lock) {
+      val t = target
+      val s = shown
+      if (t == null || s == null) null
+      else {
+        for (i in s.indices) {
+          val d = t[i] - s[i]
+          if (kotlin.math.abs(d) > 0.0005f) { s[i] += d * SMOOTH; moving = true } else s[i] = t[i]
+        }
+        s.copyOf()
+      }
+    } ?: return
     val scale = max(width / imgW.toFloat(), height / imgH.toFloat())
     val ox = (width - imgW * scale) / 2f
     val oy = (height - imgH * scale) / 2f
@@ -286,9 +346,11 @@ class HandOverlay(context: Context) : View(context) {
         canvas.drawCircle(px(i, b), py(i, b), if (isTip) 9f else 6f, if (isTip) tip else dot)
       }
     }
+    if (moving) postInvalidateOnAnimation()
   }
 
   companion object {
+    private const val SMOOTH = 0.45f  // fracción del camino por cuadro de pantalla
     private val CONNECTIONS = listOf(
       0 to 1, 1 to 2, 2 to 3, 3 to 4,
       0 to 5, 5 to 6, 6 to 7, 7 to 8,

@@ -48,6 +48,7 @@ export default function Voz() {
           status={conv.voice.active ? 'Escuchando la respuesta' : settings.name ? `${settings.name}, yo hablo por ti` : 'Yo hablo por ti'}
           tips={VOICE_TIPS}
           tone={colors.voiceSoft}
+          compact
         />
 
         <View style={st.writeCard}>
@@ -64,8 +65,8 @@ export default function Voz() {
           />
           <View style={st.writeActions}>
             {!!text && (
-              <Pressable onPress={() => setText('')} hitSlop={8} accessibilityLabel="Borrar texto">
-                <Text style={st.clear}>Borrar</Text>
+              <Pressable onPress={() => setText('')} hitSlop={10} accessibilityLabel="Borrar texto">
+                <Icon name="close-circle" size={22} color={colors.textFaint} />
               </Pressable>
             )}
             <Pressable onPress={say} disabled={!text.trim()} style={[st.sayBtn, !text.trim() && { opacity: 0.4 }]} accessibilityRole="button" accessibilityLabel="Decir en voz alta">
@@ -109,16 +110,15 @@ const PHRASE_COLORS = ['#FCEFD2', colors.signSoft, colors.voiceSoft, '#FBE3D8'];
 
 const st = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  writeCard: { marginHorizontal: space.md, backgroundColor: colors.surface, borderRadius: radius.xl, padding: space.md, borderWidth: 2, borderColor: colors.voice, gap: space.sm },
-  input: { fontFamily: fonts.bodyBold, fontSize: 22, lineHeight: 30, color: colors.text, minHeight: 84, maxHeight: 160, textAlignVertical: 'top' },
-  writeActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: space.lg },
-  clear: { fontFamily: fonts.bodyBold, color: colors.textMuted },
-  sayBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.primary, borderRadius: radius.pill, paddingHorizontal: space.xl, height: 50 },
+  writeCard: { flexDirection: 'row', alignItems: 'flex-end', marginHorizontal: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, paddingVertical: 6, paddingLeft: space.md, paddingRight: 6, borderWidth: 2, borderColor: colors.voice, gap: space.sm },
+  input: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 19, lineHeight: 26, color: colors.text, minHeight: 48, maxHeight: 130, paddingVertical: 8, textAlignVertical: 'center' },
+  writeActions: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  sayBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.primary, borderRadius: radius.pill, paddingHorizontal: space.lg, height: 48 },
   sayText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.onPrimary },
-  phrasesHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.lg, marginTop: space.md },
+  phrasesHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.lg, marginTop: space.sm },
   edit: { fontFamily: fonts.bodyBold, color: colors.primary, fontSize: 13 },
-  phrasesBox: { flexGrow: 0, maxHeight: 176 },
+  phrasesBox: { flexGrow: 0, maxHeight: 150 },
   phrases: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: space.md, paddingVertical: space.sm, gap: space.sm },
-  phrase: { borderRadius: radius.lg, paddingHorizontal: space.lg, paddingVertical: space.md },
+  phrase: { borderRadius: radius.lg, paddingHorizontal: space.md, paddingVertical: 10 },
   phraseText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.text },
 });

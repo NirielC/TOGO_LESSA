@@ -16,3 +16,5 @@ TOGO_DATASET/dataset/
 
 # Logs de entrenamiento
 Logs/
+# Pruebas de entrenamiento
+TOGO_DATASET/models/prueba_*

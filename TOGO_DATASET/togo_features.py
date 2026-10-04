@@ -179,3 +179,79 @@ def hand_letter_features(raw_frame, width, height):
     if best == 0:  # "Left"
         hand[:, 0] *= -1
     return hand.reshape(-1).astype(np.float32)
+
+
+# ------------------------------------------------------------ modelo v3
+
+"""
+CARACTERÍSTICAS DEL MODELO v3 (lo que entra a la red; los datos crudos no cambian).
+
+Por frame, 384 valores:
+    [  0:258]  la normalización v2 (pose + manos respecto a los hombros), con
+               piernas y pies (puntos 25-32) en cero: no aportan y meten ruido.
+    [258:321]  FORMA de la mano "Left":  sus 21 puntos relativos a la muñeca,
+    [321:384]  FORMA de la mano "Right": en píxeles / tamaño de la palma.
+               (Distingue la forma de los dedos, que en la parte v2 casi no pesa
+               porque está escalada por los hombros.)
+
+MANO DOMINANTE (canonical): por secuencia, si la mano "Left" aparece más que la
+"Right", se espeja toda la secuencia. Así una seña hecha con la mano izquierda
+y la misma con la derecha se ven iguales para el modelo.
+
+El teléfono (Features.kt) hace exactamente lo mismo, ventana por ventana.
+"""
+
+V3_DIM = FRAME_DIM + 2 * HAND_DIM   # 384
+LEG_POINTS = list(range(25, 33))    # rodillas, tobillos, talones, pies
+
+
+def hand_shape(raw_seq, width, height):
+    """(T, 258) crudo -> (T, 126): forma de cada mano (muñeca en 0, escala = palma)."""
+    raw = np.asarray(raw_seq, dtype=np.float32)
+    T = len(raw)
+    out = np.zeros((T, 2, HAND_N, 3), dtype=np.float32)
+    hands = raw[:, POSE_DIM:].reshape(T, 2, HAND_N, 3) * np.array([width, height, width], dtype=np.float32)
+    for t in range(T):
+        for s in range(2):
+            h = hands[t, s]
+            if not np.any(h):
+                continue
+            palma = float(np.linalg.norm(h[9, :2] - h[0, :2]))
+            if palma < 1.0:
+                continue
+            out[t, s] = (h - h[0]) / palma
+    return out.reshape(T, -1)
+
+
+def mirror_shape(shape_seq):
+    """Espejo de la parte de forma: invierte x y cambia izquierda <-> derecha."""
+    s = np.array(shape_seq, dtype=np.float32, copy=True).reshape(len(shape_seq), 2, HAND_N, 3)
+    s[..., 0] *= -1
+    return s[:, ::-1].reshape(len(shape_seq), -1)
+
+
+def dominant_is_left(raw_seq):
+    """¿La mano "Left" de MediaPipe aparece en más cuadros que la "Right"?"""
+    raw = np.asarray(raw_seq)
+    left = (np.abs(raw[:, POSE_DIM:POSE_DIM + HAND_DIM]).sum(1) > 0).sum()
+    right = (np.abs(raw[:, POSE_DIM + HAND_DIM:]).sum(1) > 0).sum()
+    return left > right
+
+
+def build_features_v3(raw_seq, width, height, canonical=True):
+    """(T, 258) crudo -> (T, 384) listo para el modelo v3."""
+    base = normalize_sequence(raw_seq, width, height)
+    pose = base[:, :POSE_DIM].reshape(len(base), POSE_N, 4)
+    pose[:, LEG_POINTS] = 0.0
+    base[:, :POSE_DIM] = pose.reshape(len(base), -1)
+    shape = hand_shape(raw_seq, width, height)
+    if canonical and dominant_is_left(raw_seq):
+        base = mirror_sequence(base)
+        shape = mirror_shape(shape)
+    return np.concatenate([base, shape], axis=1).astype(np.float32)
+
+
+def mirror_features_v3(feat):
+    """Espejo de una secuencia v3 ya construida (para aumento de datos)."""
+    f = np.asarray(feat, dtype=np.float32)
+    return np.concatenate([mirror_sequence(f[:, :FRAME_DIM]), mirror_shape(f[:, FRAME_DIM:])], axis=1)

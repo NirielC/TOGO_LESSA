@@ -44,7 +44,7 @@ def main():
 
     py = sys.executable
     paso("1/4 Extraer puntos de los videos", [py, str(TOOLS / "extract_landmarks_v2.py")])
-    entrenar = [py, str(TOOLS / "train_v2.py"), "--instalar"] + (["--por-persona"] if args.por_persona else [])
+    entrenar = [py, str(TOOLS / "train_senas.py"), "--instalar"] + (["--por-persona"] if args.por_persona else [])
     paso("2/4 Entrenar e instalar el modelo de señas", entrenar)
     if args.abecedario:
         paso("2b Entrenar e instalar el abecedario", [py, str(TOOLS / "train_abecedario.py"), "--instalar"])

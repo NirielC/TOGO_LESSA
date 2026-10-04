@@ -118,7 +118,7 @@ function Body({ pose, closeUp }: { pose: Pt[]; closeUp: boolean }) {
  * distinga cada dedo. Se agranda desde la muñeca (como en las ilustraciones de
  * lengua de señas): a escala real la forma de la mano no se alcanza a leer.
  */
-function Hand({ pts: raw, color, scale = 1.7, w = 0.1 }: { pts: Pt[]; color: string; scale?: number; w?: number }) {
+function Hand({ pts: raw, color, scale = 1.25, w = 0.085 }: { pts: Pt[]; color: string; scale?: number; w?: number }) {
   const [wx, wy] = raw[0];
   const pts = raw.map(([x, y]) => [wx + (x - wx) * scale, wy + (y - wy) * scale] as Pt);
   const palm = PALM.map((k) => `${pts[k][0]} ${pts[k][1]}`).join(' L');

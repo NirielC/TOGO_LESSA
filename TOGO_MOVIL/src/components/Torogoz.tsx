@@ -1,8 +1,10 @@
+import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Svg, { Circle, Ellipse, G, Path } from 'react-native-svg';
 import type { Mascot } from '../core/conversation/ConversationProvider';
 import { colors, fonts, palette, radius } from '../theme/tokens';
+import { PixelTogo } from './PixelTogo';
 
 /**
  * TOGO, el torogoz gordito (ave nacional de El Salvador). Es el asistente de
@@ -17,11 +19,21 @@ import { colors, fonts, palette, radius } from '../theme/tokens';
  *
  * Está hecho en capas (cuerpo, ala, cabeza) para moverse de verdad: respira,
  * parpadea, mira a los lados, aletea por su cuenta y reacciona al tocarlo.
+ * Al cambiar de estado da un pequeño rebote; las "zetas", los puntos de pensar
+ * y las ondas de escuchar flotan.
+ *
+ * SECRETO: muy de vez en cuando Togo suelta una pista. Si lo tocas 8 veces
+ * seguidas se vuelve de 8 bits un rato (PixelTogo).
  */
 export const MASCOT_NAME = 'Togo';
 const WING = '#174A5B';
 
 const TAP_LINES = ['¡Hola! Soy Togo', '¡Pío!', 'Seña con calma, te sigo', 'Juntos nos entendemos', '¡Cosquillas no!', 'Aquí estoy para ayudarte'];
+/** Pista del secreto: sale muy pocas veces (ver RARE_CHANCE). */
+export const SECRET_HINT = 'Psst… si me tocas 8 veces seguidas, viajo a los 80 👾';
+export const RARE_CHANCE = 0.06;
+const RETRO_TAPS = 8;
+const RETRO_MS = 9000;
 
 interface Props {
   state?: Mascot;
@@ -41,6 +53,11 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
   const wing = useRef(new Animated.Value(0)).current;
   const head = useRef(new Animated.Value(0)).current;
   const spin = useRef(new Animated.Value(0)).current;
+  const pop = useRef(new Animated.Value(1)).current;
+  const float = useRef(new Animated.Value(0)).current;
+  const bubbleIn = useRef(new Animated.Value(0)).current;
+  const taps = useRef({ n: 0, at: 0 });
+  const [retro, setRetro] = useState(false);
   const [blink, setBlink] = useState(false);
   const [bubble, setBubble] = useState<string | null>(null);
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,6 +75,24 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
     loop.start();
     return () => loop.stop();
   }, [state, breath]);
+
+  // Lo que flota alrededor (zetas, puntos, ondas).
+  useEffect(() => {
+    const loop = Animated.loop(Animated.timing(float, { toValue: 1, duration: 1600, easing: Easing.inOut(Easing.quad), useNativeDriver: true }));
+    loop.start();
+    return () => loop.stop();
+  }, [float]);
+
+  // Rebote breve al cambiar de estado: se nota que reaccionó.
+  const firstState = useRef(true);
+  useEffect(() => {
+    if (firstState.current) {
+      firstState.current = false;
+      return;
+    }
+    pop.setValue(0.9);
+    Animated.spring(pop, { toValue: 1, friction: 4, tension: 160, useNativeDriver: true }).start();
+  }, [state, pop]);
 
   // Postura de la cabeza según el estado.
   useEffect(() => {
@@ -160,12 +195,31 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
     bubbleTimer.current = setTimeout(() => setBubble(null), ms);
   };
 
+  const goRetro = () => {
+    setRetro(true);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    talk('¡MODO 8-BIT! Pío pío 👾', 3000);
+    setTimeout(() => {
+      setRetro(false);
+      talk('…¿qué pasó? Me sentí retro', 2500);
+    }, RETRO_MS);
+  };
+
   const onPress = () => {
+    Haptics.selectionAsync().catch(() => {});
+    const now = Date.now();
+    taps.current = { n: now - taps.current.at < 700 ? taps.current.n + 1 : 1, at: now };
+    if (taps.current.n >= RETRO_TAPS && !retro) {
+      taps.current.n = 0;
+      jump(1).start();
+      return goRetro();
+    }
     const r = Math.random();
     if (r < 0.4) celebrate();
     else if (r < 0.7) twirl();
     else lookAround();
-    talk(TAP_LINES[Math.floor(Math.random() * TAP_LINES.length)]);
+    const rare = Math.random() < RARE_CHANCE;
+    talk(rare ? SECRET_HINT : TAP_LINES[Math.floor(Math.random() * TAP_LINES.length)], rare ? 3500 : 2000);
   };
   const onLongPress = () => {
     dance();
@@ -181,11 +235,24 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
   const spinDeg = spin.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   const headDeg = head.interpolate({ inputRange: [-1.2, 1.2], outputRange: ['-14deg', '14deg'] });
   const wingDeg = wing.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-38deg'] });
-  const text = say ?? bubble;
+  const text = bubble ?? say;
+
+  // El globo aparece con un pequeño "pop".
+  useEffect(() => {
+    if (!text) return;
+    bubbleIn.setValue(0);
+    Animated.spring(bubbleIn, { toValue: 1, friction: 5, tension: 140, useNativeDriver: true }).start();
+  }, [text, bubbleIn]);
+  const floatY = float.interpolate({ inputRange: [0, 1], outputRange: [0, state === 'sleeping' ? -size * 0.08 : -size * 0.03] });
+  const floatOpacity = float.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.45, 1, 0.45] });
 
   const layer = { position: 'absolute' as const, left: 0, top: 0, width: size, height: size };
   const bird = (
-    <Animated.View style={{ width: size, height: size, transform: [{ translateY: lift }, { scaleY: squash }, { scale: breathe }, { rotate: spinDeg }] }}>
+    <Animated.View style={{ width: size, height: size, transform: [{ translateY: lift }, { scaleY: squash }, { scale: breathe }, { scale: pop }, { rotate: spinDeg }] }}>
+      {retro ? (
+        <PixelTogo size={size} />
+      ) : (
+      <>
       <View style={layer}>
         <Body size={size} />
       </View>
@@ -195,19 +262,21 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
       <Animated.View style={[layer, { transformOrigin: '55% 50%', transform: [{ rotate: headDeg }] }]}>
         <Head size={size} state={state} blink={blink} />
       </Animated.View>
-      <View style={layer}>
+      <Animated.View style={[layer, { opacity: floatOpacity, transform: [{ translateY: floatY }] }]}>
         <Extras size={size} state={state} />
-      </View>
+      </Animated.View>
+      </>
+      )}
     </Animated.View>
   );
 
   return (
     <View style={[{ alignItems: 'center' }, style]}>
       {text ? (
-        <View style={st.bubble}>
+        <Animated.View style={[st.bubble, { opacity: bubbleIn, transform: [{ scale: bubbleIn.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] }) }] }]}>
           <Text style={[st.bubbleText, size < 90 && { fontSize: 12 }]}>{text}</Text>
           <View style={st.bubbleTail} />
-        </View>
+        </Animated.View>
       ) : null}
       {interactive ? (
         <Pressable onPress={onPress} onLongPress={onLongPress} accessibilityRole="button" accessibilityLabel={`${MASCOT_NAME}, el asistente`} hitSlop={8}>

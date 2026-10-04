@@ -19,11 +19,11 @@ export const EQUIPO: Miembro[] = [
   {
     nombre: 'Elías Niriel López Casoverde',
     correo: 'elsnirielc@gmail.com',
-    rol: 'Creador · desarrollo, modelo y diseño',
+    rol: 'Diseño y desarrollo',
     color: '#1E5A6E',
     // foto: require('../../assets/equipo/elias.jpg'),
   },
 ];
 
-export const APP_VERSION = 'Alfa 0.3';
+export const APP_VERSION = 'Alfa 0.4';
 export const APP_YEAR = 2026;

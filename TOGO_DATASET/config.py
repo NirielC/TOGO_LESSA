@@ -1,5 +1,6 @@
 # config.py
 
+import os
 from pathlib import Path
 
 # ============================================================
@@ -18,7 +19,7 @@ MODELS_DIR = ROOT_DIR / "models"
 # "v3": dataset nuevo con capture_videos.py v3 (40 cuadros = 2 s, filtros de
 #       calidad, más personas). Cambia esta línea para elegir con cuál trabajar:
 #       extracción, entrenamiento y diccionario la siguen solos.
-VERSION = "v3"
+VERSION = os.environ.get("TOGO_VERSION", "v3")  # o: set TOGO_VERSION=v2
 
 VIDEOS_DIR = DATASET_DIR / ("videos" if VERSION == "v2" else f"videos_{VERSION}")
 LANDMARKS_DIR = DATASET_DIR / f"landmarks_{VERSION}"
@@ -124,19 +125,28 @@ LETRAS = [
     "_nada",
 ]
 
-# Letras que en LESSA se hacen con movimiento: se graban como clip de 30 frames
-# (igual que las señas), no como foto. REVISAR con la persona que seña antes
-# de capturar: si alguna más se mueve, agregarla aquí.
+# Letras que en LESSA se hacen con movimiento: se graban como clip (igual que
+# las señas), no como foto. REVISAR con quien seña antes de capturar: si alguna
+# más se mueve en LESSA (p. ej. K, Q, X, LL, RR), agregarla aquí.
 LETRAS_CON_MOVIMIENTO = ["J", "Ñ", "Z"]
 
-# Por persona y por letra estática: ráfagas de 30 fotos, 5 ráfagas = 150.
-# Cada ráfaga con una variación distinta (distancia, lado, giro de muñeca).
-ABC_FOTOS_POR_RAFAGA = 30
-ABC_RAFAGAS_POR_PERSONA = 5
-ABC_INTERVALO_MS = 120          # entre fotos de una ráfaga
+# --- Letras estáticas (fotos) ---
+# Por persona y letra: 4 tomas de 20 fotos = 80 (2 tomas mano derecha, 2 izquierda).
+# Con 4 personas: 320 fotos por letra, de sobra para un clasificador de puntos.
+ABC_FOTOS_POR_RAFAGA = 20
+ABC_RAFAGAS_POR_PERSONA = 4
+ABC_INTERVALO_MS = 250      # mínimo entre fotos: da tiempo a mover la mano despacio
+ABC_MIN_CAMBIO = 0.05       # cambio mínimo de la mano (en palmas) entre fotos: evita fotos repetidas
+ABC_MAX_ESPERA_MS = 900     # si la mano casi no se mueve, igual toma una foto cada 0.9 s
 
-# Por persona y por letra con movimiento.
-ABC_CLIPS_POR_PERSONA = 40
+# --- Letras con movimiento (clips) ---
+# Por persona y letra: 20 clips (10 mano derecha, 10 izquierda).
+ABC_CLIPS_POR_PERSONA = 20
+
+# MediaPipe etiqueta la mano suponiendo imagen en espejo; con la imagen sin
+# voltear de la cámara, su "Left" es la mano DERECHA real. Si en pantalla dice
+# el lado al revés, cambiar a True.
+ABC_INVERTIR_LADO = False
 
 
 if __name__ == "__main__":

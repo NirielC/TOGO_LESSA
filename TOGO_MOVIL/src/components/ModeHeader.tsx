@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Mascot, useConversation } from '../core/conversation/ConversationProvider';
 import { colors, fonts, radius, space, type } from '../theme/tokens';
-import { Torogoz } from './Torogoz';
+import { RARE_CHANCE, SECRET_HINT, Torogoz } from './Torogoz';
 import { Icon, IconName } from './ui';
 
 /**
@@ -77,21 +77,25 @@ function Tool({ icon, label, onPress, dim }: { icon: IconName; label: string; on
 }
 
 /** Togo con lo que está pasando y un consejo rotativo. */
-export function AssistantStrip({ mascot, status, tips, tone }: { mascot: Mascot; status: string; tips: string[]; tone: string }) {
+export function AssistantStrip({ mascot, status, tips, tone, compact = false }: { mascot: Mascot; status: string; tips: string[]; tone: string; compact?: boolean }) {
   const [i, setI] = useState(0);
+  const [rare, setRare] = useState(false);
   useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % tips.length), 6500);
+    const t = setInterval(() => {
+      setI((x) => (x + 1) % tips.length);
+      setRare(Math.random() < RARE_CHANCE / 2); // la pista secreta, muy de vez en cuando
+    }, 6500);
     return () => clearInterval(t);
   }, [tips.length]);
   return (
     <View style={[st.strip, { backgroundColor: tone }]}>
-      <Torogoz state={mascot} size={46} interactive />
+      <Torogoz state={mascot} size={compact ? 38 : 46} interactive />
       <View style={st.stripText}>
         <Text style={st.status} numberOfLines={2}>
           {status}
         </Text>
         <Text style={st.tip} numberOfLines={2}>
-          {tips[i]}
+          {rare ? SECRET_HINT : tips[i]}
         </Text>
       </View>
     </View>

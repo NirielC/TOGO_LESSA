@@ -1,0 +1,176 @@
+{
+  "dataset": "v2",
+  "features": "v3",
+  "precision_prueba": 0.9883,
+  "precision_tflite": 0.9883,
+  "precision_espejo": 0.34,
+  "clases": [
+    "hola",
+    "como_estas",
+    "estoy_bien",
+    "estoy_mas_o_menos",
+    "estoy_mal",
+    "mi_nombre_es",
+    "si",
+    "a_que_hora_es",
+    "por_la_tarde",
+    "ok_adios"
+  ],
+  "matriz_confusion": [
+    [
+      59,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      60,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      60,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      59,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      59,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      60,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      59,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      58,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      60,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      59
+    ]
+  ],
+  "mas_confundidas": [
+    "si -> ok_adios: 1",
+    "ok_adios -> si: 1",
+    "hola -> como_estas: 1",
+    "estoy_mas_o_menos -> hola: 1",
+    "estoy_mal -> mi_nombre_es: 1",
+    "a_que_hora_es -> estoy_mas_o_menos: 1"
+  ],
+  "tflite_kb": 864.0,
+  "tflite_ops": [
+    "ADD",
+    "FULLY_CONNECTED",
+    "LOGISTIC",
+    "MUL",
+    "PACK",
+    "RESHAPE",
+    "SOFTMAX",
+    "SPLIT",
+    "TANH",
+    "UNPACK"
+  ],
+  "formato": {
+    "seq_len": 30,
+    "frame_dim": 384,
+    "features": "v3",
+    "canonical": true,
+    "fps": 20
+  },
+  "precision_persona_no_vista": {
+    "persona_1": 0.934,
+    "persona_2": 0.874,
+    "persona_3": 0.93,
+    "persona_4": 0.797
+  },
+  "promedio_persona_no_vista": 0.8838
+}
