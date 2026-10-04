@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Togo · Pantalla</title>
+<!--
+  PANTALLA DECORATIVA DE TOGO (para un monitor horizontal en la presentación).
+  Funciona sin internet: todo está en este archivo + la carpeta "fuentes".
+  Abrir con abrir.bat (pantalla completa) o en el navegador y presionar F11.
+  El escenario mide 1920×1080 y se escala solo a cualquier pantalla.
+-->
+<style>
+  @font-face { font-family: Fredoka; font-weight: 700; src: url(fuentes/Fredoka_700Bold.ttf); }
+  @font-face { font-family: Fredoka; font-weight: 600; src: url(fuentes/Fredoka_600SemiBold.ttf); }
+  @font-face { font-family: Nunito; font-weight: 700; src: url(fuentes/Nunito_700Bold.ttf); }
+  @font-face { font-family: Nunito; font-weight: 800; src: url(fuentes/Nunito_800ExtraBold.ttf); }
+
+  :root {
+    --deep: #0D2B45; --teal: #1E5A6E; --seafoam: #6BA7A0; --sky: #B7D4E6;
+    --sand: #DCC8AA; --cream: #FBF7EE; --coral: #F08A5D; --sun: #F6C453; --wing: #174A5B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--deep); cursor: none; }
+  body { font-family: Nunito, "Segoe UI", sans-serif; color: var(--cream); }
+
+  /* Fondo a pantalla completa (fuera del escenario escalado) */
+  #fondo { position: fixed; inset: 0; background:
+      radial-gradient(1200px 700px at 78% 18%, rgba(246,196,83,.20), transparent 60%),
+      radial-gradient(900px 600px at 10% 85%, rgba(107,167,160,.28), transparent 60%),
+      linear-gradient(160deg, #0D2B45 0%, #123a57 45%, #1E5A6E 100%); }
+
+  #escenario { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+
+  /* ---------- Olas ---------- */
+  .ola { position: absolute; left: -1920px; bottom: -10px; width: 5760px; height: 260px; }
+  .ola path { fill: currentColor; }
+  .ola.o1 { color: rgba(107,167,160,.30); animation: deriva 26s linear infinite; bottom: 40px; }
+  .ola.o2 { color: rgba(183,212,230,.22); animation: deriva 18s linear infinite reverse; bottom: 0; }
+  .ola.o3 { color: rgba(30,90,110,.85); animation: deriva 34s linear infinite; bottom: -60px; }
+  @keyframes deriva { from { transform: translateX(0); } to { transform: translateX(1920px); } }
+
+  /* ---------- Burbujas y destellos ---------- */
+  .burbuja { position: absolute; bottom: -40px; border-radius: 50%; border: 3px solid rgba(183,212,230,.45);
+    animation: subir linear infinite; }
+  @keyframes subir { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 1; }
+    50% { transform: translateY(-560px) translateX(26px); } 100% { transform: translateY(-1160px) translateX(-10px); opacity: 0; } }
+  .chispa { position: absolute; width: 22px; height: 22px; animation: titilar 3.2s ease-in-out infinite; }
+  .chispa path { fill: var(--sun); }
+  @keyframes titilar { 0%,100% { transform: scale(.4) rotate(0deg); opacity: .2; } 50% { transform: scale(1) rotate(45deg); opacity: 1; } }
+
+  /* ---------- Título ---------- */
+  #titulo { position: absolute; top: 40px; left: 0; right: 0; text-align: center; }
+  #marca { font-family: Fredoka; font-weight: 700; font-size: 250px; line-height: 1; letter-spacing: 6px; white-space: nowrap; }
+  #marca span { display: inline-block; animation: ola-letra 3.6s ease-in-out infinite;
+    text-shadow: 0 10px 0 var(--deep), 0 18px 34px rgba(0,0,0,.35); }
+  #marca span:nth-child(1) { color: var(--seafoam); animation-delay: 0s; }
+  #marca span:nth-child(2) { color: var(--sky); animation-delay: .15s; }
+  #marca span:nth-child(3) { color: var(--sun); animation-delay: .30s; }
+  #marca span:nth-child(4) { color: var(--coral); animation-delay: .45s; }
+  #marca span:nth-child(5) { color: var(--cream); animation-delay: .60s; }
+  #marca span:nth-child(6) { color: var(--seafoam); animation-delay: .75s; }
+  #marca sup { font-size: 46px; vertical-align: top; color: var(--sky); position: relative; top: 34px; margin-left: 6px; }
+  @keyframes ola-letra { 0%,60%,100% { transform: translateY(0) rotate(0); } 20% { transform: translateY(-26px) rotate(-3deg); } 40% { transform: translateY(6px) rotate(2deg); } }
+  #lema { font-family: Fredoka; font-weight: 600; font-size: 46px; color: var(--cream); margin-top: 6px; letter-spacing: 1px; }
+  #lema b { color: var(--sun); font-weight: 600; }
+  #lema .flecha { display: inline-block; color: var(--coral); animation: ida 2.4s ease-in-out infinite; margin: 0 14px; }
+  @keyframes ida { 0%,100% { transform: translateX(-8px); } 50% { transform: translateX(8px); } }
+
+  /* ---------- Togo ---------- */
+  #togo-zona { position: absolute; left: 110px; top: 470px; width: 600px; height: 480px; }
+  #togo { position: absolute; left: 60px; top: 70px; width: 380px; height: 380px; animation: salto 7s ease-in-out infinite; }
+  #togo svg { width: 100%; height: 100%; overflow: visible; }
+  @keyframes salto { 0%,82%,100% { transform: translateY(0) scale(1,1); } 85% { transform: translateY(6px) scale(1.04,.94); }
+    89% { transform: translateY(-70px) scale(.97,1.04); } 93% { transform: translateY(0) scale(1.05,.95); } 96% { transform: translateY(0) scale(1,1); } }
+  .respira { animation: respira 2.6s ease-in-out infinite; transform-box: view-box; transform-origin: 50px 90px; }
+  @keyframes respira { 0%,100% { transform: scale(1); } 50% { transform: scale(1.025) translateY(-.8px); } }
+  .ala { transform-box: view-box; transform-origin: 38px 56px; animation: aleteo 7s ease-in-out infinite; }
+  @keyframes aleteo { 0%,80%,100% { transform: rotate(0); } 83%,89%,95% { transform: rotate(-38deg); } 86%,92%,98% { transform: rotate(0); } }
+  .cabeza { transform-box: view-box; transform-origin: 55px 50px; animation: mirar 9s ease-in-out infinite; }
+  @keyframes mirar { 0%,20%,100% { transform: rotate(0); } 26%,34% { transform: rotate(-12deg); } 42%,50% { transform: rotate(12deg); } 56% { transform: rotate(0); } }
+  .parpado { transform-box: fill-box; transform-origin: center; animation: parpadeo 4.2s infinite; }
+  @keyframes parpadeo { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  #togo-pixel { position: absolute; inset: 0; display: none; image-rendering: pixelated; }
+  #togo.retro #togo-pixel { display: block; animation: pixel-bote .5s steps(2) infinite; }
+  #togo.retro #togo-svg { display: none; }
+  @keyframes pixel-bote { 0% { transform: translateY(0); } 100% { transform: translateY(-14px); } }
+  #sombra { position: absolute; left: 130px; top: 418px; width: 260px; height: 30px; border-radius: 50%;
+    background: rgba(0,0,0,.28); filter: blur(6px); animation: sombra 7s ease-in-out infinite; }
+  @keyframes sombra { 0%,82%,100% { transform: scale(1); opacity: 1; } 89% { transform: scale(.65); opacity: .5; } 93% { transform: scale(1.05); } }
+  #rama { position: absolute; left: 0; top: 432px; width: 560px; height: 40px; }
+
+  #globo { position: absolute; left: 290px; top: -10px; min-width: 260px; max-width: 420px; background: var(--cream); color: var(--deep);
+    font-family: Fredoka; font-weight: 600; font-size: 36px; line-height: 1.15; padding: 20px 30px; border-radius: 34px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.25); transform-origin: 18% 100%; transition: transform .35s cubic-bezier(.3,1.6,.5,1), opacity .25s; }
+  #globo::after { content: ""; position: absolute; left: 50px; bottom: -20px; width: 40px; height: 40px; background: var(--cream);
+    transform: rotate(45deg); border-radius: 6px; }
+  #globo.oculto { transform: scale(.6); opacity: 0; }
+
+  /* ---------- Teléfono ---------- */
+  #telefono { position: absolute; right: 170px; top: 410px; width: 360px; height: 560px; border-radius: 60px;
+    background: var(--deep); border: 10px solid #08202f; box-shadow: 0 30px 80px rgba(0,0,0,.45), inset 0 0 0 3px rgba(255,255,255,.05);
+    animation: flotar 6s ease-in-out infinite; transform: rotate(4deg); }
+  @keyframes flotar { 0%,100% { transform: rotate(4deg) translateY(0); } 50% { transform: rotate(2deg) translateY(-18px); } }
+  #pantalla { position: absolute; inset: 14px; border-radius: 46px; overflow: hidden; background: var(--cream); }
+  #camara { position: absolute; left: 12px; right: 12px; top: 14px; height: 250px; border-radius: 32px; background:
+    linear-gradient(160deg, #1b4a5e, #0f3346); overflow: hidden; }
+  #camara .visor path { stroke: var(--seafoam); stroke-width: 6; fill: none; stroke-linecap: round; }
+  #camara.destello { animation: destello .8s ease-out; }
+  @keyframes destello { 0% { box-shadow: inset 0 0 0 10px var(--sun); } 100% { box-shadow: inset 0 0 0 0 transparent; } }
+  #mano { transform-box: view-box; transform-origin: 170px 250px; animation: saludo 1.6s ease-in-out infinite; }
+  @keyframes saludo { 0%,100% { transform: rotate(-14deg); } 50% { transform: rotate(14deg); } }
+  .chip-vivo { position: absolute; left: 16px; top: 14px; background: rgba(13,43,69,.7); color: var(--cream); font-weight: 800;
+    font-size: 17px; padding: 6px 14px; border-radius: 99px; display: flex; align-items: center; gap: 8px; }
+  .chip-vivo i { width: 11px; height: 11px; border-radius: 50%; background: var(--coral); animation: latido 1.2s infinite; }
+  @keyframes latido { 50% { opacity: .25; } }
+  #chat { position: absolute; left: 12px; right: 12px; top: 276px; bottom: 16px; display: flex; flex-direction: column;
+    justify-content: flex-end; gap: 10px; overflow: hidden; }
+  .msj { max-width: 82%; padding: 12px 18px; border-radius: 22px; font-weight: 800; font-size: 22px; line-height: 1.2; color: var(--deep);
+    animation: entra .45s cubic-bezier(.3,1.5,.5,1) both; }
+  .msj small { display: block; font-size: 13px; letter-spacing: 1px; opacity: .7; margin-bottom: 3px; }
+  .msj.sena { align-self: flex-start; background: #E3F0EE; border-top-left-radius: 6px; }
+  .msj.voz { align-self: flex-end; background: #E8F1F8; border-top-right-radius: 6px; font-size: 25px; }
+  @keyframes entra { from { opacity: 0; transform: translateY(24px) scale(.9); } to { opacity: 1; transform: none; } }
+  .ondas { position: absolute; right: 110px; top: 500px; }
+  .ondas span { position: absolute; border: 6px solid var(--sun); border-left-color: transparent; border-bottom-color: transparent;
+    border-radius: 50%; transform: rotate(45deg); animation: onda 2s ease-out infinite; opacity: 0; }
+  .ondas span:nth-child(1) { width: 60px; height: 60px; left: -30px; top: -30px; }
+  .ondas span:nth-child(2) { width: 110px; height: 110px; left: -55px; top: -55px; animation-delay: .4s; }
+  .ondas span:nth-child(3) { width: 160px; height: 160px; left: -80px; top: -80px; animation-delay: .8s; }
+  @keyframes onda { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
+
+  /* ---------- Centro: cómo funciona ---------- */
+  #flujo { position: absolute; left: 790px; top: 500px; width: 520px; display: flex; flex-direction: column; gap: 22px; }
+  .paso { display: flex; align-items: center; gap: 22px; background: rgba(251,247,238,.08); border: 2px solid rgba(251,247,238,.14);
+    border-radius: 30px; padding: 18px 26px; transition: transform .4s, background .4s, border-color .4s; }
+  .paso.activo { transform: scale(1.06); background: rgba(251,247,238,.16); border-color: var(--sun); }
+  .paso .ico { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+  .paso .ico svg { width: 42px; height: 42px; }
+  .paso h3 { font-family: Fredoka; font-weight: 600; font-size: 34px; color: var(--cream); }
+  .paso p { font-size: 21px; color: var(--sky); font-weight: 700; }
+
+  /* ---------- Cinta inferior ---------- */
+  #cinta { position: absolute; left: 0; right: 0; bottom: 34px; height: 70px; overflow: hidden; }
+  #cinta-in { position: absolute; display: flex; gap: 70px; white-space: nowrap; animation: cinta 40s linear infinite; }
+  #cinta-in span { font-family: Fredoka; font-weight: 600; font-size: 36px; color: var(--cream); display: flex; align-items: center; gap: 70px; }
+  #cinta-in span::after { content: "✦"; color: var(--sun); }
+  @keyframes cinta { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  #internet { position: absolute; left: 50%; top: 372px; transform: translateX(-50%); display: flex; align-items: center; gap: 14px;
+    background: var(--sun); color: var(--deep); border: 4px solid var(--deep); border-radius: 99px; padding: 8px 30px 8px 10px;
+    font-family: Fredoka; font-weight: 700; font-size: 34px; animation: meneo 5s ease-in-out infinite; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  #internet .i { width: 50px; height: 50px; border-radius: 50%; background: var(--deep); display: grid; place-items: center; }
+  @keyframes meneo { 0%,80%,100% { transform: translateX(-50%) rotate(0); } 84% { transform: translateX(-50%) rotate(-4deg); }
+    88% { transform: translateX(-50%) rotate(4deg); } 92% { transform: translateX(-50%) rotate(-2deg); } }
+
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0s !important; } }
+</style>
+</head>
+<body>
+<div id="fondo"></div>
+
+<div id="escenario">
+  <!-- Olas -->
+  <svg class="ola o1" viewBox="0 0 5760 260" preserveAspectRatio="none"><path d="M0 120 Q240 40 480 120 T960 120 T1440 120 T1920 120 T2400 120 T2880 120 T3360 120 T3840 120 T4320 120 T4800 120 T5280 120 T5760 120 V260 H0 Z"/></svg>
+  <svg class="ola o2" viewBox="0 0 5760 260" preserveAspectRatio="none"><path d="M0 150 Q320 80 640 150 T1280 150 T1920 150 T2560 150 T3200 150 T3840 150 T4480 150 T5120 150 T5760 150 V260 H0 Z"/></svg>
+  <svg class="ola o3" viewBox="0 0 5760 260" preserveAspectRatio="none"><path d="M0 170 Q200 120 400 170 T800 170 T1200 170 T1600 170 T2000 170 T2400 170 T2800 170 T3200 170 T3600 170 T4000 170 T4400 170 T4800 170 T5200 170 T5600 170 T6000 170 V260 H0 Z"/></svg>
+  <div id="burbujas"></div>
+
+  <!-- Título -->
+  <div id="titulo">
+    <div id="marca"><span>T</span><span>O</span><span>G</span><span>O</span><sup>™</sup></div>
+    <div id="lema">Lengua de Señas Salvadoreña <span class="flecha">⇄</span> <b>voz</b></div>
+  </div>
+
+  <div id="internet">
+    <div class="i"><svg width="30" height="30" viewBox="0 0 24 24"><path fill="#FBF7EE" d="M2.28 3 1 4.27l2.47 2.47C2.22 7.5 1.06 8.4 0 9.4l2 2c.9-.86 1.9-1.6 2.97-2.17l2.27 2.27C6.07 12.04 5 12.82 4 13.8l2 2c1.04-1.04 2.3-1.8 3.63-2.27l2.07 2.07C10.3 15.84 9.1 16.4 8 17.2l4 4 2.18-2.18 5.55 5.55 1.27-1.28L2.28 3M12 3C8.6 3 5.5 4.13 3 6l2.04 2.04C7.13 6.73 9.47 6 12 6c3.73 0 7.1 1.53 9.54 4l2-2C20.5 4.9 16.5 3 12 3m0 6c-.52 0-1.03.04-1.53.1l3.12 3.12c1.94.36 3.66 1.36 4.97 2.78l2-2C18.43 10.58 15.43 9 12 9z"/></svg></div>
+    ¡No necesitas internet!
+  </div>
+
+  <!-- Togo -->
+  <div id="togo-zona">
+    <div id="globo">¡Hola! Soy Togo</div>
+    <div id="sombra"></div>
+    <div id="togo">
+      <svg id="togo-svg" viewBox="0 0 100 100">
+        <g class="respira">
+          <path d="M34 76 L22 95" stroke="#1E5A6E" stroke-width="3.2" stroke-linecap="round"/>
+          <ellipse cx="20.5" cy="95" rx="4.4" ry="3.2" fill="#0D2B45" transform="rotate(-55 20.5 95)"/>
+          <ellipse cx="46" cy="62" rx="24" ry="24" fill="#1E5A6E"/>
+          <ellipse cx="53" cy="68" rx="14" ry="15" fill="#DCC8AA"/>
+          <path d="M44 85 l-2 5 M52 85 l1 5" stroke="#0D2B45" stroke-width="2.2" stroke-linecap="round"/>
+          <g class="ala"><path d="M30 54 C40 50 50 60 48 80 C38 80 28 70 30 54 Z" fill="#174A5B"/></g>
+          <g class="cabeza">
+            <circle cx="57" cy="35" r="18" fill="#6BA7A0"/>
+            <path d="M40 33 C42 20 56 14 68 20 C62 22 50 24 40 33 Z" fill="#1E5A6E"/>
+            <path d="M46 27 C54 23 64 23 72 27" stroke="#B7D4E6" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M42 35 C50 31 62 31 73 34 L73 39 C62 37 50 38 43 40 Z" fill="#0D2B45"/>
+            <path d="M72 34 C78 34 85 36 89 40 C84 40 78 40 72 40 Z" fill="#0D2B45"/>
+            <g class="parpado">
+              <circle cx="63" cy="35" r="4.4" fill="#FBF7EE"/>
+              <circle cx="64" cy="35" r="2.4" fill="#0D2B45"/>
+              <circle cx="64.9" cy="34.1" r=".8" fill="#fff"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+      <svg id="togo-pixel" viewBox="0 0 16 16"></svg>
+    </div>
+    <svg id="rama" viewBox="0 0 560 40"><path d="M10 22 C150 8 330 34 550 16" stroke="#7A4E2D" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <ellipse cx="470" cy="10" rx="34" ry="13" fill="#6BA7A0" transform="rotate(-18 470 10)"/><ellipse cx="90" cy="12" rx="28" ry="11" fill="#6BA7A0" transform="rotate(14 90 12)"/></svg>
+  </div>
+
+  <!-- Cómo funciona -->
+  <div id="flujo">
+    <div class="paso" data-paso="0">
+      <div class="ico" style="background:#6BA7A0"><svg viewBox="0 0 24 24"><path fill="#0D2B45" d="M21 7 17 3l-1.4 1.4L18.2 7H14v2h4.2l-2.6 2.6L17 13l4-4zM9 2C7.9 2 7 2.9 7 4v8.6l-1.3-1.3a1.5 1.5 0 0 0-2.1 2.1L8 18c1.1 1.3 2.7 2 4.4 2H14a5 5 0 0 0 5-5v-3h-2v3a3 3 0 0 1-3 3h-1.6c-1.1 0-2.1-.5-2.9-1.3L9 16V4h2v7h2V4c0-1.1-.9-2-2-2H9z"/></svg></div>
+      <div><h3>Lee tus señas</h3><p>La cámara ve tus manos</p></div>
+    </div>
+    <div class="paso" data-paso="1">
+      <div class="ico" style="background:#F6C453"><svg viewBox="0 0 24 24"><path fill="#0D2B45" d="M14 3.2v2.1c2.9.9 5 3.5 5 6.7s-2.1 5.8-5 6.7v2.1c4-.9 7-4.5 7-8.8s-3-7.9-7-8.8M16.5 12A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4M3 9v6h4l5 5V4L7 9H3z"/></svg></div>
+      <div><h3>Las dice en voz alta</h3><p>Para quien oye</p></div>
+    </div>
+    <div class="paso" data-paso="2">
+      <div class="ico" style="background:#B7D4E6"><svg viewBox="0 0 24 24"><path fill="#0D2B45" d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3m7 9c0 3.5-2.6 6.4-6 6.9V21h-2v-3.1c-3.4-.5-6-3.4-6-6.9h2a5 5 0 0 0 10 0h2z"/></svg></div>
+      <div><h3>Voz en letra grande</h3><p>Para leer la respuesta</p></div>
+    </div>
+  </div>
+
+  <!-- Teléfono -->
+  <div id="telefono">
+    <div id="pantalla">
+      <div id="camara">
+        <svg class="visor" viewBox="0 0 344 300" style="position:absolute;inset:0;width:100%;height:100%">
+          <path d="M26 64 v-36 h36"/><path d="M318 64 v-36 h-36"/><path d="M26 236 v36 h36"/><path d="M318 236 v36 h-36"/>
+        </svg>
+        <svg viewBox="0 0 344 300" style="position:absolute;inset:0;width:100%;height:100%"><g id="mano"></g></svg>
+        <div class="chip-vivo"><i></i>Leyendo señas</div>
+      </div>
+      <div id="chat"></div>
+    </div>
+  </div>
+  <div class="ondas"><span></span><span></span><span></span></div>
+
+  <!-- Cinta -->
+  <div id="cinta"><div id="cinta-in"></div></div>
+</div>
+
+<script>
+  // ---------- Escalar el escenario 1920×1080 a la pantalla ----------
+  const esc = document.getElementById('escenario');
+  function ajustar() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    esc.style.transform = `translate(${-960 * s}px, ${-540 * s}px) scale(${s})`;
+  }
+  addEventListener('resize', ajustar); ajustar();
+  // Doble clic = pantalla completa (o F11).
+  addEventListener('dblclick', () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}));
+
+  // ---------- Burbujas y chispas ----------
+  const bz = document.getElementById('burbujas');
+  for (let i = 0; i < 22; i++) {
+    const b = document.createElement('div');
+    const t = 14 + Math.random() * 26;
+    b.className = 'burbuja';
+    b.style.cssText = `left:${Math.random() * 1920}px;width:${t}px;height:${t}px;animation-duration:${12 + Math.random() * 14}s;animation-delay:${-Math.random() * 20}s`;
+    bz.appendChild(b);
+  }
+  [[110, 120], [1790, 90], [1640, 300], [300, 330], [1500, 60], [60, 600], [1860, 640]].forEach(([x, y], i) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    c.setAttribute('viewBox', '0 0 20 20'); c.classList.add('chispa');
+    c.style.cssText = `left:${x}px;top:${y}px;animation-delay:${i * .45}s`;
+    c.innerHTML = '<path d="M10 0 L12.5 7.5 L20 10 L12.5 12.5 L10 20 L7.5 12.5 L0 10 L7.5 7.5 Z"/>';
+    bz.appendChild(c);
+  });
+
+  // ---------- Mano con puntos (como la dibuja la app) ----------
+  const H = [[0,30],[-10,22],[-18,14],[-23,7],[-27,1],[-7,5],[-9,-6],[-10,-14],[-11,-21],[0,3],[0,-9],[0,-18],[0,-26],[7,5],[9,-5],[10,-13],[11,-20],[13,10],[17,3],[19,-3],[21,-9]];
+  const B = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
+  const P = (i) => [170 + H[i][0] * 4.2, 125 + H[i][1] * 4.2];
+  let mano = '';
+  B.forEach(([a, b]) => { const [x1, y1] = P(a), [x2, y2] = P(b); mano += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#B7D4E6" stroke-width="7" stroke-linecap="round"/>`; });
+  H.forEach((_, i) => { const [x, y] = P(i); const tip = [4, 8, 12, 16, 20].includes(i); mano += `<circle cx="${x}" cy="${y}" r="${tip ? 10 : 7}" fill="${tip ? '#F08A5D' : '#F6C453'}"/>`; });
+  document.getElementById('mano').innerHTML = mano;
+
+  // ---------- Togo 8 bits ----------
+  const PIX = ['................','......TTTT......','.....TSSSSS.....','....FFFFFFFF....','....DDDDWWDD....','....DDDDWKDDDDD.','....FFFFFFFF....','.....FFFFFF.....','....TTTTTTTT....','...TGGTTTBBBT...','..TGGGTTBBBBBT..','..TGGGTTBBBBBT..','..TTGGTTTBBBT...','...TTTTTTTTT....','..T...D..D......','.DD.............'];
+  const PC = { T: '#1E5A6E', S: '#B7D4E6', F: '#6BA7A0', D: '#0D2B45', W: '#FBF7EE', K: '#0D2B45', G: '#174A5B', B: '#DCC8AA' };
+  document.getElementById('togo-pixel').innerHTML = PIX.flatMap((r, y) => r.split('').map((c, x) => PC[c] ? `<rect x="${x}" y="${y}" width="1.04" height="1.04" fill="${PC[c]}"/>` : '')).join('');
+
+  // ---------- Lo que dice Togo ----------
+  const FRASES = ['¡Hola! Soy Togo', 'Leo la Lengua de Señas Salvadoreña', 'Y la convierto en voz', 'Lo que te responden, en letra grande', '¡Funciono sin internet!', 'Nada sale de tu teléfono', 'Si no puedes hablar, yo hablo por ti', 'Hecho en El Salvador 💙', '¡Pío pío! 🐦'];
+  const globo = document.getElementById('globo');
+  const togo = document.getElementById('togo');
+  let f = 0, vueltas = 0;
+  setInterval(() => {
+    globo.classList.add('oculto');
+    setTimeout(() => {
+      f = (f + 1) % FRASES.length;
+      if (f === 0) vueltas++;
+      // Cada dos vueltas, Togo viaja a los 80 un ratito.
+      const retro = vueltas % 2 === 1 && f === 4;
+      togo.classList.toggle('retro', retro);
+      globo.textContent = retro ? '¡MODO 8-BIT! 👾' : FRASES[f];
+      globo.classList.remove('oculto');
+    }, 350);
+  }, 3800);
+
+  // ---------- Conversación en el teléfono (bucle) ----------
+  const CHAT = [
+    ['sena', 'Hola'], ['sena', '¿Cómo estás?'], ['voz', '¡Muy bien! ¿Y tú?'],
+    ['sena', 'Estoy bien'], ['sena', 'Mi nombre es ANA'], ['voz', '¡Mucho gusto, Ana!'],
+    ['sena', '¿A qué hora es?'], ['voz', 'Por la tarde'], ['sena', 'Ok, adiós'],
+  ];
+  const chat = document.getElementById('chat');
+  const cam = document.getElementById('camara');
+  const pasos = [...document.querySelectorAll('.paso')];
+  let c = 0;
+  function siguiente() {
+    if (c === CHAT.length) { chat.innerHTML = ''; c = 0; }
+    const [quien, texto] = CHAT[c++];
+    const m = document.createElement('div');
+    m.className = 'msj ' + quien;
+    m.innerHTML = `<small>${quien === 'sena' ? '🤟 SEÑA' : '🎤 RESPUESTA'}</small>${texto}`;
+    chat.appendChild(m);
+    while (chat.children.length > 3) chat.removeChild(chat.firstChild);
+    if (quien === 'sena') { cam.classList.remove('destello'); void cam.offsetWidth; cam.classList.add('destello'); }
+    pasos.forEach((p, i) => p.classList.toggle('activo', quien === 'sena' ? i === 0 || i === 1 && c % 2 === 0 : i === 2));
+  }
+  siguiente();
+  setInterval(siguiente, 2600);
+
+  // ---------- Cinta inferior ----------
+  const CINTA = ['Lengua de Señas Salvadoreña', 'Seña → voz', 'Voz → letra grande', '¡Sin internet!', 'Privado: nada sale de tu teléfono', 'Para quien oye y para quien no habla', 'Con Togo, el torogoz 🐦', 'Hecho en El Salvador'];
+  document.getElementById('cinta-in').innerHTML = [...CINTA, ...CINTA].map((t) => `<span>${t}</span>`).join('');
+</script>
+</body>
+</html>
