@@ -2,7 +2,7 @@
 
 Se dockeriza la **versión web** de Togo (Expo para web). Dentro del contenedor se genera la web de
 producción y se sirve en el puerto **5173**. Funciona toda la interfaz (inicio, Dar voz, frases rápidas,
-pizarra, diccionario con animaciones, el torogoz, ajustes, Sobre nosotros). El reconocimiento de señas con la
+pizarra, diccionario con animaciones, el torogoz, ajustes, Sobre Togo). El reconocimiento de señas con la
 cámara usa un módulo nativo de Android, por eso ese queda en la APK.
 
 ## Archivos

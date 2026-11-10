@@ -10,7 +10,7 @@ import type { StabilizerConfig } from '@/core/signs/PredictionStabilizer';
 import { visionAvailability } from '@/core/signs/native';
 import * as stt from '@/core/voice/stt';
 import { speak } from '@/core/voice/tts';
-import { APP_VERSION } from '@/data/equipo';
+import { APP_VERSION } from '@/data/app';
 import { colors, fonts, radius, space, type } from '@/theme/tokens';
 
 export default function Ajustes() {
@@ -202,6 +202,6 @@ const st = StyleSheet.create({
   stepper: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceAlt, borderRadius: radius.pill },
   stepValue: { fontFamily: fonts.bodyBold, fontSize: 14, minWidth: 52, textAlign: 'center', color: colors.text },
   link: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 44 },
-  nameInput: { ...type.body, minWidth: 120, backgroundColor: colors.surfaceAlt, borderRadius: radius.pill, paddingHorizontal: space.md, height: 40, textAlign: 'center' },
+  nameInput: { ...type.body, width: 140, backgroundColor: colors.surfaceAlt, borderRadius: radius.pill, paddingHorizontal: space.md, height: 40, textAlign: 'center' },
   advToggle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.xs },
 });

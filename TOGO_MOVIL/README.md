@@ -10,38 +10,45 @@ las dice en voz alta; la voz se muestra en letra grande. Dos modos, según quié
 
 La mascota es **Togo**, el torogoz gordito: asistente que indica el estado y da consejos.
 Además: "¿Quisiste decir…?" antes de decir una frase en señas, Diccionario LESSA (animaciones
-con datos reales del dataset), conversaciones guardadas y Sobre nosotros.
+con datos reales del dataset), conversaciones guardadas y Sobre Togo.
 
-**Foto del autor:** copiar a `assets/equipo/elias.jpg` (cuadrada, ~400×400) y descomentar
-la línea `foto` en `src/data/equipo.ts`.
+**Foto del autor:** copiar a `assets/autor.jpg` (cuadrada, ~400×400) y descomentar la línea
+`foto` en `src/data/app.ts`.
 
 ## Instalar en el teléfono
 
-La APK lista está en `dist/Togo-0.3.apk`. Cópiala al teléfono y ábrela (hay que permitir
-"instalar apps desconocidas"), o con el teléfono por USB y depuración activada:
+La APK está en la carpeta [`APK/`](../APK) de la raíz del repositorio (`Togo-Beta-0.6.apk`).
+Cópiala al teléfono y ábrela (hay que permitir "instalar apps desconocidas"), o con el teléfono
+por USB y depuración activada:
 
 ```bash
-adb install -r dist/Togo-0.3.apk
+adb install -r APK/Togo-Beta-0.6.apk
 ```
 
 ## Compilar
 
 Expo Go **no** sirve para el reconocimiento: el módulo `modules/togo-vision` es nativo (Kotlin).
-En Expo Go solo se ve la interfaz; mantener presionada la cámara abre un simulador de señas.
+En Expo Go solo se ve la interfaz; mantener presionada la cámara abre un simulador de señas para
+probar el flujo completo.
 
-En Windows las rutas de `node_modules` pasan de 260 caracteres y la compilación falla. Se compila
-desde una unidad corta:
+En Windows, un solo comando (copia la app a `C:\L\TOGO_MOVIL` y compila ahí, porque las rutas
+de `node_modules` pasan de 260 caracteres):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build-apk.ps1
+```
+
+La APK queda en `dist/Togo-<versión>.apk` (la versión sale de `APP_VERSION` en
+`src/data/app.ts`). `dist/` no se sube a git: la APK de cada versión se copia a `APK/` en la raíz.
+
+A mano (Linux/macOS, o para ver cada paso):
 
 ```bash
-subst L: C:\Users\elsni\Downloads\Togo
+npx expo prebuild --platform android
 ```
 
 ```bash
-cd /l/TOGO_MOVIL && npx expo prebuild --platform android
-```
-
-```bash
-cd /l/TOGO_MOVIL/android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
+cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
 ```
 
 La APK queda en `android/app/build/outputs/apk/release/app-release.apk`.
@@ -50,13 +57,14 @@ La APK queda en `android/app/build/outputs/apk/release/app-release.apk`.
 
 | Carpeta | Qué hay |
 |---|---|
-| `src/app/` | Pantallas: inicio (`index`), `senas`, `voz`, `ajustes`, `guardadas` |
+| `src/app/` | Pantallas: inicio (`index`), `senas`, `voz`, `diccionario/`, `guardadas`, `ajustes`, `acerca` |
 | `src/core/conversation/` | Turnos, frase en curso y deletreo (`reducer.ts`, lógica pura) y su proveedor |
 | `src/core/signs/` | Contrato del motor, estabilizador, vocabulario, puente al módulo nativo |
 | `src/core/voice/` | Voz a texto (`expo-speech-recognition`) y texto a voz |
-| `src/components/` | Momo, cámara, pizarra, línea de tiempo, barras |
+| `src/components/` | Togo, cámara, pizarra, línea de tiempo, barras, avatar de señas |
 | `modules/togo-vision/` | Módulo nativo: CameraX + MediaPipe + TFLite + dibujo de manos |
 | `modules/togo-vision/android/src/main/assets/` | Modelos (`.task`, `.tflite`) y etiquetas |
+| `src/data/` | Versión y autor (`app.ts`), diccionario exportado del dataset, consejos de Togo |
 
 ## Reglas de conversación
 

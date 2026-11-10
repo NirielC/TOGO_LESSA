@@ -80,12 +80,15 @@ export default function Diccionario() {
               <Text style={st.letter}>{item.letra}</Text>
             </View>
           )}
+          ListFooterComponent={
+            q ? null : <Text style={[type.small, { textAlign: 'center' }]}>J, Ñ y Z se hacen con movimiento: la cámara también las reconoce.</Text>
+          }
         />
       ) : (
         <View style={st.soon}>
           <Torogoz state="thinking" size={80} />
           <Text style={[type.h2, { textAlign: 'center' }]}>El abecedario viene pronto</Text>
-          <Text style={[type.small, { textAlign: 'center' }]}>Cuando el equipo capture las fotos de cada letra, aparecerán aquí con su forma de mano.</Text>
+          <Text style={[type.small, { textAlign: 'center' }]}>Cuando se capturen las fotos de cada letra, aparecerán aquí con su forma de mano.</Text>
         </View>
       )}
     </SafeAreaView>

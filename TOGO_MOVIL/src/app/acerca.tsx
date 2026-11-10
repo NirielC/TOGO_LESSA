@@ -8,11 +8,11 @@ import { SIGNS } from '@/components/SignAvatar';
 import { Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { goBack } from '@/core/nav';
-import { APP_VERSION, APP_YEAR, EQUIPO } from '@/data/equipo';
+import { APP_VERSION, APP_YEAR, AUTOR } from '@/data/app';
 import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
 
-/** SOBRE NOSOTROS: qué es Togo, por qué existe, por qué un torogoz y quiénes lo hicimos. */
-export default function Nosotros() {
+/** SOBRE TOGO: qué es, por qué existe, por qué un torogoz y quién la hizo. */
+export default function Acerca() {
   const [egg, setEgg] = useState(false);
   const taps = useRef({ n: 0, at: 0 });
   // 5 toques seguidos en la versión abren el secreto.
@@ -28,7 +28,7 @@ export default function Nosotros() {
     <SafeAreaView style={st.safe}>
       <View style={st.head}>
         <IconButton icon="arrow-left" label="Volver" onPress={goBack} />
-        <Text style={type.h1}>Sobre nosotros</Text>
+        <Text style={type.h1}>Sobre Togo</Text>
       </View>
       <ScrollView contentContainerStyle={st.content}>
         {/* Portada */}
@@ -63,30 +63,28 @@ export default function Nosotros() {
         <View style={st.values}>
           <Value icon="shield-lock-outline" title="Privado" text="Nada sale de tu teléfono: ni imágenes ni voz." />
           <Value icon="account-heart-outline" title="Para las dos personas" text="La otra persona no necesita tener la app." />
-          <Value icon="map-marker-radius-outline" title="Hecho aquí" text="Con señas reales grabadas por nuestro equipo." />
+          <Value icon="map-marker-radius-outline" title="Hecho aquí" text="Con señas reales de LESSA, grabadas en El Salvador." />
         </View>
 
-        <Text style={st.section}>EQUIPO DE DESARROLLO</Text>
-        {EQUIPO.map((m, i) => (
-          <View key={m.correo} style={[st.member, i === 0 && st.first]}>
-            {m.foto ? (
-              <Image source={m.foto} style={[st.photo, { borderColor: m.color }]} />
-            ) : (
-              <View style={[st.photo, { backgroundColor: m.color, borderColor: m.color }]}>
-                <Text style={[st.initials, m.color === '#1E5A6E' && { color: colors.onInk }]}>{initials(m.nombre)}</Text>
-              </View>
-            )}
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={type.bodyStrong}>{m.nombre}</Text>
-              <Text style={type.small}>{m.rol}</Text>
-              <Pressable onPress={() => Linking.openURL(`mailto:${m.correo}`)} hitSlop={6}>
-                <Text style={st.mail} numberOfLines={1}>
-                  {m.correo}
-                </Text>
-              </Pressable>
+        <Text style={st.section}>CREADA POR</Text>
+        <View style={st.member}>
+          {AUTOR.foto ? (
+            <Image source={AUTOR.foto} style={[st.photo, { borderColor: AUTOR.color }]} />
+          ) : (
+            <View style={[st.photo, { backgroundColor: AUTOR.color, borderColor: AUTOR.color }]}>
+              <Text style={st.initials}>{initials(AUTOR.nombre)}</Text>
             </View>
+          )}
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={type.bodyStrong}>{AUTOR.nombre}</Text>
+            <Text style={type.small}>{AUTOR.rol}</Text>
+            <Pressable onPress={() => Linking.openURL(`mailto:${AUTOR.correo}`)} hitSlop={6}>
+              <Text style={st.mail} numberOfLines={1}>
+                {AUTOR.correo}
+              </Text>
+            </Pressable>
           </View>
-        ))}
+        </View>
 
         <View style={st.footer}>
           <View style={st.made}>
@@ -95,7 +93,7 @@ export default function Nosotros() {
           </View>
           <Pressable onPress={tapVersion} hitSlop={10}>
             <Text style={st.legal}>
-              Togo™ · © {APP_YEAR} Equipo Togo · {APP_VERSION}
+              Togo™ · © {APP_YEAR} {AUTOR.nombre} · {APP_VERSION}
             </Text>
           </Pressable>
         </View>
@@ -153,7 +151,7 @@ const st = StyleSheet.create({
   hero: { backgroundColor: colors.surface, borderRadius: radius.xl, padding: space.xl, gap: space.md, alignItems: 'center', overflow: 'hidden' },
   heroTitle: { fontFamily: fonts.title, fontSize: 28, lineHeight: 33, color: colors.text, textAlign: 'center' },
   heroText: { ...type.body, textAlign: 'center' },
-  stats: { flexDirection: 'row', gap: space.sm },
+  stats: { flexDirection: 'row', gap: space.sm, alignSelf: 'stretch' },
   stat: { flex: 1, alignItems: 'center', borderRadius: radius.md, paddingVertical: space.sm, gap: 1 },
   statValue: { fontFamily: fonts.title, fontSize: 24, color: colors.text },
   statLabel: { ...type.small, fontSize: 12 },
@@ -163,10 +161,9 @@ const st = StyleSheet.create({
   value: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   valueIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   section: { ...type.label, marginTop: space.sm },
-  member: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.md, borderWidth: 1, borderColor: 'transparent' },
-  first: { borderColor: 'rgba(107,167,160,0.55)' },
+  member: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.md, borderWidth: 1, borderColor: 'rgba(107,167,160,0.55)' },
   photo: { width: 60, height: 60, borderRadius: 30, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderWidth: 2 },
-  initials: { fontFamily: fonts.title, fontSize: 21, color: colors.text },
+  initials: { fontFamily: fonts.title, fontSize: 21, color: colors.onInk },
   mail: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.primary },
   footer: { alignItems: 'center', gap: space.sm, marginTop: space.lg },
   made: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FBE3D8', borderRadius: radius.pill, paddingHorizontal: space.lg, paddingVertical: 8 },

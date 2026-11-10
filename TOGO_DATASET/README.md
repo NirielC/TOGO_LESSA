@@ -1,7 +1,7 @@
 # TOGO_DATASET
 
-Datos y entrenamiento del modelo de señas LESSA. El resultado (`models/v2/lessa_signs.tflite` +
-`labels.json`) es lo que usa la app `TOGO_MOVIL`.
+Datos y entrenamiento del modelo de señas LESSA. El resultado (`models/v3/`: `.tflite` + etiquetas)
+se copia a la app `TOGO_MOVIL` con `--instalar`. Historial de modelos en `models/README.md`.
 
 ```bash
 pip install -r requirements.txt

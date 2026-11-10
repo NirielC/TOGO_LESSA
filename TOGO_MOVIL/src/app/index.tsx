@@ -8,13 +8,13 @@ import { Logo } from '@/components/Logo';
 import { MASCOT_NAME, RARE_CHANCE, SECRET_HINT, Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { useSettings } from '@/core/settings';
-import { APP_VERSION, APP_YEAR } from '@/data/equipo';
+import { APP_VERSION, APP_YEAR } from '@/data/app';
 import { HOME_TIPS } from '@/data/tips';
 import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
 
 /**
  * INICIO: dos maneras de conversar, según quién tiene el teléfono, y debajo
- * lo que siempre está a mano (diccionario, conversaciones, nosotros).
+ * lo que siempre está a mano (diccionario, conversaciones, sobre Togo).
  */
 export default function Inicio() {
   const { settings, update } = useSettings();
@@ -94,7 +94,7 @@ export default function Inicio() {
         <View style={st.links}>
           <Row icon="book-open-variant" title="Diccionario LESSA" text="Aprende y repasa cada seña" tone="#FCEFD2" onPress={() => router.push('/diccionario')} />
           <Row icon="history" title="Conversaciones guardadas" text="Vuelve a leer lo que hablaron" tone={colors.voiceSoft} onPress={() => router.push('/guardadas')} />
-          <Row icon="account-group-outline" title="Sobre nosotros" text="Quiénes están detrás de Togo" tone={colors.signSoft} onPress={() => router.push('/nosotros')} />
+          <Row icon="information-outline" title="Sobre Togo" text="Qué es, quién la hizo y por qué un torogoz" tone={colors.signSoft} onPress={() => router.push('/acerca')} />
         </View>
 
         <View style={st.footer}>

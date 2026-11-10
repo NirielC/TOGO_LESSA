@@ -5,7 +5,7 @@ import { colors, fonts, palette, radius, space } from '../theme/tokens';
 
 /**
  * Secreto: un héroe de 8 bits levantando la Trifuerza.
- * Se abre tocando 5 veces la versión en "Sobre nosotros".
+ * Se abre tocando 5 veces la versión en "Sobre Togo".
  */
 const PIXELS = [
   '......Y......',

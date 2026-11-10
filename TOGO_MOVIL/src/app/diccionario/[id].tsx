@@ -65,7 +65,7 @@ export default function SenaDetalle() {
           <Hint icon="gesture-swipe" text={`Movimiento ${p.movimiento}`} />
           <Hint icon="human-handsup" text={`A la altura de ${p.zona}`} />
           <Text style={[type.small, { marginTop: space.xs }]}>
-            Medido en {sign.grabaciones} grabaciones reales del equipo Togo.
+            Medido en {sign.grabaciones} grabaciones reales de esta seña.
           </Text>
         </View>
 
