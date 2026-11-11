@@ -77,6 +77,27 @@ export default function Voz() {
           </View>
         </View>
 
+        <View style={st.urgentesHead}>
+          <Icon name="alert-circle-outline" size={16} color={colors.live} />
+          <Text style={[type.label, { color: colors.live }]}>URGENTE</Text>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.urgentesBox} contentContainerStyle={st.urgentes}>
+          {URGENTES.map((p) => (
+            <Pressable
+              key={p}
+              onPress={() => {
+                tocar();
+                conv.sayTyped(p, 'phrase');
+              }}
+              style={({ pressed }) => [st.urgente, pressed && { transform: [{ scale: 0.96 }] }]}
+              accessibilityRole="button"
+              accessibilityLabel={`Decir: ${p}`}
+            >
+              <Text style={st.urgenteText}>{p}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
         <View style={st.phrasesHead}>
           <Text style={type.label}>FRASES RÁPIDAS</Text>
           <Pressable onPress={() => setEditPhrases(true)} hitSlop={8}>
@@ -111,6 +132,8 @@ export default function Voz() {
 }
 
 const PHRASE_COLORS = ['#FCEFD2', colors.signSoft, colors.voiceSoft, '#FBE3D8'];
+/** Frases para una urgencia: siempre a la vista, se dicen con un solo toque. */
+const URGENTES = ['Necesito ayuda, por favor', 'Llame a un médico', 'Me siento mal', 'Llame a mi familia', 'Llame a la policía'];
 
 const st = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
@@ -119,6 +142,11 @@ const st = StyleSheet.create({
   writeActions: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   sayBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.primary, borderRadius: radius.pill, paddingHorizontal: space.lg, height: 48 },
   sayText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.onPrimary },
+  urgentesHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: space.lg, marginTop: space.sm },
+  urgentesBox: { flexGrow: 0, flexShrink: 0 },
+  urgentes: { gap: space.sm, paddingHorizontal: space.lg, paddingVertical: space.xs, alignItems: 'center' },
+  urgente: { backgroundColor: '#FBE3D8', borderColor: colors.live, borderWidth: 1.5, borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 8 },
+  urgenteText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.text },
   phrasesHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.lg, marginTop: space.sm },
   edit: { fontFamily: fonts.bodyBold, color: colors.primary, fontSize: 13 },
   phrasesBox: { flexGrow: 0, maxHeight: 150 },

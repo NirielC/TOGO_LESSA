@@ -6,6 +6,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { Aparecer } from '@/components/Aparecer';
 import { SignsScene, VoiceScene } from '@/components/Illustrations';
 import { Logo } from '@/components/Logo';
+import { Novedades } from '@/components/Novedades';
 import { MASCOT_NAME, RARE_CHANCE, SECRET_HINT, Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { useSettings } from '@/core/settings';
@@ -43,6 +44,7 @@ export default function Inicio() {
   return (
     <SafeAreaView style={st.safe}>
       <Backdrop />
+      <Novedades />
       <ScrollView contentContainerStyle={st.content} keyboardShouldPersistTaps="handled">
         <View style={st.topBar}>
           <View style={{ width: 48 }} />

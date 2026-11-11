@@ -9,6 +9,7 @@ export const HOME_TIPS = [
   'En el Diccionario aprendes señas paso a paso',
   'Mantenme presionado y verás 🎶',
   'No hace falta que la otra persona tenga la app',
+  'Practica cada seña con la cámara desde el Diccionario',
 ];
 
 export const SIGN_TIPS = [
@@ -18,6 +19,7 @@ export const SIGN_TIPS = [
   'Con buena luz te entiendo mejor',
   'Si me equivoco, toca la seña para quitarla',
   'Puedes girar la pantalla para que lean la frase',
+  'Por ahora leo manos y cuerpo; las expresiones de la cara, todavía no',
 ];
 
 export const VOICE_TIPS = [
@@ -25,4 +27,5 @@ export const VOICE_TIPS = [
   'Toca "Escuchar respuesta" y acerca el teléfono',
   'Gira el texto para que lo lea quien está enfrente',
   'Agrega tus propias frases con Editar',
+  'Las frases urgentes se dicen con un solo toque',
 ];

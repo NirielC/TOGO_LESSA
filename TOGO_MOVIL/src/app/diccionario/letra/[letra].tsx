@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LETTERS, LetterHand } from '@/components/SignAvatar';
 import { Torogoz } from '@/components/Torogoz';
-import { Icon, IconButton, IconName } from '@/components/ui';
+import { Button, Icon, IconButton, IconName } from '@/components/ui';
 import { goBack } from '@/core/nav';
 import { useSettings } from '@/core/settings';
 import { tocar } from '@/core/tacto';
@@ -14,7 +14,7 @@ import { colors, fonts, radius, space, type } from '@/theme/tokens';
 /** Ficha de una letra del abecedario: la forma de la mano en grande, en espejo si se quiere, y a la anterior/siguiente. */
 export default function LetraDetalle() {
   const { letra } = useLocalSearchParams<{ letra: string }>();
-  const { settings } = useSettings();
+  const { settings, update } = useSettings();
   const [mirror, setMirror] = useState(false);
   const i = LETTERS.findIndex((l) => l.letra === (letra ?? '').toUpperCase());
   const item = LETTERS[i];
@@ -70,6 +70,16 @@ export default function LetraDetalle() {
             Para deletrear una palabra, forma una letra tras otra en Leer señas: «Mi nombre es» + A-N-A → «Mi nombre es Ana».
           </Text>
         </View>
+
+        <Button
+          label="Practicar con la cámara"
+          icon="camera-front-variant"
+          variant="ink"
+          onPress={() => {
+            update({ cameraFacing: 'front' });
+            router.push('/senas');
+          }}
+        />
 
         <View style={st.tip}>
           <Torogoz state="attentive" size={44} interactive lively={false} />

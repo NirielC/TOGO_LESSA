@@ -270,8 +270,8 @@
   document.getElementById('mano').innerHTML = mano;
 
   // ---------- Togo 8 bits ----------
-  const PIX = ['................','......TTTT......','.....TSSSSS.....','....FFFFFFFF....','....DDDDWWDD....','....DDDDWKDDDDD.','....FFFFFFFF....','.....FFFFFF.....','....TTTTTTTT....','...TGGTTTBBBT...','..TGGGTTBBBBBT..','..TGGGTTBBBBBT..','..TTGGTTTBBBT...','...TTTTTTTTT....','..T...D..D......','.DD.............'];
-  const PC = { T: '#1E5A6E', S: '#B7D4E6', F: '#6BA7A0', D: '#0D2B45', W: '#FBF7EE', K: '#0D2B45', G: '#174A5B', B: '#DCC8AA' };
+  const PIX = ["................","......CCCC......",".....CCCCCC.....","....HCSSSSSH....","....HHDDDWWDD...","....HHDDDWKDDDD.","....hHHHHHHMMM..",".....hhhhhh.....","....TTTTTTBB....","...TTAAATTBBB...","...TAAAQTTBBB...","...TAQQQTTBBb...","..NQQQQTTTbb....","...RR.tTTTt.....",".RR.....D.D.....","NR.....DD.DD...."];
+  const PC = {"C":"#1E5A6E","S":"#C6EDF4","H":"#88C2B9","h":"#5E9A92","D":"#0D2B45","K":"#0D2B45","M":"#1B3549","W":"#FBF7EE","T":"#2A6E80","t":"#174B5C","B":"#F0E0C4","b":"#D6BA92","A":"#1D576A","Q":"#227F8E","N":"#0D2B45","R":"#2E92A3"};
   document.getElementById('togo-pixel').innerHTML = PIX.flatMap((r, y) => r.split('').map((c, x) => PC[c] ? `<rect x="${x}" y="${y}" width="1.04" height="1.04" fill="${PC[c]}"/>` : '')).join('');
 
   // ---------- Lo que dice Togo ----------

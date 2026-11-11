@@ -120,7 +120,13 @@ const pantalla = join(aqui, '..', '..', 'TOGO_PANTALLA', 'index.html');
   const a = html.indexOf('<!-- togo:inicio');
   const b = html.indexOf('<!-- togo:fin -->') + '<!-- togo:fin -->'.length;
   if (a < 0 || b < a) throw new Error('No encontré las marcas togo:inicio/fin en la pantalla del monitor');
-  writeFileSync(pantalla, html.slice(0, a) + svg + html.slice(b));
+  let nuevo = html.slice(0, a) + svg + html.slice(b);
+  // Togo en 8 bits (secreto de la pantalla): mismos píxeles que la app.
+  nuevo = nuevo
+    .replace(/const PIX = \[[^\]]*\];/, `const PIX = ${JSON.stringify(A.PIXEL_A)};`)
+    .replace(/const PC = \{[^}]*\};/, `const PC = ${JSON.stringify(A.PIXEL_COLOR)};`);
+  if (!nuevo.includes(JSON.stringify(A.PIXEL_A))) throw new Error('No pude poner el Togo de 8 bits en la pantalla del monitor');
+  writeFileSync(pantalla, nuevo);
   console.log('listo', 'TOGO_PANTALLA/index.html (Togo)');
 }
 

@@ -17,6 +17,8 @@ export interface Settings {
   showHands: boolean;
   /** Qué ayudas ya se vieron (se abren solas la primera vez). */
   seenHelp: { senas?: boolean; voz?: boolean };
+  /** Versión cuyas novedades ya se mostraron (Novedades sale una vez por versión). */
+  novedadesVistas: string;
   /** Mostrar "¿Quisiste decir…?" antes de decir una frase en señas. */
   confirmBeforeSpeak: boolean;
   /** Si falta el paquete de español sin conexión, usar el reconocedor con internet. */
@@ -37,6 +39,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showHands: true,
   confirmBeforeSpeak: true,
   seenHelp: {},
+  novedadesVistas: '',
   allowOnlineVoice: true,
   speechRate: 0.95,
   quickPhrases: [

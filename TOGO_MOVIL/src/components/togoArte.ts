@@ -218,6 +218,46 @@ export const NOMBRE: { l: string; color: string; giro: number; baja: number }[] 
 ];
 export const LEMA = ['señas', 'voz', 'texto'];
 
+/*
+ * TOGO EN 8 BITS (16x16, secreto: tocarlo 8 veces). Mismos rasgos del Togo normal: gorra y
+ * ceja clara, antifaz que empieza a media cabeza y sigue en el pico (mandíbula de abajo en
+ * otro tono), pecho crema, ala turquesa con punta negra y cola con raqueta. Cuadro A casi
+ * siempre; cuadro B un instante (parpadeo + aleteo). Lo usan PixelTogo.tsx y la pantalla
+ * del monitor (tools/iconos.mjs).
+ */
+export const PIXEL_A = [
+  '................',
+  '......CCCC......',
+  '.....CCCCCC.....',
+  '....HCSSSSSH....',
+  '....HHDDDWWDD...',
+  '....HHDDDWKDDDD.',
+  '....hHHHHHHMMM..',
+  '.....hhhhhh.....',
+  '....TTTTTTBB....',
+  '...TTAAATTBBB...',
+  '...TAAAQTTBBB...',
+  '...TAQQQTTBBb...',
+  '..NQQQQTTTbb....',
+  '...RR.tTTTt.....',
+  '.RR.....D.D.....',
+  'NR.....DD.DD....',
+];
+export const PIXEL_B = PIXEL_A.map((fila, y) => {
+  if (y === 4) return '....HHDDDDDDD...';
+  if (y === 5) return '....HHDDDDDDDDD.';
+  if (y === 8) return '..QQATTTTTBB....';
+  if (y === 9) return '..NQAATTTTBBB...';
+  if (y === 10) return '...TAATTTTBBB...';
+  if (y === 11) return '...TTTTTTTBBb...';
+  if (y === 12) return '....TTTTTTbb....';
+  return fila;
+});
+export const PIXEL_COLOR: Record<string, string> = {
+  C: '#1E5A6E', S: '#C6EDF4', H: '#88C2B9', h: '#5E9A92', D: '#0D2B45', K: '#0D2B45', M: '#1B3549', W: '#FBF7EE',
+  T: '#2A6E80', t: '#174B5C', B: '#F0E0C4', b: '#D6BA92', A: '#1D576A', Q: '#227F8E', N: '#0D2B45', R: '#2E92A3',
+};
+
 /** Sombra en el suelo (capa aparte: no salta con Togo). */
 export const SOMBRA: Forma[] = [{ t: 'ellipse', cx: 48, cy: 95.5, rx: 15, ry: 2.6, fill: COLOR.deepOcean, opacity: 0.13 }];
 

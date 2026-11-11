@@ -1,10 +1,10 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SignAvatar, useSign } from '@/components/SignAvatar';
 import { Torogoz } from '@/components/Torogoz';
-import { Icon, IconButton, IconName } from '@/components/ui';
+import { Button, Icon, IconButton, IconName } from '@/components/ui';
 import { goBack } from '@/core/nav';
 import { useSettings } from '@/core/settings';
 import { meaningOf } from '@/core/signs/vocabulary';
@@ -15,7 +15,7 @@ import { colors, fonts, radius, space, type } from '@/theme/tokens';
 export default function SenaDetalle() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const sign = useSign(id ?? '');
-  const { settings } = useSettings();
+  const { settings, update } = useSettings();
   const [slow, setSlow] = useState(false);
   const [mirror, setMirror] = useState(false);
   const [playing, setPlaying] = useState(true);
@@ -68,6 +68,16 @@ export default function SenaDetalle() {
             Medido en {sign.grabaciones} grabaciones reales de esta seña.
           </Text>
         </View>
+
+        <Button
+          label="Practicar con la cámara"
+          icon="camera-front-variant"
+          variant="ink"
+          onPress={() => {
+            update({ cameraFacing: 'front' });
+            router.push('/senas');
+          }}
+        />
 
         <View style={st.tip}>
           <Torogoz state="attentive" size={44} interactive lively={false} />

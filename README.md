@@ -23,8 +23,9 @@ persona. Todo se procesa en el teléfono: ni imágenes ni voz salen del disposit
 |---|---|---|
 | **Leer señas** | Quien oye | Cámara hacia quien seña → frase en curso → «¿Quisiste decir…?» → voz. Con el micrófono, la respuesta aparece en grande. |
 | **Dar voz** | Quien no habla | Escribir o tocar una frase rápida → voz. «Escuchar respuesta» la muestra en letra grande. |
+| **Frases urgentes** | Quien no habla | «Necesito ayuda», «Llame a un médico»… siempre a la vista, se dicen con un solo toque. |
 | **Deletreo** | Ambos | Si no es una seña del vocabulario y la mano forma una letra, la letra entra: «Mi nombre es» + A-N-A → «Mi nombre es Ana». |
-| **Diccionario LESSA** | Quien aprende | Cada seña animada con datos reales del dataset, en lento y en espejo. |
+| **Diccionario LESSA** | Quien aprende | Cada seña animada con datos reales del dataset, en lento y en espejo; el abecedario letra por letra. «Practicar con la cámara» abre la cámara frontal para copiarla. |
 | **Conversaciones guardadas** | Ambos | Se guardan a propósito, se pueden volver a escuchar o compartir como texto. |
 | **Togo** | Todos | Mascota (un torogoz, ave nacional) que indica qué está pasando y da consejos. |
 
