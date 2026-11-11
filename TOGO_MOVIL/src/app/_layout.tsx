@@ -42,3 +42,6 @@ function Gate({ fontsLoaded, children }: { fontsLoaded: boolean; children: React
   }, [ok]);
   return ok ? <>{children}</> : null;
 }
+
+/** Si una pantalla falla, Togo avisa en vez de cerrarse la app. */
+export { ErrorPantalla as ErrorBoundary } from '@/components/ErrorPantalla';

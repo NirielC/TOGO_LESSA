@@ -1,10 +1,11 @@
 import * as Haptics from 'expo-haptics';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import Svg, { Circle, Ellipse, G, Path } from 'react-native-svg';
+import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Stop } from 'react-native-svg';
 import type { Mascot } from '../core/conversation/ConversationProvider';
 import { colors, fonts, palette, radius } from '../theme/tokens';
 import { PixelTogo } from './PixelTogo';
+import { ALA, cabeza, CUERPO, extras, GRADIENTES, SOMBRA, type Forma } from './togoArte';
 
 /**
  * TOGO, el torogoz gordito (ave nacional de El Salvador). Es el asistente de
@@ -17,8 +18,12 @@ import { PixelTogo } from './PixelTogo';
  *   confused     hay manos pero no entendí (ladea la cabeza)
  *   listening    turno de quien habla (ondas de sonido)
  *
- * Está hecho en capas (cuerpo, ala, cabeza) para moverse de verdad: respira,
+ * El dibujo está en togoArte.ts (lo comparten el ícono, la pantalla de carga y el
+ * logo). Está hecho en capas (cuerpo, ala, cabeza) para moverse de verdad: respira,
  * parpadea, mira a los lados, aletea por su cuenta y reacciona al tocarlo.
+ * Tiene una sombra en el suelo (se achica cuando salta), expresiones que flotan
+ * (burbuja de pensamiento, Zzz, ?, destellos, ondas) y, con
+ * `greet`, saluda saltando y aleteando al aparecer.
  * Al cambiar de estado da un pequeño rebote; las "zetas", los puntos de pensar
  * y las ondas de escuchar flotan.
  *
@@ -26,7 +31,6 @@ import { PixelTogo } from './PixelTogo';
  * seguidas se vuelve de 8 bits un rato (PixelTogo).
  */
 export const MASCOT_NAME = 'Togo';
-const WING = '#174A5B';
 
 const TAP_LINES = ['¡Hola! Soy Togo', '¡Pío!', 'Seña con calma, te sigo', 'Juntos nos entendemos', '¡Cosquillas no!', 'Aquí estoy para ayudarte'];
 /** Pista del secreto: sale muy pocas veces (ver RARE_CHANCE). */
@@ -45,9 +49,11 @@ interface Props {
   say?: string | null;
   /** Comportamiento propio (mirar, aletear) cada pocos segundos. */
   lively?: boolean;
+  /** Saluda (salta y aletea) al aparecer, por ejemplo al abrir la app. */
+  greet?: boolean;
 }
 
-export function Torogoz({ state = 'attentive', size = 64, style, interactive = false, say = null, lively = true }: Props) {
+export function Torogoz({ state = 'attentive', size = 64, style, interactive = false, say = null, lively = true, greet = false }: Props) {
   const breath = useRef(new Animated.Value(0)).current;
   const hop = useRef(new Animated.Value(0)).current;
   const wing = useRef(new Animated.Value(0)).current;
@@ -56,6 +62,7 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
   const pop = useRef(new Animated.Value(1)).current;
   const float = useRef(new Animated.Value(0)).current;
   const bubbleIn = useRef(new Animated.Value(0)).current;
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const taps = useRef({ n: 0, at: 0 });
   const [retro, setRetro] = useState(false);
   const [blink, setBlink] = useState(false);
@@ -138,6 +145,14 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
     },
     [],
   );
+
+  // Saludo al aparecer.
+  useEffect(() => {
+    if (!greet) return;
+    const t = setTimeout(() => celebrate(), 600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const run = (anim: Animated.CompositeAnimation) => {
     busy.current = true;
@@ -236,6 +251,9 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
   const headDeg = head.interpolate({ inputRange: [-1.2, 1.2], outputRange: ['-14deg', '14deg'] });
   const wingDeg = wing.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-38deg'] });
   const text = bubble ?? say;
+  // La sombra se queda en el suelo: cuando salta, se achica y se aclara.
+  const shadowScale = hop.interpolate({ inputRange: [0, 1], outputRange: [1, 0.55] });
+  const shadowOpacity = hop.interpolate({ inputRange: [0, 1], outputRange: [1, 0.4] });
 
   // El globo aparece con un pequeño "pop".
   useEffect(() => {
@@ -254,16 +272,16 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
       ) : (
       <>
       <View style={layer}>
-        <Body size={size} />
+        <Capa size={size} formas={CUERPO} uid={`${uid}c`} />
       </View>
-      <Animated.View style={[layer, { transformOrigin: '38% 56%', transform: [{ rotate: wingDeg }] }]}>
-        <Wing size={size} />
+      <Animated.View style={[layer, { transformOrigin: '47% 50%', transform: [{ rotate: wingDeg }] }]}>
+        <Capa size={size} formas={ALA} uid={`${uid}a`} />
       </Animated.View>
-      <Animated.View style={[layer, { transformOrigin: '55% 50%', transform: [{ rotate: headDeg }] }]}>
-        <Head size={size} state={state} blink={blink} />
+      <Animated.View style={[layer, { transformOrigin: '56% 47%', transform: [{ rotate: headDeg }] }]}>
+        <Capa size={size} formas={cabeza(state, blink)} uid={`${uid}h`} />
       </Animated.View>
       <Animated.View style={[layer, { opacity: floatOpacity, transform: [{ translateY: floatY }] }]}>
-        <Extras size={size} state={state} />
+        <Capa size={size} formas={extras(state)} uid={`${uid}x`} />
       </Animated.View>
       </>
       )}
@@ -278,119 +296,57 @@ export function Torogoz({ state = 'attentive', size = 64, style, interactive = f
           <View style={st.bubbleTail} />
         </Animated.View>
       ) : null}
-      {interactive ? (
-        <Pressable onPress={onPress} onLongPress={onLongPress} accessibilityRole="button" accessibilityLabel={`${MASCOT_NAME}, el asistente`} hitSlop={8}>
-          {bird}
-        </Pressable>
-      ) : (
-        bird
-      )}
+      <View style={{ width: size, height: size }}>
+        <Animated.View pointerEvents="none" style={[layer, { opacity: shadowOpacity, transformOrigin: '48% 95.5%', transform: [{ scaleX: shadowScale }] }]}>
+          <Capa size={size} formas={SOMBRA} uid={`${uid}s`} />
+        </Animated.View>
+        {interactive ? (
+          <Pressable onPress={onPress} onLongPress={onLongPress} accessibilityRole="button" accessibilityLabel={`${MASCOT_NAME}, el asistente`} hitSlop={8}>
+            {bird}
+          </Pressable>
+        ) : (
+          bird
+        )}
+      </View>
     </View>
   );
 }
 
-function Body({ size }: { size: number }) {
+/** Una capa de Togo: las formas de togoArte.ts, con sus degradados. */
+function Capa({ size, formas, uid }: { size: number; formas: Forma[]; uid: string }) {
+  if (!formas.length) return null;
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100">
-      {/* Cola con raquetas, rasgo del torogoz */}
-      <Path d="M34 76 L22 95" stroke={palette.oceanTeal} strokeWidth={3.2} strokeLinecap="round" />
-      <Ellipse cx={20.5} cy={95} rx={4.4} ry={3.2} fill={palette.deepOcean} transform="rotate(-55 20.5 95)" />
-      <Ellipse cx={46} cy={62} rx={24} ry={24} fill={palette.oceanTeal} />
-      <Ellipse cx={53} cy={68} rx={14} ry={15} fill={palette.sandyBeige} />
-      <Path d="M44 85 l-2 5 M52 85 l1 5" stroke={palette.deepOcean} strokeWidth={2.2} strokeLinecap="round" />
+      <Defs>
+        {GRADIENTES.map((g) => (
+          <LinearGradient key={g.id} id={`${g.id}${uid}`} x1={g.x1} y1={g.y1} x2={g.x2} y2={g.y2}>
+            {g.stops.map(([o, c]) => (
+              <Stop key={o} offset={o} stopColor={c} />
+            ))}
+          </LinearGradient>
+        ))}
+      </Defs>
+      <Formas formas={formas} uid={uid} />
     </Svg>
   );
 }
 
-function Wing({ size }: { size: number }) {
+function Formas({ formas, uid }: { formas: Forma[]; uid: string }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 100 100">
-      <Path d="M30 54 C40 50 50 60 48 80 C38 80 28 70 30 54 Z" fill={WING} />
-    </Svg>
-  );
-}
-
-function Head({ size, state, blink }: { size: number; state: Mascot; blink: boolean }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 100 100">
-      <Circle cx={57} cy={35} r={18} fill={palette.seafoam} />
-      <Path d="M40 33 C42 20 56 14 68 20 C62 22 50 24 40 33 Z" fill={palette.oceanTeal} />
-      <Path d="M46 27 C54 23 64 23 72 27" stroke={palette.lightSky} strokeWidth={3} strokeLinecap="round" fill="none" />
-      <Path d="M42 35 C50 31 62 31 73 34 L73 39 C62 37 50 38 43 40 Z" fill={palette.deepOcean} />
-      {state === 'celebrating' ? (
-        <G fill={palette.deepOcean}>
-          <Path d="M72 33 C78 31 85 32 89 35 C84 36 78 36 72 37 Z" />
-          <Path d="M72 39 C78 40 84 42 87 45 C82 44 77 43 72 42 Z" />
-        </G>
-      ) : (
-        <Path d="M72 34 C78 34 85 36 89 40 C84 40 78 40 72 40 Z" fill={palette.deepOcean} />
-      )}
-      <Eyes state={state} blink={blink} />
-    </Svg>
-  );
-}
-
-function Eyes({ state, blink }: { state: Mascot; blink: boolean }) {
-  const cx = 63;
-  const cy = 35;
-  if (state === 'sleeping' || blink) {
-    return <Path d={`M${cx - 4} ${cy} Q${cx} ${cy + 3} ${cx + 4} ${cy}`} stroke={palette.cream} strokeWidth={1.8} fill="none" strokeLinecap="round" />;
-  }
-  if (state === 'celebrating') {
-    return <Path d={`M${cx - 4} ${cy + 1.5} Q${cx} ${cy - 3.5} ${cx + 4} ${cy + 1.5}`} stroke={palette.cream} strokeWidth={2} fill="none" strokeLinecap="round" />;
-  }
-  const look = state === 'thinking' ? { dx: 0.6, dy: -1.6 } : state === 'listening' ? { dx: -1.4, dy: 0 } : { dx: 1, dy: 0 };
-  return (
-    <G>
-      <Circle cx={cx} cy={cy} r={4.4} fill={palette.cream} />
-      <Circle cx={cx + look.dx} cy={cy + look.dy} r={2.4} fill={palette.deepOcean} />
-      <Circle cx={cx + look.dx + 0.9} cy={cy + look.dy - 0.9} r={0.8} fill={palette.white} />
-      {state === 'confused' && <Path d="M58 28 L67 25" stroke={palette.deepOcean} strokeWidth={1.8} strokeLinecap="round" />}
-    </G>
-  );
-}
-
-function Extras({ size, state }: { size: number; state: Mascot }) {
-  let content: React.ReactNode = null;
-  switch (state) {
-    case 'sleeping':
-      content = <Path d="M80 14 h7 l-7 8 h7" stroke={palette.oceanTeal} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
-      break;
-    case 'thinking':
-      content = (
-        <G fill={palette.oceanTeal}>
-          <Circle cx={80} cy={18} r={2} />
-          <Circle cx={87} cy={13} r={2.4} />
-          <Circle cx={94} cy={8} r={2.8} />
-        </G>
-      );
-      break;
-    case 'celebrating':
-      content = (
-        <G fill={palette.sun}>
-          <Path d="M84 12 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 z" />
-          <Path d="M26 20 l1.4 3.4 3.4 1.4 -3.4 1.4 -1.4 3.4 -1.4 -3.4 -3.4 -1.4 3.4 -1.4 z" />
-          <Circle cx={92} cy={30} r={1.8} fill={palette.coral} />
-        </G>
-      );
-      break;
-    case 'confused':
-      content = <Path d="M82 10 c0 -5 9 -5 9 0 c0 3 -4.5 3.5 -4.5 7 M86.5 21 v0.5" stroke={palette.coral} strokeWidth={2.4} fill="none" strokeLinecap="round" />;
-      break;
-    case 'listening':
-      content = (
-        <G stroke={palette.lightSky} strokeWidth={2.4} fill="none" strokeLinecap="round">
-          <Path d="M36 24 q-5 6 0 12" />
-          <Path d="M30 20 q-8 10 0 20" />
-        </G>
-      );
-      break;
-  }
-  if (!content) return null;
-  return (
-    <Svg width={size} height={size} viewBox="0 0 100 100">
-      {content}
-    </Svg>
+    <>
+      {formas.map(({ t, hijos, fill, ...p }, i) => {
+        const relleno = fill?.startsWith('grad:') ? `url(#${fill.slice(5)}${uid})` : fill;
+        if (t === 'g')
+          return (
+            <G key={i} {...p} fill={relleno}>
+              <Formas formas={hijos ?? []} uid={uid} />
+            </G>
+          );
+        if (t === 'circle') return <Circle key={i} {...p} fill={relleno} />;
+        if (t === 'ellipse') return <Ellipse key={i} {...p} fill={relleno} />;
+        return <Path key={i} {...p} fill={relleno} />;
+      })}
+    </>
   );
 }
 

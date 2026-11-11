@@ -17,12 +17,12 @@ con datos reales del dataset), conversaciones guardadas y Sobre Togo.
 
 ## Instalar en el teléfono
 
-La APK está en la carpeta [`APK/`](../APK) de la raíz del repositorio (`Togo-Beta-0.6.apk`).
+La APK está en la carpeta [`APK/`](../APK) de la raíz del repositorio (`Togo-Beta-0.7.apk`).
 Cópiala al teléfono y ábrela (hay que permitir "instalar apps desconocidas"), o con el teléfono
 por USB y depuración activada:
 
 ```bash
-adb install -r APK/Togo-Beta-0.6.apk
+adb install -r APK/Togo-Beta-0.7.apk
 ```
 
 ## Compilar

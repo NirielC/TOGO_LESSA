@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useConversation } from '../core/conversation/ConversationProvider';
 import type { DraftPart } from '../core/conversation/reducer';
+import { tocar } from '../core/tacto';
 import { colors, fonts, radius, space, type } from '../theme/tokens';
 import { Icon, IconButton } from './ui';
 
@@ -70,7 +71,7 @@ export function DraftBar() {
             Baja las manos para decirlo
           </Text>
           <IconButton icon="delete-outline" label="Descartar frase" onPress={discardDraft} color={colors.textMuted} />
-          <Pressable onPress={sendDraft} style={st.send} accessibilityRole="button" accessibilityLabel="Decir ahora">
+          <Pressable onPress={() => { tocar(); sendDraft(); }} style={st.send} accessibilityRole="button" accessibilityLabel="Decir ahora">
             <Text style={st.sendText}>Decir</Text>
             <Icon name="volume-high" size={18} color={colors.onPrimary} />
           </Pressable>

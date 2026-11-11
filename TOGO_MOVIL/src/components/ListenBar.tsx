@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useConversation } from '../core/conversation/ConversationProvider';
+import { tocar } from '../core/tacto';
 import * as stt from '../core/voice/stt';
 import { colors, fonts, radius, space, type } from '../theme/tokens';
 import { Icon, IconButton } from './ui';
@@ -108,7 +109,11 @@ export function ListenBar({ label, hint }: { label: string; hint: string }) {
       )}
       <View style={st.row}>
         <Pressable
-          onPress={() => (listening ? conv.stopVoice() : conv.startVoice())}
+          onPress={() => {
+            tocar();
+            if (listening) conv.stopVoice();
+            else conv.startVoice();
+          }}
           style={({ pressed }) => [st.bar, listening && { backgroundColor: colors.live }, pressed && { opacity: 0.9 }]}
           accessibilityRole="button"
           accessibilityLabel={listening ? 'Terminar de escuchar' : label}

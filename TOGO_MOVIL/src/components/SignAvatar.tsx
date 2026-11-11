@@ -1,33 +1,23 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Svg, { Circle, G, Line, Path } from 'react-native-svg';
 import dict from '../data/diccionario.json';
+import { limpiarSena, type Pt, type SignEntry } from '../core/signs/animacion';
 import { palette } from '../theme/tokens';
 
 /**
- * Dibuja una seña con el movimiento REAL de una grabación del dataset
- * (ver TOGO_DATASET/tools/export_diccionario.py). Coordenadas en anchos de
- * hombro, con el centro de los hombros en (0, 0).
+ * Dibuja una seña con el movimiento REAL de una grabación del dataset, ya limpia
+ * (ver src/core/signs/animacion.ts). Coordenadas en anchos de hombro, con el
+ * centro de los hombros en (0, 0).
  */
-type Pt = [number, number];
-interface Frame {
-  p: Pt[]; // nariz, hombro I, hombro D, codo I, codo D, muñeca I, muñeca D, cadera I, cadera D
-  l: Pt[] | null;
-  r: Pt[] | null;
-}
-export interface SignEntry {
-  id: string;
-  frames: Frame[];
-  pistas: { manos: number; movimiento: string; zona: string };
-  grabaciones: number;
-}
+export type { SignEntry };
 export interface LetterEntry {
   letra: string;
   mano: Pt[];
 }
 
-export const SIGNS = (dict as unknown as { senas: SignEntry[] }).senas;
 export const LETTERS = (dict as unknown as { letras: LetterEntry[] }).letras;
 const FPS = (dict as unknown as { fps: number }).fps;
+export const SIGNS = (dict as unknown as { senas: SignEntry[] }).senas.map(limpiarSena);
 
 const FINGERS = [
   [0, 1, 2, 3, 4],
@@ -144,8 +134,8 @@ function Hand({ pts: raw, color, scale = 1.25, w = 0.085 }: { pts: Pt[]; color: 
 }
 
 /** Mano estática de una letra (forma relativa a la muñeca, escala de palma). */
-export function LetterHand({ letter, size = 120 }: { letter: LetterEntry; size?: number }) {
-  const pts = letter.mano.map(([x, y]) => [x, y] as Pt);
+export function LetterHand({ letter, size = 120, mirror = false }: { letter: LetterEntry; size?: number; mirror?: boolean }) {
+  const pts = letter.mano.map(([x, y]) => [mirror ? -x : x, y] as Pt);
   const xs = pts.map((p) => p[0]);
   const ys = pts.map((p) => p[1]);
   const pad = 0.4;

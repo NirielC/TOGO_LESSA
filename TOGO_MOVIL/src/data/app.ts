@@ -23,5 +23,5 @@ export const AUTOR: Autor = {
   // foto: require('../../assets/autor.jpg'),
 };
 
-export const APP_VERSION = 'Beta 0.6';
+export const APP_VERSION = 'Beta 0.7';
 export const APP_YEAR = 2026;

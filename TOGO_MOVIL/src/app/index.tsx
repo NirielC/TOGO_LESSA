@@ -3,11 +3,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { Aparecer } from '@/components/Aparecer';
 import { SignsScene, VoiceScene } from '@/components/Illustrations';
 import { Logo } from '@/components/Logo';
 import { MASCOT_NAME, RARE_CHANCE, SECRET_HINT, Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { useSettings } from '@/core/settings';
+import { tocar } from '@/core/tacto';
 import { APP_VERSION, APP_YEAR } from '@/data/app';
 import { HOME_TIPS } from '@/data/tips';
 import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
@@ -49,7 +51,7 @@ export default function Inicio() {
         </View>
 
         <View style={st.hero}>
-          <Torogoz state="attentive" size={124} interactive say={hello} />
+          <Torogoz state="attentive" size={124} interactive say={hello} greet />
           <OfflineBadge />
           <Text style={[st.tip, rare && { color: '#8A5A12' }]}>{rare ? SECRET_HINT : HOME_TIPS[tip]}</Text>
           <Text style={st.question}>¿Cómo vamos a conversar?</Text>
@@ -72,30 +74,34 @@ export default function Inicio() {
           )}
         </View>
 
-        <ModeCard
-          title="Leer señas"
-          who="Para quien oye"
-          text="Apunta la cámara a quien seña: te pregunto si entendí bien y lo digo en voz alta. Responde hablando y lo leerá en grande."
-          bg={palette.seafoam}
-          scene={<SignsScene width={140} height={105} />}
-          icon="hand-back-right"
-          onPress={() => router.push('/senas')}
-        />
-        <ModeCard
-          title="Dar voz"
-          who="Para quien no habla"
-          text="Escribe o toca una frase y el teléfono la dice en voz alta. La respuesta te llega en letra grande."
-          bg={palette.lightSky}
-          scene={<VoiceScene width={140} height={105} />}
-          icon="account-voice"
-          onPress={() => router.push('/voz')}
-        />
+        <Aparecer delay={150}>
+          <ModeCard
+            title="Leer señas"
+            who="Para quien oye"
+            text="Apunta la cámara a quien seña: te pregunto si entendí bien y lo digo en voz alta. Responde hablando y lo leerá en grande."
+            bg={palette.seafoam}
+            scene={<SignsScene width={140} height={105} />}
+            icon="hand-back-right"
+            onPress={() => router.push('/senas')}
+          />
+        </Aparecer>
+        <Aparecer delay={260}>
+          <ModeCard
+            title="Dar voz"
+            who="Para quien no habla"
+            text="Escribe o toca una frase y el teléfono la dice en voz alta. La respuesta te llega en letra grande."
+            bg={palette.lightSky}
+            scene={<VoiceScene width={140} height={105} />}
+            icon="account-voice"
+            onPress={() => router.push('/voz')}
+          />
+        </Aparecer>
 
-        <View style={st.links}>
+        <Aparecer delay={370} style={st.links}>
           <Row icon="book-open-variant" title="Diccionario LESSA" text="Aprende y repasa cada seña" tone="#FCEFD2" onPress={() => router.push('/diccionario')} />
           <Row icon="history" title="Conversaciones guardadas" text="Vuelve a leer lo que hablaron" tone={colors.voiceSoft} onPress={() => router.push('/guardadas')} />
           <Row icon="information-outline" title="Sobre Togo" text="Qué es, quién la hizo y por qué un torogoz" tone={colors.signSoft} onPress={() => router.push('/acerca')} />
-        </View>
+        </Aparecer>
 
         <View style={st.footer}>
           <Text style={st.legal}>
@@ -137,7 +143,10 @@ function OfflineBadge() {
 function ModeCard(p: { title: string; who: string; text: string; bg: string; scene: React.ReactNode; icon: IconName; onPress: () => void }) {
   return (
     <Pressable
-      onPress={p.onPress}
+      onPress={() => {
+        tocar();
+        p.onPress();
+      }}
       style={({ pressed }) => [st.card, { backgroundColor: p.bg, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
       accessibilityRole="button"
       accessibilityLabel={`${p.title}. ${p.who}`}

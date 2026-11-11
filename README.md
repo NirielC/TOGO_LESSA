@@ -1,4 +1,6 @@
-# Togo
+<p align="center"><img src="docs/logo-togo.png" width="460" alt="Togo: señas, voz y texto"></p>
+
+# Togo: Traductor de señas
 
 **Traductor de Lengua de Señas Salvadoreña (LESSA) a voz, que funciona sin internet.**
 
@@ -7,7 +9,7 @@ LESSA y el teléfono la dice en voz alta; lo que responde la otra persona aparec
 grande. Si alguien no puede hablar, escribe o toca una frase y el teléfono habla por esa
 persona. Todo se procesa en el teléfono: ni imágenes ni voz salen del dispositivo.
 
-**Versión Beta 0.6** · Android · Español
+**Versión Beta 0.7** · Android · Español
 
 | Inicio | Dar voz | Diccionario LESSA | Ficha de una seña |
 |:---:|:---:|:---:|:---:|
@@ -77,7 +79,7 @@ persona. Para crecer hace falta grabar a más gente que use LESSA.
 
 ## Probarla
 
-- **En un teléfono Android:** descargar [`APK/Togo-Beta-0.6.apk`](APK/Togo-Beta-0.6.apk)
+- **En un teléfono Android:** descargar [`APK/Togo-Beta-0.7.apk`](APK/Togo-Beta-0.7.apk)
   (botón «Download raw»), abrirla en el teléfono y permitir «instalar apps desconocidas».
   Requiere Android 7 o superior con procesador de 64 bits (arm64).
 - **Solo la interfaz (sin reconocimiento):**

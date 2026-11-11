@@ -59,7 +59,7 @@ La APK queda en `TOGO_MOVIL/dist/`; la de cada versión publicada se copia a `AP
 - **Windows, rutas largas:** `build-apk.ps1` copia la app a `C:\L\TOGO_MOVIL` y compila ahí (el compilador
   de C++ no acepta rutas de más de 260 caracteres). Esa carpeta se puede borrar cuando quieras; se vuelve a crear.
 - **Docker Desktop no arranca** ("The file cannot be accessed by the system"): ver el final de `TOGO_MOVIL/DOCKER.md`.
-- **Precisión real (modelo `v3_alfa_0.5`, el de Beta 0.6):** 98 % en prueba y 85.7 % con personas que el modelo no vio
+- **Precisión real (modelo `v3_alfa_0.5`, el de Beta 0.6 y 0.7):** 98 % en prueba y 85.7 % con personas que el modelo no vio
   (antes 68–88 %). Detalle de cada versión en `TOGO_DATASET/models/README.md`.
 - **Versión de la app:** `APP_VERSION` en `TOGO_MOVIL/src/data/app.ts` (también `version` y
   `versionCode` en `TOGO_MOVIL/app.json`). La APK de la versión publicada va en `APK/`.

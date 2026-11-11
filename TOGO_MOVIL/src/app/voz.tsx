@@ -9,6 +9,7 @@ import { Timeline } from '@/components/Timeline';
 import { Icon } from '@/components/ui';
 import { useConversation } from '@/core/conversation/ConversationProvider';
 import { useSettings } from '@/core/settings';
+import { tocar } from '@/core/tacto';
 import { VOICE_TIPS } from '@/data/tips';
 import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
 
@@ -69,7 +70,7 @@ export default function Voz() {
                 <Icon name="close-circle" size={22} color={colors.textFaint} />
               </Pressable>
             )}
-            <Pressable onPress={say} disabled={!text.trim()} style={[st.sayBtn, !text.trim() && { opacity: 0.4 }]} accessibilityRole="button" accessibilityLabel="Decir en voz alta">
+            <Pressable onPress={() => { tocar(); say(); }} disabled={!text.trim()} style={[st.sayBtn, !text.trim() && { opacity: 0.4 }]} accessibilityRole="button" accessibilityLabel="Decir en voz alta">
               <Icon name="volume-high" size={22} color={colors.onPrimary} />
               <Text style={st.sayText}>Decir</Text>
             </Pressable>
@@ -86,7 +87,10 @@ export default function Voz() {
           {phrases.map((p, i) => (
             <Pressable
               key={p}
-              onPress={() => conv.sayTyped(p, 'phrase')}
+              onPress={() => {
+                tocar();
+                conv.sayTyped(p, 'phrase');
+              }}
               style={({ pressed }) => [st.phrase, { backgroundColor: PHRASE_COLORS[i % PHRASE_COLORS.length] }, pressed && { transform: [{ scale: 0.96 }] }]}
             >
               <Text style={st.phraseText}>{p}</Text>

@@ -7,7 +7,7 @@
 | `prueba_solo_nuevos/` | Prueba: solo videos nuevos (2 s) | p2 + p3 | 79.7 % (p2 83.2, p3 76.3) | — |
 | `prueba_combinado/` | Prueba: nuevos + originales | p2 + p3 + 4000 originales | 84.8 % (p2 82.0, p3 87.6) | — |
 | `prueba_abecedario_p2p3/` | Prueba del abecedario (solo el registro) | fotos p2 + p3, clips p3 | — | — |
-| `v3_alfa_0.5/` | **Modelo final de Alfa 0.5** (señas + abecedario) | p1 (828 videos) + p2 + p3 + 4000 originales; abecedario p2 + p3 | **85.7 %** (p1 85.9, p2 81.5, p3 89.5) | `Alfa-0.5`, `Beta-0.6` |
+| `v3_alfa_0.5/` | **Modelo final de Alfa 0.5** (señas + abecedario) | p1 (828 videos) + p2 + p3 + 4000 originales; abecedario p2 + p3 | **85.7 %** (p1 85.9, p2 81.5, p3 89.5) | `Alfa-0.5`, `Beta-0.6`, `Beta-0.7` |
 | `v3/` | Salida del último entrenamiento (hoy = `v3_alfa_0.5`) | — | — | — |
 | `mediapipe/` | Detectores de pose y manos (los mismos del teléfono) | — | — | todas |
 

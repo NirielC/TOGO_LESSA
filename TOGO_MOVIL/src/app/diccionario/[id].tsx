@@ -63,7 +63,7 @@ export default function SenaDetalle() {
           <Text style={type.label}>CÓMO SE HACE</Text>
           <Hint icon="hand-back-right-outline" text={p.manos === 2 ? 'Con las dos manos' : 'Con una mano'} />
           <Hint icon="gesture-swipe" text={`Movimiento ${p.movimiento}`} />
-          <Hint icon="human-handsup" text={`A la altura de ${p.zona}`} />
+          <Hint icon="human-handsup" text={`A la altura ${p.zona.startsWith('el ') ? `del ${p.zona.slice(3)}` : `de ${p.zona}`}`} />
           <Text style={[type.small, { marginTop: space.xs }]}>
             Medido en {sign.grabaciones} grabaciones reales de esta seña.
           </Text>

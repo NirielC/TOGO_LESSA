@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, PressableProps, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { tocar } from '../core/tacto';
 import { colors, fonts, radius, space, touch, type } from '../theme/tokens';
 
 export type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -16,6 +17,7 @@ export function Button({
   icon,
   variant = 'primary',
   style,
+  onPress,
   ...rest
 }: PressableProps & { label: string; icon?: IconName; variant?: Variant; style?: ViewStyle }) {
   const v = VARIANTS[variant];
@@ -24,6 +26,11 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={label}
       style={({ pressed }) => [s.btn, { backgroundColor: v.bg, opacity: pressed ? 0.85 : rest.disabled ? 0.5 : 1 }, style]}
+      onPress={(e) => {
+        // Los botones principales (llenos) vibran un poco al tocarlos.
+        if (variant === 'primary' || variant === 'ink') tocar();
+        onPress?.(e);
+      }}
       {...rest}
     >
       {icon && <Icon name={icon} size={20} color={v.fg} />}

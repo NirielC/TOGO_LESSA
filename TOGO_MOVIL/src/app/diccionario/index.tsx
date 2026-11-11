@@ -48,8 +48,11 @@ export default function Diccionario() {
         ))}
       </View>
 
+      {/* Cada lista con su propia key: tienen distinto número de columnas y React Native
+          no permite cambiar numColumns en la misma lista (en la APK cerraba la app). */}
       {tab === 'senas' ? (
         <FlatList
+          key="senas"
           data={signs}
           keyExtractor={(s) => s.id}
           numColumns={2}
@@ -69,19 +72,27 @@ export default function Diccionario() {
         />
       ) : letters.length ? (
         <FlatList
+          key="letras"
           data={letters}
           keyExtractor={(l) => l.letra}
           numColumns={3}
           columnWrapperStyle={{ gap: space.md }}
           contentContainerStyle={st.grid}
           renderItem={({ item }) => (
-            <View style={[st.card, { alignItems: 'center' }]}>
+            <Pressable
+              style={({ pressed }) => [st.card, { alignItems: 'center' }, pressed && { transform: [{ scale: 0.95 }] }]}
+              onPress={() => router.push(`/diccionario/letra/${item.letra}`)}
+              accessibilityRole="button"
+              accessibilityLabel={`Letra ${item.letra}`}
+            >
               <LetterHand letter={item} size={80} />
               <Text style={st.letter}>{item.letra}</Text>
-            </View>
+            </Pressable>
           )}
           ListFooterComponent={
-            q ? null : <Text style={[type.small, { textAlign: 'center' }]}>J, Ñ y Z se hacen con movimiento: la cámara también las reconoce.</Text>
+            q ? null : (
+              <Text style={[type.small, { textAlign: 'center' }]}>Toca una letra para verla en grande. J, Ñ y Z se hacen con movimiento: la cámara también las reconoce.</Text>
+            )
           }
         />
       ) : (

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Mascot, useConversation } from '../core/conversation/ConversationProvider';
+import { listo, tocar } from '../core/tacto';
 import { colors, fonts, radius, space, type } from '../theme/tokens';
 import { RARE_CHANCE, SECRET_HINT, Torogoz } from './Torogoz';
 import { Icon, IconName } from './ui';
@@ -20,6 +21,7 @@ export function ModeHeader({ title, accent, onHelp }: { title: string; accent: s
   const save = async () => {
     if (!has) return Alert.alert('Nada que guardar', 'La conversación todavía está vacía.');
     await conv.save();
+    listo();
     Alert.alert('Guardada', 'La encuentras en Historial.');
   };
 
@@ -69,7 +71,12 @@ export function ModeHeader({ title, accent, onHelp }: { title: string; accent: s
 
 function Tool({ icon, label, onPress, dim }: { icon: IconName; label: string; onPress: () => void; dim?: boolean }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [st.tool, { opacity: dim ? 0.4 : pressed ? 0.6 : 1 }]} accessibilityRole="button" accessibilityLabel={label}>
+    <Pressable
+      onPress={() => {
+        tocar();
+        onPress();
+      }}
+      style={({ pressed }) => [st.tool, { opacity: dim ? 0.4 : pressed ? 0.6 : 1 }]} accessibilityRole="button" accessibilityLabel={label}>
       <Icon name={icon} size={21} color={colors.text} />
       <Text style={st.toolText}>{label}</Text>
     </Pressable>
