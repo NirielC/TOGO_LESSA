@@ -10,6 +10,7 @@ Muestra tablas por persona para:
 y avisa de archivos con nombre raro (sin número de persona).
 """
 
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -21,18 +22,18 @@ from config import ABC_IMAGENES_DIR, ABC_VIDEOS_DIR, CLASSES, LETRAS, LETRAS_CON
 
 META_FOTOS = 40
 META_CLIPS = 20
+NOMBRE = re.compile(r"^p(\d+)_\d+(_[DI])?$")   # p<persona>_<n> (señas) o p<persona>_<n>_<D|I> (abecedario)
 
 
 def contar(carpeta: Path, ext: str):
-    """{persona: n} y lista de archivos sin persona."""
+    """{persona: n} y lista de archivos con nombre raro (sin persona, o copias como 'p1_0005 (2)')."""
     por, raros = defaultdict(int), []
     if carpeta.exists():
         for f in carpeta.glob(f"*.{ext}"):
-            try:
-                if not f.stem.startswith("p"):
-                    raise ValueError
-                por[int(f.stem.split("_")[0][1:])] += 1
-            except ValueError:
+            m = NOMBRE.match(f.stem)
+            if m:
+                por[int(m[1])] += 1
+            else:
                 raros.append(f)
     return por, raros
 
@@ -86,7 +87,9 @@ def main():
     tabla("ABECEDARIO - CLIPS", clips, META_CLIPS)
 
     if raros_total:
-        print(f"\nArchivos sin número de persona ({len(raros_total)}), revisar:")
+        print(f"\nArchivos con nombre raro ({len(raros_total)}): no se cuentan arriba, pero el entrenamiento SÍ los usa.")
+        print("Suelen ser copias de Windows ('p1_0005 (2).mp4'): si son repetidos, bórralos. Para traer datos de")
+        print("otra PC sin que pase esto: python tools/juntar_datos.py <carpeta o zip>")
         for f in raros_total[:10]:
             print(f"  {f.relative_to(ROOT_DIR)}")
     print("\n* = menos que la meta. Con todo listo: python tools/actualizar_modelo.py --abecedario --por-persona")

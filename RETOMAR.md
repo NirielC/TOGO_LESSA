@@ -70,11 +70,18 @@ La APK queda en `TOGO_MOVIL/dist/`; la de cada versión publicada se copia a `AP
 
 Cada persona graba con su número (`p1`, `p2`…), así los archivos nunca se pisan.
 
-1. **Señas** (`capture_videos.py`): copiar las carpetas de clase de su `videos_v3/` dentro de
-   `TOGO_DATASET/dataset/videos_v3/` (Windows pregunta "combinar carpetas": sí).
-2. **Abecedario** (`capture_abecedario.py`, se le puede pasar solo ese archivo): manda
-   `abecedario_p<N>.zip`; copiar sus carpetas `imagenes/` y `videos/` dentro de
-   `TOGO_DATASET/dataset/abecedario/`.
+1. **Señas** (`capture_videos.py`) y **abecedario** (`capture_abecedario.py`, se le puede pasar solo ese
+   archivo; manda `abecedario_p<N>.zip`). Juntarlos con un solo comando, que nunca sobrescribe (si la
+   misma persona grabó en dos PC, renumera en vez de pisar) y se puede repetir sin duplicar:
+   ```bash
+   python TOGO_DATASET/tools/juntar_datos.py RUTA/abecedario_p4.zip
+   ```
+   ```bash
+   python TOGO_DATASET/tools/juntar_datos.py RUTA/videos_v3
+   ```
+   `--prueba` muestra qué haría sin copiar; `--persona 4` si grabó con un número equivocado.
+   No copiar a mano con el Explorador: "reemplazar" pisa videos y "conservar ambos" deja copias `(2)`.
+2. Para completar clases sueltas: `python TOGO_DATASET/tools/capture_videos.py --persona 1 --clases por_la_tarde,ok_adios,nada`.
 3. Revisar cuánto hay de cada quien:
    ```bash
    python TOGO_DATASET/tools/revisar_dataset.py

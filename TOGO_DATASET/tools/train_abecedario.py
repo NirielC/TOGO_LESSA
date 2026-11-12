@@ -94,6 +94,13 @@ def extraer_estaticas():
     return np.array(X, dtype=np.float32), np.array(y), np.array(personas)
 
 
+def huella_fotos():
+    """Lista 'letra/archivo|tamaño' de todas las fotos: si cambia, la caché ya no sirve."""
+    if not ABC_IMAGENES_DIR.exists():
+        return []
+    return sorted(f"{f.parent.name}/{f.name}|{f.stat().st_size}" for f in ABC_IMAGENES_DIR.glob("*/*.jpg"))
+
+
 def aumentar_mano(X, rng, copias=3):
     """Giro leve en el plano, escala y ruido: la misma letra hecha un poco distinta."""
     out = [X]
@@ -116,16 +123,25 @@ def entrenar_estaticas(args):
     from tensorflow.keras import layers
     from train_v2 import exportar_tflite
 
+    # La caché solo sirve si las fotos son las mismas: al juntar las de otra persona
+    # (o borrar/regrabar) se vuelve a extraer. Antes se usaba la vieja y las nuevas no entraban.
+    huella, guardada = huella_fotos(), None
     if CACHE.exists() and not args.re_extraer:
-        d = np.load(CACHE, allow_pickle=True)
-        X, y, personas = d["X"], d["y"], d["personas"]
+        with np.load(CACHE, allow_pickle=True) as d:   # cerrarla: en Windows no se puede reescribir abierta
+            guardada = d["huella"].tolist() if "huella" in d.files else "?"
+            if guardada == huella:
+                X, y, personas = d["X"], d["y"], d["personas"]
+    if guardada == huella:
         print(f"Usando caché {CACHE.name}: {X.shape}")
     else:
+        if guardada is not None:
+            antes = len(guardada) if isinstance(guardada, list) else "?"
+            print(f"Las fotos cambiaron desde la última extracción ({antes} -> {len(huella)}): se vuelven a procesar.")
         print("Extrayendo manos de las fotos...")
         X, y, personas = extraer_estaticas()
         if len(X):
             CACHE.parent.mkdir(parents=True, exist_ok=True)
-            np.savez(CACHE, X=X, y=y, personas=personas)
+            np.savez(CACHE, X=X, y=y, personas=personas, huella=np.array(huella))
     if len(X) == 0:
         print("No hay fotos del abecedario todavía. Captura con tools/capture_abecedario.py")
         return None
@@ -193,7 +209,7 @@ def entrenar_movimiento(args):
     cache_dir = DATASET_DIR / "abecedario" / "landmarks_movimiento"
     for carpeta, v in clips:
         out = cache_dir / carpeta.name / f"{v.stem}.npy"
-        if not out.exists():
+        if not out.exists() or out.stat().st_mtime < v.stat().st_mtime:   # sin extraer o clip regrabado
             _, status, _, _ = ext._process(str(v), str(out))
             if status != "ok":
                 continue

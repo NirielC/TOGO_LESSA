@@ -14,5 +14,9 @@ TOGO_DATASET/dataset/
 *.mp4
 *.avi
 
+# capture_abecedario.py suelto en tools/: fotos de personas, su zip y el modelo descargado
+TOGO_DATASET/tools/abecedario_p*
+TOGO_DATASET/tools/hand_landmarker.task*
+
 # Logs de entrenamiento
 Logs/

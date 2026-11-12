@@ -11,7 +11,9 @@ Ver togo_features.py para el formato y la normalización.
 Uso:
     python tools/extract_landmarks_v2.py            # todo, en paralelo
     python tools/extract_landmarks_v2.py --workers 4
-Se puede interrumpir y relanzar: omite lo que ya existe.
+    python tools/extract_landmarks_v2.py --limpiar     # borra .npy de videos que ya no existen
+Se puede interrumpir y relanzar: omite lo que ya existe (salvo videos más nuevos que
+sus puntos, que se volvieron a grabar con el mismo nombre).
 """
 
 import argparse
@@ -116,18 +118,32 @@ def _process(video_path: str, out_path: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
+    ap.add_argument("--limpiar", action="store_true", help="borrar los .npy cuyo video ya no existe")
     args = ap.parse_args()
 
     for m in (POSE_MODEL, HAND_MODEL):
         if not m.exists():
             sys.exit(f"Falta el modelo {m}")
 
-    jobs = []
+    jobs, huerfanos = [], []
     for clase in CLASSES:
-        for v in sorted((VIDEOS_DIR / clase).glob("*.mp4")):
+        videos = sorted((VIDEOS_DIR / clase).glob("*.mp4"))
+        for v in videos:
             out = OUT_DIR / clase / f"{v.stem}.npy"
-            if not out.exists():
+            # Sin extraer, o el video es más nuevo que sus puntos (se borró y se volvió a grabar
+            # con el mismo nombre): extraer.
+            if not out.exists() or out.stat().st_mtime < v.stat().st_mtime:
                 jobs.append((str(v), str(out)))
+        if videos:   # sin videos de la clase (p. ej. solo se copiaron los puntos) no se juzga nada
+            nombres = {v.stem for v in videos}
+            huerfanos += [n for n in sorted((OUT_DIR / clase).glob("*.npy")) if n.stem not in nombres]
+    if huerfanos and args.limpiar:
+        for n in huerfanos:
+            n.unlink()
+        print(f"Borrados {len(huerfanos)} .npy de videos que ya no existen.")
+    elif huerfanos:
+        print(f"Aviso: {len(huerfanos)} .npy sin su video (¿borraste esos videos?). El entrenamiento los sigue usando;"
+              f" para quitarlos: --limpiar. Por ejemplo: {', '.join(str(n.relative_to(OUT_DIR)) for n in huerfanos[:3])}")
 
     print(f"Togo extracción v2 | pendientes: {len(jobs)} | procesos: {args.workers}", flush=True)
     t0 = time.time()
