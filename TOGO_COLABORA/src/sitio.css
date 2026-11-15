@@ -1,0 +1,111 @@
+/* =================================================================== sitio público
+   Bandas de color a todo el ancho; el contenido va en .envoltura. */
+.sitio { flex: 1; width: 100%; }
+.envoltura { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+.envoltura.estrecha { max-width: 780px; }
+.banda { padding: clamp(48px, 8vw, 96px) 0; }
+.banda.crema { background: var(--cream); }
+.banda.blanca { background: var(--white); }
+.banda.menta { background: var(--sign-soft); }
+.banda.profunda { background: var(--deep); color: #E9F1F5; }
+.banda.profunda p { color: #BFD3DF; }
+
+.antetitulo { display: inline-block; font: 800 13px var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--sign-ink); margin-bottom: 14px; }
+.antetitulo.claro, .claro { color: var(--sky); }
+.titular { font-size: clamp(38px, 6.4vw, 66px); letter-spacing: -.02em; line-height: 1.02; margin-bottom: 18px; }
+.titular em { font-style: normal; color: var(--teal); background: linear-gradient(transparent 68%, rgba(246, 196, 83, .55) 68%); }
+.titulo-seccion { font-size: clamp(28px, 4vw, 42px); letter-spacing: -.01em; margin-bottom: 28px; }
+.titulo-seccion.claro { color: var(--white); }
+.entrada { font-size: 19px; color: var(--muted); max-width: 34em; }
+
+.datos-rapidos { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 0; margin: 22px 0 0; font: 700 14px var(--body); color: var(--muted); }
+.datos-rapidos li::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); margin-right: 8px; vertical-align: 1px; }
+
+/* portada: texto + Togo con un teléfono que conversa */
+.portada { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; }
+.portada-arte { position: relative; min-height: 440px; }
+.portada-togo { width: 82%; aspect-ratio: 1; object-fit: cover; border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; box-shadow: 0 30px 60px rgba(13, 43, 69, .18); }
+.telefono {
+  position: absolute; right: -8px; bottom: -40px; width: min(240px, 58%);
+  background: var(--deep); border-radius: 34px; padding: 16px 12px 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 24px 50px rgba(13, 43, 69, .35); transform: rotate(3deg);
+}
+.telefono-barra { display: grid; place-items: center; height: 10px; }
+.telefono-barra span { width: 60px; height: 6px; border-radius: 9px; background: #23445E; }
+.burbuja { border-radius: 16px; padding: 9px 12px 10px; font: 700 15px/1.25 var(--body); color: var(--deep); max-width: 88%; }
+.burbuja small { display: block; font: 800 10px var(--body); letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: 2px; }
+.burbuja.sena { background: var(--sign-soft); align-self: flex-start; border-bottom-left-radius: 4px; }
+.burbuja.voz { background: #FBE3D8; align-self: flex-end; border-bottom-right-radius: 4px; }
+.burbuja.corta { opacity: .85; }
+.ondas { display: inline-flex; gap: 3px; align-items: center; height: 14px; margin-left: 8px; vertical-align: -2px; }
+.ondas i { width: 3px; height: 100%; border-radius: 2px; background: var(--sign-ink); animation: onda 1s ease-in-out infinite; }
+.ondas i:nth-child(2) { animation-delay: .15s; }
+.ondas i:nth-child(3) { animation-delay: .3s; }
+.ondas i:nth-child(4) { animation-delay: .45s; }
+.ondas i:nth-child(5) { animation-delay: .6s; }
+@keyframes onda { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .ondas i { animation: none; } }
+
+/* tres modos */
+.modos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.modo { background: var(--cream); border-radius: var(--r-lg); padding: 26px 24px 22px; border-top: 6px solid var(--seafoam); }
+.modo.m-voz { border-top-color: var(--coral); }
+.modo.m-dic { border-top-color: var(--sun); }
+.modo h3 { font-size: 22px; font-weight: 600; }
+.modo p { color: var(--muted); margin: 0; }
+.modo-num { display: block; font: 600 40px var(--title); color: var(--sand); margin-bottom: 6px; }
+
+/* razones (banda oscura) */
+.razones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.razones b { display: block; font: 600 clamp(24px, 3vw, 30px)/1.1 var(--title); color: var(--sun); margin-bottom: 10px; }
+
+/* columnas */
+.dos-columnas { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+.tres-columnas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.arte-lateral { width: 100%; max-width: 360px; justify-self: center; border-radius: 40px; box-shadow: 0 24px 50px rgba(13, 43, 69, .15); }
+
+/* listas numeradas grandes */
+.lista-pasos, .instalar { list-style: none; counter-reset: n; padding: 0; margin: 0; display: grid; gap: 12px; }
+.lista-pasos li, .instalar li { counter-increment: n; position: relative; padding: 16px 18px 16px 66px; background: var(--white); border-radius: var(--r-md); }
+.instalar li { background: var(--cream); }
+.lista-pasos li::before, .instalar li::before {
+  content: counter(n); position: absolute; left: 16px; top: 14px; width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center; font: 600 18px var(--title); background: var(--coral); color: var(--white);
+}
+.instalar code { font: 700 14px ui-monospace, monospace; background: var(--surface-alt); padding: 1px 6px; border-radius: 6px; }
+
+/* preguntas */
+.preguntas details { border-bottom: 2px solid var(--border); padding: 4px 0; }
+.preguntas summary { list-style: none; cursor: pointer; padding: 16px 40px 16px 0; font: 600 19px var(--title); position: relative; }
+.preguntas summary::-webkit-details-marker { display: none; }
+.preguntas summary::after { content: '+'; position: absolute; right: 6px; top: 10px; font: 500 28px var(--title); color: var(--coral); transition: transform .2s; }
+.preguntas details[open] summary::after { transform: rotate(45deg); }
+.preguntas p { color: var(--muted); padding-bottom: 12px; }
+
+.contacto { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+
+/* pestañas de la cabecera */
+.top nav.pestanas { margin-left: auto; margin-right: auto; gap: 2px; }
+.pestanas a { text-decoration: none; color: var(--muted); font: 700 15px var(--body); padding: 8px 12px; border-radius: 99px; white-space: nowrap; }
+.pestanas a:hover { color: var(--deep); background: var(--surface-alt); }
+.pestanas a[aria-current='page'] { color: var(--deep); box-shadow: inset 0 -3px 0 var(--coral); border-radius: 0; }
+
+/* pie */
+.pie { background: var(--deep); color: #9FB6C6; text-align: left; font-size: 14px; padding: 48px 0 56px; }
+.pie-columnas { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1.2fr; gap: 28px; }
+.pie-columnas > div { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.pie-columnas b { color: var(--white); font: 600 16px var(--title); }
+.pie-columnas a { color: #D6E5EE; font-weight: 600; text-decoration: none; }
+.pie-columnas a:hover { text-decoration: underline; }
+.pie .marca { color: var(--white); }
+.pie p { margin: 0; max-width: 26em; }
+
+@media (max-width: 860px) {
+  .portada, .dos-columnas { grid-template-columns: 1fr; }
+  .portada-arte { min-height: 0; max-width: 440px; width: 100%; margin: 8px auto 0; padding-bottom: 40px; }
+  .modos, .razones, .tres-columnas { grid-template-columns: 1fr; }
+  .pie-columnas { grid-template-columns: 1fr 1fr; }
+  .top { flex-wrap: wrap; }
+  .top nav.pestanas { order: 3; width: 100%; margin: 4px 0 0; overflow-x: auto; justify-content: flex-start; }
+}

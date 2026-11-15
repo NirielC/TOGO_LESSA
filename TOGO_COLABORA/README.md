@@ -102,3 +102,9 @@ y el teléfono calculan exactamente lo mismo.
 4. Revisas las dudosas en el panel (A acepta, R rechaza) y vuelves a sincronizar.
 5. `python tools/actualizar_modelo.py --desde-supabase` hace todo y entrena.
    Las señas nuevas también van en `CLASSES` de `TOGO_DATASET/config.py`.
+
+## Sitio público
+
+Pestañas Inicio (`#/`), La app (`#/app`), Colabora (`#/colabora`) y El proyecto (`#/proyecto`).
+Contacto, autor y datos del APK en `src/sitio.js`. El enlace de descarga se pone en
+`VITE_APK_URL` (en `.env` o en Vercel); mientras esté vacío, la página dice "muy pronto".

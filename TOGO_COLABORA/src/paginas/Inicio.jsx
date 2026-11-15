@@ -1,11 +1,10 @@
 import { api } from '../api.js';
 import { useApp } from '../contexto.js';
-import { Muneco, useDiccionario } from '../componentes/Muneco.jsx';
 import { Barra, useCarga } from '../componentes/ui.jsx';
 
+/** Colabora: cómo se ayuda a Togo grabando señas, y cómo vamos. */
 export default function Inicio() {
   const { uid } = useApp();
-  const dic = useDiccionario();
   const [datos] = useCarga(() => Promise.all([api.senas(), api.progreso()]), []);
   const [senas, prog] = datos || [[], {}];
   const total = Object.values(prog).reduce((s, p) => s + Number(p.tomas), 0);
@@ -16,7 +15,7 @@ export default function Inicio() {
     .slice(0, 6);
 
   return (
-    <>
+    <div className="envoltura" style={{ paddingTop: 24, paddingBottom: 40 }}>
       <section className="hero">
         <div>
           <h1>Enséñale LESSA a Togo</h1>
@@ -29,9 +28,7 @@ export default function Inicio() {
             <a className="btn sec" href="#/practica">Probar sin cuenta</a>
           </div>
         </div>
-        <div className="muneco-hero">
-          {dic?.senas?.hola ? <Muneco frames={dic.senas.hola.frames} fps={dic.fps} size={260} /> : <div style={{ height: 273 }} />}
-        </div>
+        <img className="arte-lateral" src="/togo.png" alt="Togo, el torogoz" />
       </section>
 
       <div className="space" />
@@ -87,6 +84,6 @@ export default function Inicio() {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }

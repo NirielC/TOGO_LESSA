@@ -1,11 +1,16 @@
 import { lazy, StrictMode, Suspense, useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './estilos.css';
+import './sitio.css';
 import { api, DEMO } from './api.js';
 import { Cargando } from './componentes/ui.jsx';
 import { Ctx, useApp } from './contexto.js';
 import { cola, procesarCola } from './captura/cola.js';
 import Inicio from './paginas/Inicio.jsx';
+import Portada from './paginas/Portada.jsx';
+import Descargar from './paginas/Descargar.jsx';
+import Proyecto from './paginas/Proyecto.jsx';
+import { CONTACTO, PESTANAS } from './sitio.js';
 import Entrar from './paginas/Entrar.jsx';
 import Unirme, { EsperandoTutor } from './paginas/Unirme.jsx';
 import Senas from './paginas/Senas.jsx';
@@ -90,6 +95,7 @@ function App() {
   const ctx = { sesion, uid, perfil, acuerdo, recargar, setPerfil };
   const [pag, ...args] = ruta;
   const enGrabar = pag === 'grabar' || pag === 'practica';
+  const publica = PESTANAS.some(([p]) => p === (pag || '')) || !RUTAS.has(pag);
 
   return (
     <Ctx.Provider value={ctx}>
@@ -99,6 +105,11 @@ function App() {
           <b>Togo</b>
           <small>Colabora</small>
         </a>
+        <nav className="pestanas" aria-label="Secciones">
+          {PESTANAS.map(([p, t]) => (
+            <a key={p} href={`#/${p}`} aria-current={(pag || '') === p ? 'page' : undefined}>{t}</a>
+          ))}
+        </nav>
         <nav>
           {DEMO && <span className="chip sol">Demo</span>}
           {uid && pendientes > 0 && (
@@ -116,7 +127,7 @@ function App() {
           )}
         </nav>
       </header>
-      <main className={`main ${pag === 'admin' ? 'ancho' : ''}`}>
+      <main className={publica ? 'sitio' : `main ${pag === 'admin' ? 'ancho' : ''}`}>
         {!listo ? (
           <Cargando />
         ) : (
@@ -125,17 +136,44 @@ function App() {
       </main>
       {!enGrabar && (
         <footer className="pie no-imprimir">
-          Togo traduce Lengua de Señas Salvadoreña (LESSA) a voz, sin internet. ·{' '}
-          <a href="#/acuerdo">Acuerdo de colaboración</a> · <a href="#/gracias">Colaboradores</a>
+          <div className="envoltura pie-columnas">
+            <div>
+              <div className="marca"><img src="/togo-128.png" alt="" width="34" height="34" /><b>Togo</b></div>
+              <p>Traduce Lengua de Señas Salvadoreña (LESSA) a voz, sin internet. Hecho en El Salvador.</p>
+            </div>
+            <div>
+              <b>Togo</b>
+              {PESTANAS.map(([p, t]) => <a key={p} href={`#/${p}`}>{t}</a>)}
+            </div>
+            <div>
+              <b>Colabora</b>
+              <a href="#/practica">Probar sin cuenta</a>
+              <a href="#/acuerdo">Acuerdo de colaboración</a>
+              <a href="#/gracias">Colaboradores</a>
+            </div>
+            <div>
+              <b>Contacto</b>
+              <a href={`mailto:${CONTACTO}`}>{CONTACTO}</a>
+            </div>
+          </div>
         </footer>
       )}
     </Ctx.Provider>
   );
 }
 
+/** Rutas que no son del sitio público (tienen su propio ancho y estilo). */
+const RUTAS = new Set(['entrar', 'acuerdo', 'gracias', 'tutor', 'practica', 'unirme', 'colaborar', 'grabar', 'constancia', 'cuenta', 'admin']);
+
 function Pagina({ pag, args }) {
   switch (pag) {
     case '':
+      return <Portada />;
+    case 'app':
+      return <Descargar />;
+    case 'proyecto':
+      return <Proyecto />;
+    case 'colabora':
       return <Inicio />;
     case 'entrar':
       return <YaDentro />;
@@ -166,7 +204,7 @@ function Pagina({ pag, args }) {
         </Requiere>
       );
     default:
-      return <Inicio />;
+      return <Portada />;
   }
 }
 
