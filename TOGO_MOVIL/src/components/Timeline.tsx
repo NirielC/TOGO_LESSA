@@ -71,7 +71,7 @@ function Bubble({ m, perspective, onPress }: { m: Message; perspective: Perspect
   };
   return (
     <Animated.View style={[st.row, right ? st.right : st.left, anim]}>
-      <Pressable onPress={onPress} style={({ pressed }) => [st.bubble, isVoice ? st.voice : st.sign, right ? st.tailRight : st.tailLeft, pressed && { opacity: 0.8 }]}>
+      <Pressable onPress={onPress} accessibilityRole="button" style={({ pressed }) => [st.bubble, isVoice ? st.voice : st.sign, right ? st.tailRight : st.tailLeft, pressed && { opacity: 0.8 }]}>
         <View style={st.head}>
           <ChannelTag icon={meta.icon} text={meta.tag[perspective]} color={isVoice ? colors.voiceInk : colors.signInk} />
           <Text style={st.time}>{time}</Text>

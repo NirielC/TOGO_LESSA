@@ -90,7 +90,7 @@ export function HelpSheet({ mode, open, onClose }: { mode: Mode; open: boolean; 
         <View style={st.grabber} />
         <View style={st.tabs}>
           {parts.map((x, i) => (
-            <Pressable key={x.tab} onPress={() => { setTab(i); setFlipped(false); }} style={[st.tab, tab === i && st.tabOn]}>
+            <Pressable key={x.tab} onPress={() => { setTab(i); setFlipped(false); }} style={[st.tab, tab === i && st.tabOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === i }}>
               <Text style={[st.tabText, tab === i && { color: colors.onInk }]}>{x.tab}</Text>
             </Pressable>
           ))}
@@ -110,13 +110,13 @@ export function HelpSheet({ mode, open, onClose }: { mode: Mode; open: boolean; 
 
         <View style={st.actions}>
           {p.shareable && (
-            <Pressable onPress={() => setFlipped((f) => !f)} style={st.secondary}>
+            <Pressable onPress={() => setFlipped((f) => !f)} style={st.secondary} accessibilityRole="button">
               <Icon name="screen-rotation" size={18} color={colors.text} />
               <Text style={st.secondaryText}>Girar</Text>
             </Pressable>
           )}
           {p.spoken && (
-            <Pressable onPress={() => speak(p.spoken!, { rate: settings.speechRate })} style={st.secondary}>
+            <Pressable onPress={() => speak(p.spoken!, { rate: settings.speechRate })} style={st.secondary} accessibilityRole="button">
               <Icon name="volume-high" size={18} color={colors.text} />
               <Text style={st.secondaryText}>Decirlo</Text>
             </Pressable>

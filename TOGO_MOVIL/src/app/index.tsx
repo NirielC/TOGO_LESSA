@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, Easing, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { Aparecer } from '@/components/Aparecer';
@@ -11,7 +11,7 @@ import { MASCOT_NAME, RARE_CHANCE, SECRET_HINT, Torogoz } from '@/components/Tor
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { useSettings } from '@/core/settings';
 import { tocar } from '@/core/tacto';
-import { APP_VERSION, APP_YEAR } from '@/data/app';
+import { APP_VERSION, APP_YEAR, urlColaborar } from '@/data/app';
 import { HOME_TIPS } from '@/data/tips';
 import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
 
@@ -70,7 +70,7 @@ export default function Inicio() {
               maxLength={30}
             />
           ) : (
-            <Pressable onPress={() => setEditing(true)} hitSlop={8}>
+            <Pressable onPress={() => setEditing(true)} hitSlop={8} accessibilityRole="button">
               <Text style={st.changeName}>No soy {settings.name} · cambiar nombre</Text>
             </Pressable>
           )}
@@ -103,6 +103,7 @@ export default function Inicio() {
           <Row icon="book-open-variant" title="Diccionario LESSA" text="Aprende y repasa cada seña" tone="#FCEFD2" onPress={() => router.push('/diccionario')} />
           <Row icon="history" title="Conversaciones guardadas" text="Vuelve a leer lo que hablaron" tone={colors.voiceSoft} onPress={() => router.push('/guardadas')} />
           <Row icon="information-outline" title="Sobre Togo" text="Qué es, quién la hizo y por qué un torogoz" tone={colors.signSoft} onPress={() => router.push('/acerca')} />
+          <Row icon="hand-heart-outline" title="Enséñale señas a Togo" text="Graba señas en 5 minutos (abre la web)" tone="#FBE3D8" onPress={() => Linking.openURL(urlColaborar('app'))} />
         </Aparecer>
 
         <View style={st.footer}>
@@ -153,14 +154,13 @@ function ModeCard(p: { title: string; who: string; text: string; bg: string; sce
       accessibilityRole="button"
       accessibilityLabel={`${p.title}. ${p.who}`}
     >
+      {/* La etiqueta va arriba, a todo lo ancho: así "PARA QUIEN NO HABLA" no se parte en dos líneas. */}
+      <View style={st.whoPill}>
+        <Icon name={p.icon} size={14} color={colors.text} />
+        <Text style={st.who} numberOfLines={1}>{p.who.toUpperCase()}</Text>
+      </View>
       <View style={st.cardTop}>
-        <View style={{ flex: 1, gap: 4 }}>
-          <View style={st.whoPill}>
-            <Icon name={p.icon} size={14} color={colors.text} />
-            <Text style={st.who}>{p.who.toUpperCase()}</Text>
-          </View>
-          <Text style={st.cardTitle}>{p.title}</Text>
-        </View>
+        <Text style={[st.cardTitle, { flex: 1 }]}>{p.title}</Text>
         {p.scene}
       </View>
       <Text style={st.cardText}>{p.text}</Text>
@@ -174,7 +174,7 @@ function ModeCard(p: { title: string; who: string; text: string; bg: string; sce
 
 function Row({ icon, title, text, tone, onPress }: { icon: IconName; title: string; text: string; tone: string; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [st.row, pressed && { opacity: 0.85 }]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [st.row, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel={`${title}. ${text}`}>
       <View style={[st.rowIcon, { backgroundColor: tone }]}>
         <Icon name={icon} size={22} />
       </View>

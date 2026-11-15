@@ -23,5 +23,25 @@ export const AUTOR: Autor = {
   // foto: require('../../assets/autor.jpg'),
 };
 
-export const APP_VERSION = 'Beta 0.7';
+export const APP_VERSION = 'Beta 0.8';
 export const APP_YEAR = 2026;
+
+/**
+ * PLATAFORMA DE COLABORACIÓN (TOGO_COLABORA): la web donde voluntarios graban
+ * tomas para entrenar a Togo. La app solo la abre y lee los nombres de los
+ * colaboradores (si hay internet); no envía nada.
+ * La clave es la PUBLICABLE de Supabase (pública por diseño; la protegen las reglas RLS).
+ */
+export const COLABORA = {
+  web: 'https://togo-colabora.vercel.app',
+  supabaseUrl: 'https://vzptgcsgwvfrswzugcap.supabase.co',
+  supabaseKey: 'sb_publishable_DTBcQZq7ai-BvBp0DKl2UQ_Lg2E9nzk',
+};
+
+/** Enlace a la web de colaboración. `de` dice desde dónde llegó (se ve en el panel); `sena` abre directo esa seña. */
+export function urlColaborar(de: string, sena?: string) {
+  return `${COLABORA.web}/?de=${de}${sena ? `#/grabar/${sena}` : ''}`;
+}
+
+/** Identificador de una letra en la plataforma: A -> letra_a, Ñ -> letra_enie. */
+export const idLetra = (letra: string) => `letra_${letra === 'Ñ' ? 'enie' : letra.toLowerCase()}`;

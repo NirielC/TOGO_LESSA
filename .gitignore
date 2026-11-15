@@ -20,3 +20,6 @@ TOGO_DATASET/tools/hand_landmarker.task*
 
 # Logs de entrenamiento
 Logs/
+
+# Claves privadas (sincronizar_web.py)
+TOGO_DATASET/.env

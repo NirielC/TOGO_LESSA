@@ -55,6 +55,9 @@ export function QuickPhrases({ open, onClose }: { open: boolean; onClose: () => 
                   onClose();
                 }}
                 onLongPress={() => remove(p)}
+                accessibilityRole="button"
+                accessibilityLabel={`Decir: ${p}`}
+                accessibilityHint="Mantén presionado para quitarla"
                 style={({ pressed }) => [st.item, pressed && { backgroundColor: colors.signSoft }]}
               >
                 <Text style={st.itemText}>{p}</Text>

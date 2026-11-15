@@ -25,6 +25,9 @@ VIDEOS_DIR = DATASET_DIR / ("videos" if VERSION == "v2" else f"videos_{VERSION}"
 LANDMARKS_DIR = DATASET_DIR / f"landmarks_{VERSION}"
 MODELO_DIR = MODELS_DIR / VERSION
 SEQUENCES_DIR = DATASET_DIR / "sequences"
+# Tomas de la plataforma web (TOGO_COLABORA), ya convertidas por tools/sincronizar_web.py.
+# Solo las ACEPTADAS; las dudosas esperan en web/_revision y no se entrenan.
+WEB_DIR = DATASET_DIR / "web"
 PROCESSED_DIR = DATASET_DIR / "processed"
 
 

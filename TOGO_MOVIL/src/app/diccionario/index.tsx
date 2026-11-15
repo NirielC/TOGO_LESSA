@@ -42,7 +42,7 @@ export default function Diccionario() {
 
       <View style={st.tabs}>
         {(['senas', 'letras'] as const).map((t) => (
-          <Pressable key={t} onPress={() => setTab(t)} style={[st.tab, tab === t && st.tabOn]}>
+          <Pressable key={t} onPress={() => setTab(t)} style={[st.tab, tab === t && st.tabOn]} accessibilityRole="tab" accessibilityState={{ selected: tab === t }}>
             <Text style={[st.tabText, tab === t && { color: colors.onInk }]}>{t === 'senas' ? `Señas (${SIGNS.length})` : `Abecedario (${LETTERS.length})`}</Text>
           </Pressable>
         ))}
@@ -60,7 +60,7 @@ export default function Diccionario() {
           contentContainerStyle={st.grid}
           ListEmptyComponent={<Text style={[type.small, { textAlign: 'center' }]}>No encontré esa seña.</Text>}
           renderItem={({ item }) => (
-            <Pressable style={({ pressed }) => [st.card, pressed && { transform: [{ scale: 0.97 }] }]} onPress={() => router.push(`/diccionario/${item.id}`)}>
+            <Pressable style={({ pressed }) => [st.card, pressed && { transform: [{ scale: 0.97 }] }]} onPress={() => router.push(`/diccionario/${item.id}`)} accessibilityRole="button">
               <View style={st.thumb}>
                 <SignAvatar sign={item} size={120} playing={false} />
               </View>

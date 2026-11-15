@@ -100,7 +100,7 @@ export default function Voz() {
 
         <View style={st.phrasesHead}>
           <Text style={type.label}>FRASES RÁPIDAS</Text>
-          <Pressable onPress={() => setEditPhrases(true)} hitSlop={8}>
+          <Pressable onPress={() => setEditPhrases(true)} hitSlop={8} accessibilityRole="button" accessibilityLabel="Editar frases rápidas">
             <Text style={st.edit}>Editar</Text>
           </Pressable>
         </View>

@@ -9,11 +9,10 @@ import { Button, Icon, IconName } from './ui';
 
 /** Lo nuevo de esta versión: lo presenta Togo una sola vez (se recuerda en los ajustes). */
 const NOVEDADES: { icon: IconName; texto: string; tono: string }[] = [
-  { icon: 'bird', texto: 'Togo se renovó: más expresivo, piensa, duerme y celebra contigo', tono: colors.signSoft },
-  { icon: 'alphabetical-variant', texto: 'Abecedario: toca una letra para verla en grande y en espejo', tono: '#FCEFD2' },
-  { icon: 'camera-front-variant', texto: 'Practica cada seña y letra con la cámara desde el Diccionario', tono: colors.voiceSoft },
-  { icon: 'alert-circle-outline', texto: 'Frases urgentes en Dar voz: se dicen con un solo toque', tono: '#FBE3D8' },
-  { icon: 'auto-fix', texto: 'Animaciones más naturales, vibración al tocar y la app ya no se cierra en el abecedario', tono: colors.signSoft },
+  { icon: 'hand-heart-outline', texto: 'Enséñale señas a Togo: graba desde tu teléfono en 5 minutos', tono: '#FBE3D8' },
+  { icon: 'account-group-outline', texto: 'Colaboradores: los nombres de quienes le enseñan a Togo', tono: colors.signSoft },
+  { icon: 'dots-horizontal-circle-outline', texto: 'Arriba hay menos botones: Historial, Guardar y Borrar están en «Más»', tono: '#FCEFD2' },
+  { icon: 'gesture-tap-button', texto: 'Mejor lectura de pantalla: los botones se anuncian con TalkBack', tono: colors.voiceSoft },
 ];
 
 export function Novedades() {

@@ -31,8 +31,8 @@ sys.path.insert(0, str(ROOT_DIR))
 from config import ALTO, ANCHO, CLASSES, DATASET_DIR, LANDMARKS_DIR as _LM  # noqa: E402
 from togo_features import HAND_DIM, POSE_DIM, normalize_sequence  # noqa: E402
 
-# Usa la versión actual; si aún no tiene datos, la v2 (los 4000 videos originales).
-LANDMARKS_DIR = _LM if any(_LM.glob("*/*.npy")) else DATASET_DIR / "landmarks_v2"
+# Solo datos propios (versión actual). Los videos originales no se usan.
+LANDMARKS_DIR = _LM
 ABC_CACHE = DATASET_DIR / "abecedario" / "features_estaticas.npz"
 OUT = ROOT_DIR.parent / "TOGO_MOVIL" / "src" / "data" / "diccionario.json"
 

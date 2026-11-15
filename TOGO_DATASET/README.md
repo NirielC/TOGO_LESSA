@@ -77,8 +77,8 @@ rascarse, moverse sin señar) que evita que el modelo "invente" señas.
   zurdos se ven igual; grabar mitad con cada mano suma variedad.
 - Sin piernas ni pies; aumento de datos con velocidad distinta y seña corrida en la ventana.
 - Escribe `signs_meta.json`: la app lee de ahí el formato (sin él, usa el formato v2 original).
-- **Dataset combinado**: suma los 4000 videos originales (`landmarks_v2`, 1.5 s, centrados en la
-  ventana de 2 s) a los nuevos. Validación y prueba solo con videos nuevos. `--sin-originales` lo apaga.
+- **Desde cero**: entrena solo con tomas propias (las nuevas y las de la web). Los 4000 videos
+  originales del proyecto anterior **no se usan** (no hay permiso para usarlos).
   `V2_A_V3` (arriba del script) dice qué persona original es cuál en v3, para que "persona no vista"
   no haga trampa.
 - `tools/revisar_dataset.py`: tabla de cuánto grabó cada persona y qué falta; lista aparte los nombres

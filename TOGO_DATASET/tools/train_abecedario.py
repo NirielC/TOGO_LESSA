@@ -36,7 +36,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 sys.path.insert(0, str(ROOT_DIR / "tools"))
 
-from config import ABC_IMAGENES_DIR, ABC_VIDEOS_DIR, ALTO, ANCHO, DATASET_DIR, LANDMARKS_DIR, MODELO_DIR, MODELS_DIR, persona_de_archivo  # noqa: E402
+from config import ABC_IMAGENES_DIR, ABC_VIDEOS_DIR, ALTO, ANCHO, DATASET_DIR, LANDMARKS_DIR, MODELO_DIR, MODELS_DIR, WEB_DIR, persona_de_archivo  # noqa: E402
 from togo_features import (  # noqa: E402
     HAND_DIM, SEQ_LEN, V3_DIM, build_features_v3, frame_from_results, hand_letter_features,
 )
@@ -94,6 +94,24 @@ def extraer_estaticas():
     return np.array(X, dtype=np.float32), np.array(y), np.array(personas)
 
 
+def estaticas_web(cada=3):
+    """Letras quietas de la plataforma web: cada toma es ~1.5 s de la mano sosteniendo la
+    letra; se toma 1 de cada `cada` cuadros como muestra (como las ráfagas de fotos)."""
+    X, y, personas = [], [], []
+    base = WEB_DIR / "letras"
+    for d in sorted(base.iterdir()) if base.exists() else []:
+        for f in sorted(d.glob("*.npy")):
+            for cuadro in np.load(f)[::cada]:
+                feats = hand_letter_features(cuadro, ANCHO, ALTO)
+                if feats is not None:
+                    X.append(feats)
+                    y.append(etiqueta(d.name))
+                    personas.append(persona_de(f.stem))
+    if X:
+        print(f"  Web: {len(X)} muestras de letras quietas")
+    return np.array(X, dtype=np.float32).reshape(-1, HAND_DIM), np.array(y), np.array(personas)
+
+
 def huella_fotos():
     """Lista 'letra/archivo|tamaño' de todas las fotos: si cambia, la caché ya no sirve."""
     if not ABC_IMAGENES_DIR.exists():
@@ -142,6 +160,11 @@ def entrenar_estaticas(args):
         if len(X):
             CACHE.parent.mkdir(parents=True, exist_ok=True)
             np.savez(CACHE, X=X, y=y, personas=personas, huella=np.array(huella))
+    Xw, yw, pw = estaticas_web()
+    if len(Xw):
+        X = np.concatenate([X.reshape(-1, HAND_DIM), Xw]) if len(X) else Xw
+        y = np.concatenate([y, yw]) if len(y) else yw
+        personas = np.concatenate([personas, pw]) if len(personas) else pw
     if len(X) == 0:
         print("No hay fotos del abecedario todavía. Captura con tools/capture_abecedario.py")
         return None
@@ -199,7 +222,9 @@ def entrenar_movimiento(args):
 
     carpetas = sorted(d for d in ABC_VIDEOS_DIR.iterdir() if d.is_dir()) if ABC_VIDEOS_DIR.exists() else []
     clips = [(c, v) for c in carpetas for v in sorted(c.glob("*.mp4"))]
-    if not clips:
+    # Letras con movimiento de la web: ya vienen como puntos (no hay que extraer).
+    web_mov = sorted((WEB_DIR / "letras_mov").glob("*/*.npy")) if (WEB_DIR / "letras_mov").exists() else []
+    if not clips and not web_mov:
         print("No hay clips de letras con movimiento todavía.")
         return None
 
@@ -215,6 +240,12 @@ def entrenar_movimiento(args):
                 continue
         X.append(build_features_v3(np.load(out), ANCHO, ALTO))  # mismo formato que el modelo de señas
         y.append(etiqueta(carpeta.name))
+    if web_mov:
+        from train_senas import ajustar_largo
+        print(f"  Web: {len(web_mov)} clips de letras con movimiento")
+        for f in web_mov:
+            X.append(build_features_v3(ajustar_largo(np.load(f)), ANCHO, ALTO))
+            y.append(etiqueta(f.parent.name))
 
     # "_nada" = señas: el modelo aprende que una seña no es una letra.
     # Deben tener el mismo largo que los clips: misma versión del dataset.

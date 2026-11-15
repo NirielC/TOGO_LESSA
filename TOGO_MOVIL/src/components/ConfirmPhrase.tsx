@@ -40,7 +40,7 @@ export function ConfirmPhrase() {
               <Text style={st.yesText}>Sí, decirlo</Text>
             </Pressable>
           </View>
-          <Pressable onPress={() => setFlipped((f) => !f)} style={st.flip} hitSlop={8}>
+          <Pressable onPress={() => setFlipped((f) => !f)} style={st.flip} hitSlop={8} accessibilityRole="button">
             <Icon name="screen-rotation" size={18} color={colors.primary} />
             <Text style={st.flipText}>Girar para que lo lea quien seña</Text>
           </Pressable>

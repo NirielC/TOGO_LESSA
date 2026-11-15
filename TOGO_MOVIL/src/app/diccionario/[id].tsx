@@ -1,11 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SignAvatar, useSign } from '@/components/SignAvatar';
 import { Torogoz } from '@/components/Torogoz';
 import { Button, Icon, IconButton, IconName } from '@/components/ui';
 import { goBack } from '@/core/nav';
+import { urlColaborar } from '@/data/app';
 import { useSettings } from '@/core/settings';
 import { meaningOf } from '@/core/signs/vocabulary';
 import { speak } from '@/core/voice/tts';
@@ -77,6 +78,14 @@ export default function SenaDetalle() {
             update({ cameraFacing: 'front' });
             router.push('/senas');
           }}
+        />
+
+        <Button
+          label="Grabarla para enseñarle a Togo"
+          icon="hand-heart-outline"
+          variant="soft"
+          accessibilityHint="Abre la web de colaboración"
+          onPress={() => Linking.openURL(urlColaborar('app-diccionario', id))}
         />
 
         <View style={st.tip}>

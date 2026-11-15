@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Mascot, useConversation } from '../core/conversation/ConversationProvider';
 import { listo, tocar } from '../core/tacto';
 import { colors, fonts, radius, space, type } from '../theme/tokens';
@@ -10,13 +10,15 @@ import { Icon, IconName } from './ui';
 /**
  * Encabezado de cada modo, en dos filas:
  *   [Inicio]        Título        [? Ayuda]
- *   Diccionario · Historial · Guardar · Borrar · Ajustes   (ícono + nombre)
+ *   Diccionario · Más · Ajustes   (ícono + nombre)
+ * "Más" abre Historial, Guardar y Borrar: arriba quedan pocos botones grandes.
  * Con nombre bajo cada ícono nadie tiene que adivinar qué hace.
  * (Android muestra como máximo 3 botones por alerta: todas tienen Cancelar.)
  */
 export function ModeHeader({ title, accent, onHelp }: { title: string; accent: string; onHelp: () => void }) {
   const conv = useConversation();
   const has = conv.state.messages.length > 0;
+  const [mas, setMas] = useState(false);
 
   const save = async () => {
     if (!has) return Alert.alert('Nada que guardar', 'La conversación todavía está vacía.');
@@ -60,11 +62,18 @@ export function ModeHeader({ title, accent, onHelp }: { title: string; accent: s
       </View>
       <View style={st.tools}>
         <Tool icon="book-open-variant" label="Diccionario" onPress={() => router.push('/diccionario')} />
-        <Tool icon="history" label="Historial" onPress={() => router.push('/guardadas')} />
-        <Tool icon="bookmark-outline" label="Guardar" onPress={save} />
-        <Tool icon="broom" label="Borrar" onPress={clear} dim={!has} />
+        <Tool icon="dots-horizontal-circle-outline" label="Más" onPress={() => setMas(true)} />
         <Tool icon="cog-outline" label="Ajustes" onPress={() => router.push('/ajustes')} />
       </View>
+      <Modal visible={mas} transparent animationType="fade" onRequestClose={() => setMas(false)}>
+        <Pressable style={st.velo} onPress={() => setMas(false)} accessibilityLabel="Cerrar menú">
+          <View style={st.menu}>
+            <Opcion icon="history" label="Historial" onPress={() => { setMas(false); router.push('/guardadas'); }} />
+            <Opcion icon="bookmark-outline" label="Guardar conversación" onPress={() => { setMas(false); save(); }} dim={!has} />
+            <Opcion icon="broom" label="Borrar conversación" onPress={() => { setMas(false); clear(); }} dim={!has} />
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -79,6 +88,23 @@ function Tool({ icon, label, onPress, dim }: { icon: IconName; label: string; on
       style={({ pressed }) => [st.tool, { opacity: dim ? 0.4 : pressed ? 0.6 : 1 }]} accessibilityRole="button" accessibilityLabel={label}>
       <Icon name={icon} size={21} color={colors.text} />
       <Text style={st.toolText}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function Opcion({ icon, label, onPress, dim }: { icon: IconName; label: string; onPress: () => void; dim?: boolean }) {
+  return (
+    <Pressable
+      onPress={() => {
+        tocar();
+        onPress();
+      }}
+      style={({ pressed }) => [st.opcion, { opacity: dim ? 0.4 : pressed ? 0.6 : 1 }]}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+    >
+      <Icon name={icon} size={24} color={colors.text} />
+      <Text style={st.opcionText}>{label}</Text>
     </Pressable>
   );
 }
@@ -130,6 +156,10 @@ const st = StyleSheet.create({
   tools: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.xs },
   tool: { alignItems: 'center', minWidth: 56, paddingVertical: 4, gap: 1 },
   toolText: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.textMuted },
+  velo: { flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', paddingTop: 110, paddingHorizontal: space.lg, alignItems: 'center' },
+  menu: { backgroundColor: colors.surface, borderRadius: radius.lg, paddingVertical: space.xs, minWidth: 260, borderWidth: 1, borderColor: colors.border },
+  opcion: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md, paddingHorizontal: space.lg },
+  opcionText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.text },
   strip: {
     flexDirection: 'row',
     alignItems: 'center',

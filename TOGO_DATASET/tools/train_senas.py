@@ -16,10 +16,8 @@ Qué mejora respecto a train_v2.py (que se conserva para reproducir el modelo ac
       la seña no siempre queda centrada.
     - Tamaño, posición y ruido leves.
 
-  Dataset combinado: además de los videos nuevos (v3, 2 s) suma los 4000 videos
-  originales (landmarks_v2, 1.5 s, centrados en la ventana de 2 s). Más personas,
-  días, ropa y fondos. Validación y prueba se hacen solo con videos nuevos.
-  (--sin-originales para entrenar solo con los nuevos.)
+  Dataset: SOLO las tomas nuevas (v3 y las de la web, 2 s). Los 4000 videos
+  originales del proyecto anterior no se usan: no tenemos permiso para usarlos.
 
   Red: Dense(128) por cuadro -> LSTM(96) -> LSTM(64) -> Dense(64) -> softmax,
   con suavizado de etiquetas (no se pone 100% segura cuando duda) y pesos por clase.
@@ -31,7 +29,6 @@ Uso:
     python tools/train_senas.py                    # dataset de config.VERSION (v3)
     python tools/train_senas.py --por-persona      # + precisión con persona no vista
     python tools/train_senas.py --instalar         # + copia el modelo a la app
-    set TOGO_VERSION=v2 && python tools/train_senas.py   # con los 4000 videos originales
 """
 
 import argparse
@@ -49,14 +46,13 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 sys.path.insert(0, str(ROOT_DIR / "tools"))
 
-from config import ALTO, ANCHO, CLASSES, DATASET_DIR, FPS, LANDMARKS_DIR, MODELO_DIR, VERSION, persona_de_archivo  # noqa: E402
+from config import ALTO, ANCHO, CLASSES, DATASET_DIR, FPS, LANDMARKS_DIR, MODELO_DIR, VERSION, WEB_DIR, persona_de_archivo  # noqa: E402
 from togo_features import (  # noqa: E402
     FRAME_DIM, SEQ_LEN, V3_DIM, build_features_v3, mirror_features_v3, mirror_sequence, normalize_sequence,
 )
 
 SEED = 42
 APP_ASSETS = ROOT_DIR.parent / "TOGO_MOVIL" / "modules" / "togo-vision" / "android" / "src" / "main" / "assets"
-LANDMARKS_V2_DIR = DATASET_DIR / "landmarks_v2"   # los 4000 videos originales (30 cuadros)
 # Persona de los videos originales -> su número en el dataset nuevo (si es la misma
 # persona). Solo sirve para que "persona no vista" no haga trampa. Ajustar si cambió.
 V2_A_V3 = {1: 1, 2: 2, 3: 3, 4: 4}
@@ -77,12 +73,12 @@ def ajustar_largo(raw):
     return np.concatenate([np.repeat(raw[:1], izq, 0), raw, np.repeat(raw[-1:], SEQ_LEN - T - izq, 0)])
 
 
-def cargar(features, con_v2):
-    """Junta el dataset actual (v3) con los 4000 videos originales (v2) si existen.
-    Los v2 se marcan con persona 100+N para no mezclarlos al medir."""
+def cargar(features):
+    """Junta el dataset actual (v3) con las tomas de la web. Solo datos propios."""
     fuentes = [(LANDMARKS_DIR, 0)]
-    if con_v2 and VERSION != "v2" and LANDMARKS_V2_DIR.exists():
-        fuentes.append((LANDMARKS_V2_DIR, 100))
+    # Tomas de la web (personas p1001, p1002...): mismo formato crudo, 2 s a 20 fps.
+    if VERSION != "v2" and (WEB_DIR / "senas").exists():
+        fuentes.append((WEB_DIR / "senas", 0))
     X, y, persona, origen, clases = [], [], [], [], []
     for clase in CLASSES:
         files = [(f, extra) for d, extra in fuentes for f in sorted((d / clase).glob("*.npy"))]
@@ -229,7 +225,6 @@ def main():
     ap.add_argument("--por-persona", action="store_true", help="precisión dejando fuera a cada persona")
     ap.add_argument("--instalar", action="store_true", help="copia el modelo, etiquetas y formato a la app")
     ap.add_argument("--salida", default=None, help="carpeta de salida (por defecto models/<versión>)")
-    ap.add_argument("--sin-originales", action="store_true", help="no sumar los 4000 videos originales (v2)")
     args = ap.parse_args()
 
     from sklearn.metrics import confusion_matrix
@@ -239,8 +234,10 @@ def main():
 
     out_dir = Path(args.salida) if args.salida else MODELO_DIR
     print(f"Dataset {VERSION} ({SEQ_LEN} cuadros) · características {args.features}"
-          + ("" if args.sin_originales else " · + videos originales v2"))
-    X, y, persona, origen, clases = cargar(args.features, not args.sin_originales)
+          )
+    if VERSION == "v2":
+        sys.exit("TOGO_VERSION=v2 son los videos originales: no se usan. Entrena con v3 (las tomas propias).")
+    X, y, persona, origen, clases = cargar(args.features)
     D = X.shape[2]
     print(f"Total: {X.shape}  clases: {len(clases)}  personas: {sorted(set(persona.tolist()))}")
 

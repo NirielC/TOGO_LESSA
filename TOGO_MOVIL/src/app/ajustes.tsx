@@ -116,14 +116,14 @@ export default function Ajustes() {
         </Section>
 
         <Section title="Conversaciones">
-          <Pressable style={st.link} onPress={() => router.push('/guardadas')}>
+          <Pressable style={st.link} onPress={() => router.push('/guardadas')} accessibilityRole="button">
             <Icon name="bookmark-multiple-outline" />
             <Text style={[type.body, { flex: 1 }]}>Conversaciones guardadas</Text>
             <Icon name="chevron-right" color={colors.textFaint} />
           </Pressable>
         </Section>
 
-        <Pressable style={st.advToggle} onPress={() => setAdvanced((a) => !a)}>
+        <Pressable style={st.advToggle} onPress={() => setAdvanced((a) => !a)} accessibilityRole="button" accessibilityState={{ expanded: advanced }}>
           <Text style={type.h2}>Avanzado</Text>
           <Icon name={advanced ? 'chevron-up' : 'chevron-down'} />
         </Pressable>

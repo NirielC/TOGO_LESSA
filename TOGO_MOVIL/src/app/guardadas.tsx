@@ -71,7 +71,7 @@ export default function Guardadas() {
           <View style={st.empty}>
             <Torogoz state="sleeping" size={84} />
             <Text style={type.h2}>Aún no hay conversaciones</Text>
-            <Text style={[type.small, { textAlign: 'center' }]}>En Leer señas o Dar voz, toca «Guardar» arriba y la encontrarás aquí.</Text>
+            <Text style={[type.small, { textAlign: 'center' }]}>En Leer señas o Dar voz, toca «Más» › «Guardar conversación» arriba y la encontrarás aquí.</Text>
           </View>
         }
         renderItem={({ item }) => {
@@ -105,7 +105,7 @@ export default function Guardadas() {
                     {item.messages.map((m) => {
                       const s = SOURCE[m.source];
                       return (
-                        <Pressable key={m.id} onPress={() => speak(m.text)} style={[st.msg, s.voice ? st.voice : st.sign]}>
+                        <Pressable key={m.id} onPress={() => speak(m.text)} style={[st.msg, s.voice ? st.voice : st.sign]} accessibilityRole="button" accessibilityHint="Lo dice en voz alta">
                           <View style={st.msgHead}>
                             <ChannelTag icon={s.icon} text={s.tag} color={s.voice ? colors.voiceInk : colors.signInk} />
                             <Text style={st.metaText}>{hora(m.at)}</Text>

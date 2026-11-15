@@ -3,6 +3,7 @@ import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { EasterEgg } from '@/components/EasterEgg';
+import { Colaboradores } from '@/components/Colaboradores';
 import { Logo } from '@/components/Logo';
 import { SIGNS } from '@/components/SignAvatar';
 import { Torogoz } from '@/components/Torogoz';
@@ -66,6 +67,9 @@ export default function Acerca() {
           <Value icon="map-marker-radius-outline" title="Hecho aquí" text="Con señas reales de LESSA, grabadas en El Salvador." />
         </View>
 
+        <Text style={st.section}>COLABORADORES</Text>
+        <Colaboradores />
+
         <Text style={st.section}>CREADA POR</Text>
         <View style={st.member}>
           {AUTOR.foto ? (
@@ -78,7 +82,7 @@ export default function Acerca() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={type.bodyStrong}>{AUTOR.nombre}</Text>
             <Text style={type.small}>{AUTOR.rol}</Text>
-            <Pressable onPress={() => Linking.openURL(`mailto:${AUTOR.correo}`)} hitSlop={6}>
+            <Pressable onPress={() => Linking.openURL(`mailto:${AUTOR.correo}`)} hitSlop={6} accessibilityRole="link">
               <Text style={st.mail} numberOfLines={1}>
                 {AUTOR.correo}
               </Text>
