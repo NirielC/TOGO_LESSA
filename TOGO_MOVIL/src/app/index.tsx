@@ -7,19 +7,22 @@ import { Aparecer } from '@/components/Aparecer';
 import { SignsScene, VoiceScene } from '@/components/Illustrations';
 import { Logo } from '@/components/Logo';
 import { Novedades } from '@/components/Novedades';
+import { TextoSuave } from '@/components/TextoSuave';
 import { MASCOT_NAME, RARE_CHANCE, SECRET_HINT, Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { useSettings } from '@/core/settings';
 import { tocar } from '@/core/tacto';
 import { APP_VERSION, APP_YEAR, urlColaborar } from '@/data/app';
 import { HOME_TIPS } from '@/data/tips';
-import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, palette, radius, space, themed, themeName, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /**
  * INICIO: dos maneras de conversar, según quién tiene el teléfono, y debajo
  * lo que siempre está a mano (diccionario, conversaciones, sobre Togo).
  */
 export default function Inicio() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const { settings, update } = useSettings();
   const [name, setName] = useState(settings.name);
   const [editing, setEditing] = useState(!settings.name);
@@ -30,7 +33,7 @@ export default function Inicio() {
     const t = setInterval(() => {
       setTip((x) => (x + 1) % HOME_TIPS.length);
       setRare(Math.random() < RARE_CHANCE); // la pista del secreto de Togo, muy de vez en cuando
-    }, 5000);
+    }, 9000);
     return () => clearInterval(t);
   }, []);
 
@@ -55,7 +58,7 @@ export default function Inicio() {
         <View style={st.hero}>
           <Torogoz state="attentive" size={124} interactive say={hello} greet />
           <OfflineBadge />
-          <Text style={[st.tip, rare && { color: '#8A5A12' }]}>{rare ? SECRET_HINT : HOME_TIPS[tip]}</Text>
+          <TextoSuave style={[st.tip, rare && { color: colors.gold }]} numberOfLines={2} text={rare ? SECRET_HINT : HOME_TIPS[tip]} />
           <Text style={st.question}>¿Cómo vamos a conversar?</Text>
           {editing ? (
             <TextInput
@@ -81,7 +84,7 @@ export default function Inicio() {
             title="Leer señas"
             who="Para quien oye"
             text="Apunta la cámara a quien seña: te pregunto si entendí bien y lo digo en voz alta. Responde hablando y lo leerá en grande."
-            bg={palette.seafoam}
+            bg={colors.cardSign}
             scene={<SignsScene width={140} height={105} />}
             icon="hand-back-right"
             onPress={() => router.push('/senas')}
@@ -92,7 +95,7 @@ export default function Inicio() {
             title="Dar voz"
             who="Para quien no habla"
             text="Escribe o toca una frase y el teléfono la dice en voz alta. La respuesta te llega en letra grande."
-            bg={palette.lightSky}
+            bg={colors.cardVoice}
             scene={<VoiceScene width={140} height={105} />}
             icon="account-voice"
             onPress={() => router.push('/voz')}
@@ -100,10 +103,10 @@ export default function Inicio() {
         </Aparecer>
 
         <Aparecer delay={370} style={st.links}>
-          <Row icon="book-open-variant" title="Diccionario LESSA" text="Aprende y repasa cada seña" tone="#FCEFD2" onPress={() => router.push('/diccionario')} />
+          <Row icon="book-open-variant" title="Diccionario LESSA" text="Aprende y repasa cada seña" tone={colors.toneSun} onPress={() => router.push('/diccionario')} />
           <Row icon="history" title="Conversaciones guardadas" text="Vuelve a leer lo que hablaron" tone={colors.voiceSoft} onPress={() => router.push('/guardadas')} />
           <Row icon="information-outline" title="Sobre Togo" text="Qué es, quién la hizo y por qué un torogoz" tone={colors.signSoft} onPress={() => router.push('/acerca')} />
-          <Row icon="hand-heart-outline" title="Enséñale señas a Togo" text="Graba señas en 5 minutos (abre la web)" tone="#FBE3D8" onPress={() => Linking.openURL(urlColaborar('app'))} />
+          <Row icon="hand-heart-outline" title="Enséñale señas a Togo" text="Graba señas en 5 minutos (abre la web)" tone={colors.toneCoral} onPress={() => Linking.openURL(urlColaborar('app'))} />
         </Aparecer>
 
         <View style={st.footer}>
@@ -191,26 +194,26 @@ function Row({ icon, title, text, tone, onPress }: { icon: IconName; title: stri
 function Backdrop() {
   return (
     <Svg style={StyleSheet.absoluteFill} viewBox="0 0 400 800" preserveAspectRatio="xMidYMin slice" pointerEvents="none">
-      <Path d="M260 -40 C360 -20 440 60 420 160 C400 240 300 230 250 170 C200 110 170 -60 260 -40 Z" fill={palette.sun} opacity={0.3} />
-      <Path d="M-60 140 C0 100 90 140 80 220 C70 290 -20 300 -60 260 Z" fill={palette.coral} opacity={0.15} />
+      <Path d="M260 -40 C360 -20 440 60 420 160 C400 240 300 230 250 170 C200 110 170 -60 260 -40 Z" fill={themeName() === 'dark' ? palette.seafoam : palette.sun} opacity={themeName() === 'dark' ? 0.12 : 0.3} />
+      <Path d="M-60 140 C0 100 90 140 80 220 C70 290 -20 300 -60 260 Z" fill={themeName() === 'dark' ? palette.lightSky : palette.coral} opacity={themeName() === 'dark' ? 0.07 : 0.15} />
       <Circle cx={40} cy={70} r={7} fill={palette.lightSky} />
     </Svg>
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   content: { padding: space.lg, gap: space.lg, paddingBottom: space.xxl },
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   hero: { alignItems: 'center', gap: space.sm },
-  tip: { ...type.small, textAlign: 'center', fontFamily: fonts.bodyBold, color: colors.signInk, minHeight: 18 },
+  tip: { ...type.small, textAlign: 'center', fontFamily: fonts.bodyBold, color: colors.signInk, minHeight: 36, paddingHorizontal: space.lg },
   question: { ...type.h1, textAlign: 'center' },
   nameInput: { ...type.body, alignSelf: 'stretch', marginHorizontal: space.xl, textAlign: 'center', backgroundColor: colors.surface, borderRadius: radius.pill, height: 46, borderWidth: 1, borderColor: colors.border, paddingHorizontal: space.lg },
   changeName: { ...type.small, textDecorationLine: 'underline', textAlign: 'center' },
   card: { borderRadius: radius.xl, padding: space.lg, gap: space.sm, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', alignItems: 'center' },
-  sceneSigns: { backgroundColor: 'rgba(255,255,255,0.35)', borderRadius: radius.lg, overflow: 'hidden' },
-  whoPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
+  sceneSigns: { backgroundColor: colors.glassSoft, borderRadius: radius.lg, overflow: 'hidden' },
+  whoPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: colors.glass, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 },
   who: { fontFamily: fonts.bodyBold, fontSize: 11, letterSpacing: 0.6, color: colors.text },
   cardTitle: { fontFamily: fonts.title, fontSize: 30, lineHeight: 36, color: colors.text },
   cardText: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 21, color: colors.text },
@@ -224,4 +227,4 @@ const st = StyleSheet.create({
   offlineIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center' },
   offlineText: { fontFamily: fonts.title, fontSize: 17, color: colors.ink },
   legal: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.textMuted },
-});
+}));

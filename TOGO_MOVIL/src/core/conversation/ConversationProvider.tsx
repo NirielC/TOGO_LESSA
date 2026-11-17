@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { LayoutAnimation } from 'react-native';
 import { useSettings } from '../settings';
 import type { EngineEvent, Quality } from '../signs/engine';
 import { PredictionStabilizer } from '../signs/PredictionStabilizer';
@@ -8,7 +9,7 @@ import { meaningOf } from '../signs/vocabulary';
 import * as stt from '../voice/stt';
 import { speak, stopSpeaking, warmUp } from '../voice/tts';
 import { contexto, expectsLetters, previousKeys } from './contexto';
-import { ConversationState, conversationReducer, draftText, initialConversation, Message, Turn } from './reducer';
+import { Action, ConversationState, conversationReducer, draftText, initialConversation, Message, Turn } from './reducer';
 
 /**
  * Une el motor de señas, la voz y la conversación. Las pantallas solo leen
@@ -114,6 +115,13 @@ export async function deleteSaved(id: string) {
 }
 
 const NO_SPEECH = new Set(['no-speech', 'speech-timeout']);
+/** Animación de acomodo: lo nuevo aparece con fundido y lo demás se desliza a su lugar. */
+const SUAVE = {
+  duration: 260,
+  create: { type: LayoutAnimation.Types.easeInEaseOut, property: LayoutAnimation.Properties.opacity },
+  update: { type: LayoutAnimation.Types.easeInEaseOut },
+  delete: { type: LayoutAnimation.Types.easeInEaseOut, property: LayoutAnimation.Properties.opacity },
+};
 /**
  * Mano quieta: movimiento de toda la mano (anchos de hombro por cuadro, suavizado) por
  * debajo de esto. Una letra sostenida queda en ~0.01; asentir con el puño pasa de 0.03.
@@ -127,7 +135,13 @@ const step = (x: number, s: number) => Math.round(x / s) * s;
 
 export function ConversationProvider({ children }: { children: React.ReactNode }) {
   const { settings } = useSettings();
-  const [state, dispatch] = useReducer(conversationReducer, undefined, () => initialConversation());
+  const [state, dispatchNow] = useReducer(conversationReducer, undefined, () => initialConversation());
+  // Todo cambio de la conversación mueve cosas en pantalla (el borrador crece, llega un
+  // mensaje): en vez de saltar de golpe, se acomoda con una animación corta.
+  const dispatch = useCallback((a: Action) => {
+    LayoutAnimation.configureNext(SUAVE);
+    dispatchNow(a);
+  }, []);
   const [cameraOn, setCameraOn] = useState(true);
   const [live, setLive] = useState<LiveUi>({
     quality: 'no_person',

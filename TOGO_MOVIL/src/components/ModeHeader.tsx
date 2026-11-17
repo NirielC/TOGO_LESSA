@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Mascot, useConversation } from '../core/conversation/ConversationProvider';
 import { listo, tocar } from '../core/tacto';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
+import { TextoSuave } from './TextoSuave';
 import { RARE_CHANCE, SECRET_HINT, Torogoz } from './Torogoz';
 import { Icon, IconName } from './ui';
 
@@ -117,7 +118,7 @@ export function AssistantStrip({ mascot, status, tips, tone, compact = false }: 
     const t = setInterval(() => {
       setI((x) => (x + 1) % tips.length);
       setRare(Math.random() < RARE_CHANCE / 2); // la pista secreta, muy de vez en cuando
-    }, 6500);
+    }, 10000);
     return () => clearInterval(t);
   }, [tips.length]);
   return (
@@ -127,15 +128,13 @@ export function AssistantStrip({ mascot, status, tips, tone, compact = false }: 
         <Text style={st.status} numberOfLines={2}>
           {status}
         </Text>
-        <Text style={st.tip} numberOfLines={2}>
-          {rare ? SECRET_HINT : tips[i]}
-        </Text>
+        <TextoSuave style={st.tip} numberOfLines={2} text={rare ? SECRET_HINT : tips[i]} />
       </View>
     </View>
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   wrap: { paddingHorizontal: space.md, paddingTop: space.sm, gap: space.xs },
   top: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   pill: {
@@ -156,7 +155,7 @@ const st = StyleSheet.create({
   tools: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: space.xs },
   tool: { alignItems: 'center', minWidth: 56, paddingVertical: 4, gap: 1 },
   toolText: { fontFamily: fonts.bodyMedium, fontSize: 11, color: colors.textMuted },
-  velo: { flex: 1, backgroundColor: 'rgba(0,0,0,0.25)', paddingTop: 110, paddingHorizontal: space.lg, alignItems: 'center' },
+  velo: { flex: 1, backgroundColor: colors.veilLight, paddingTop: 110, paddingHorizontal: space.lg, alignItems: 'center' },
   menu: { backgroundColor: colors.surface, borderRadius: radius.lg, paddingVertical: space.xs, minWidth: 260, borderWidth: 1, borderColor: colors.border },
   opcion: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md, paddingHorizontal: space.lg },
   opcionText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.text },
@@ -173,5 +172,5 @@ const st = StyleSheet.create({
   },
   stripText: { flexShrink: 1, alignItems: 'center' },
   status: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.text, textAlign: 'center' },
-  tip: { ...type.small, textAlign: 'center' },
-});
+  tip: { ...type.small, textAlign: 'center', minHeight: 36 },
+}));

@@ -10,10 +10,12 @@ import { idLetra, urlColaborar } from '@/data/app';
 import { useSettings } from '@/core/settings';
 import { tocar } from '@/core/tacto';
 import { speak } from '@/core/voice/tts';
-import { colors, fonts, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /** Ficha de una letra del abecedario: la forma de la mano en grande, en espejo si se quiere, y a la anterior/siguiente. */
 export default function LetraDetalle() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const { letra } = useLocalSearchParams<{ letra: string }>();
   const { settings, update } = useSettings();
   const [mirror, setMirror] = useState(false);
@@ -117,14 +119,14 @@ function Hint({ icon, text }: { icon: IconName; text: string }) {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
   content: { padding: space.lg, gap: space.md, paddingBottom: space.xxl },
-  stage: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FCEFD2', borderRadius: radius.xl, paddingVertical: space.lg, paddingHorizontal: space.xs },
+  stage: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.toneSun, borderRadius: radius.xl, paddingVertical: space.lg, paddingHorizontal: space.xs },
   handBox: { alignItems: 'center', gap: space.xs },
   big: { fontFamily: fonts.title, fontSize: 44, lineHeight: 50, color: colors.text },
-  arrow: { width: 48, height: 48, borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.7)', alignItems: 'center', justifyContent: 'center' },
+  arrow: { width: 48, height: 48, borderRadius: radius.pill, backgroundColor: colors.glass, alignItems: 'center', justifyContent: 'center' },
   controls: { flexDirection: 'row', justifyContent: 'center', gap: space.sm },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: space.lg, height: 44, borderRadius: radius.pill, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   toggleOn: { backgroundColor: colors.ink, borderColor: colors.ink },
@@ -132,4 +134,4 @@ const st = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, gap: space.sm },
   hint: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   tip: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.signSoft, borderRadius: radius.lg, padding: space.md },
-});
+}));

@@ -2,10 +2,10 @@
   "expo": {
     "name": "Togo",
     "slug": "togo",
-    "version": "0.7.0",
+    "version": "0.9.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "sv.togo.app"
@@ -18,7 +18,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "sv.togo.app",
-      "versionCode": 7,
+      "versionCode": 9,
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO"
@@ -35,7 +35,11 @@
         {
           "backgroundColor": "#FBF7EE",
           "image": "./assets/splash-icon.png",
-          "imageWidth": 240
+          "imageWidth": 240,
+          "dark": {
+            "backgroundColor": "#0E1B26",
+            "image": "./assets/splash-icon.png"
+          }
         }
       ],
       [

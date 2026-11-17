@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useConversation } from '../core/conversation/ConversationProvider';
 import type { Message } from '../core/conversation/reducer';
-import { colors, radius, space, type } from '../theme/tokens';
+import { colors, radius, space, themed, type } from '../theme/tokens';
 import { Torogoz } from './Torogoz';
 import { ChannelTag, Icon, IconName } from './ui';
 
@@ -86,7 +86,7 @@ function Bubble({ m, perspective, onPress }: { m: Message; perspective: Perspect
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   list: { padding: space.lg, gap: space.md },
   row: { flexDirection: 'row' },
   left: { justifyContent: 'flex-start', paddingRight: space.xxl },
@@ -101,4 +101,4 @@ const st = StyleSheet.create({
   signText: { ...type.bodyStrong, fontSize: 19, lineHeight: 26 },
   hint: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start' },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.sm, padding: space.xl },
-});
+}));

@@ -10,10 +10,12 @@ import { Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton, IconName } from '@/components/ui';
 import { goBack } from '@/core/nav';
 import { APP_VERSION, APP_YEAR, AUTOR } from '@/data/app';
-import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, palette, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /** SOBRE TOGO: qué es, por qué existe, por qué un torogoz y quién la hizo. */
 export default function Acerca() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const [egg, setEgg] = useState(false);
   const taps = useRef({ n: 0, at: 0 });
   // 5 toques seguidos en la versión abren el secreto.
@@ -43,7 +45,7 @@ export default function Acerca() {
           </Text>
           <View style={st.stats}>
             <Stat icon="hand-back-right-outline" value={`${SIGNS.length || 10}`} label="señas" tone={colors.signSoft} />
-            <Stat icon="alphabetical-variant" value="27" label="letras" tone="#FCEFD2" />
+            <Stat icon="alphabetical-variant" value="27" label="letras" tone={colors.toneSun} />
             <Stat icon="wifi-off" value="0" label="internet" tone={colors.voiceSoft} />
           </View>
         </View>
@@ -148,7 +150,7 @@ function initials(name: string) {
   return (parts[0][0] + (parts[2]?.[0] ?? parts[1]?.[0] ?? '')).toUpperCase();
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
   content: { padding: space.lg, gap: space.md, paddingBottom: space.xxl },
@@ -170,7 +172,7 @@ const st = StyleSheet.create({
   initials: { fontFamily: fonts.title, fontSize: 21, color: colors.onInk },
   mail: { fontFamily: fonts.bodyMedium, fontSize: 13, color: colors.primary },
   footer: { alignItems: 'center', gap: space.sm, marginTop: space.lg },
-  made: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FBE3D8', borderRadius: radius.pill, paddingHorizontal: space.lg, paddingVertical: 8 },
+  made: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.toneCoral, borderRadius: radius.pill, paddingHorizontal: space.lg, paddingVertical: 8 },
   madeText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.text },
   legal: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.textMuted, textAlign: 'center' },
-});
+}));

@@ -15,6 +15,8 @@ export interface Settings {
   /** Manos bajas durante este tiempo = la frase terminó y se envía. */
   finalizeAfterMs: number;
   showHands: boolean;
+  /** Apariencia: seguir al teléfono, o siempre clara / oscura. */
+  theme: 'auto' | 'light' | 'dark';
   /** Qué ayudas ya se vieron (se abren solas la primera vez). */
   seenHelp: { senas?: boolean; voz?: boolean };
   /** Versión cuyas novedades ya se mostraron (Novedades sale una vez por versión). */
@@ -39,6 +41,7 @@ export const DEFAULT_SETTINGS: Settings = {
   listenAfterSend: false,
   finalizeAfterMs: 1200,
   showHands: true,
+  theme: 'auto',
   confirmBeforeSpeak: true,
   seenHelp: {},
   novedadesVistas: '',
@@ -78,6 +81,7 @@ const KEY = 'togo.settings.v2';
 // v1 tenía otros valores de reconocimiento: de ahí solo se rescatan las preferencias personales.
 const KEY_V1 = 'togo.settings.v1';
 const KEEP_FROM_V1: (keyof Settings)[] = ['name', 'quickPhrases', 'cameraFacing', 'showHands', 'autoSpeak', 'speechRate'];
+export const THEME_LABEL: Record<Settings['theme'], string> = { auto: 'Como el teléfono', light: 'Claro', dark: 'Oscuro' };
 
 interface Ctx {
   settings: Settings;
@@ -135,7 +139,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const reset = useCallback(() => {
     setSettings((prev) => {
-      const next = { ...DEFAULT_SETTINGS, name: prev.name, quickPhrases: prev.quickPhrases };
+      const next = { ...DEFAULT_SETTINGS, name: prev.name, quickPhrases: prev.quickPhrases, theme: prev.theme };
       persist(next);
       return next;
     });

@@ -3,7 +3,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useConversation } from '../core/conversation/ConversationProvider';
 import { useSettings } from '../core/settings';
 import { KNOWN_LABELS, meaningOf, NO_SIGN_LABEL } from '../core/signs/vocabulary';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 
 /**
  * SOLO DESARROLLO (__DEV__). No es una función de la app: sirve para probar
@@ -86,11 +86,11 @@ function Chip({ text, onPress, strong }: { text: string; onPress: () => void; st
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.25)' },
   sheet: { backgroundColor: colors.bg, padding: space.xl, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, maxHeight: '60%', gap: space.sm },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, paddingVertical: space.md },
   chip: { paddingHorizontal: space.lg, paddingVertical: space.md, borderRadius: radius.pill, backgroundColor: colors.signSoft },
   chipStrong: { backgroundColor: colors.primary },
   chipText: { fontFamily: fonts.bodyBold, color: colors.signInk },
-});
+}));

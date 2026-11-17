@@ -3,7 +3,7 @@ import { Animated, Pressable, StyleSheet, Text, TextInput, View } from 'react-na
 import { useConversation } from '../core/conversation/ConversationProvider';
 import { tocar } from '../core/tacto';
 import * as stt from '../core/voice/stt';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { Icon, IconButton } from './ui';
 
 /**
@@ -145,7 +145,7 @@ export function ListenBar({ label, hint }: { label: string; hint: string }) {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   wrap: { paddingHorizontal: space.md, paddingTop: space.sm, paddingBottom: space.sm, gap: space.sm },
   row: { flexDirection: 'row', gap: space.sm, alignItems: 'stretch' },
   bar: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: space.sm, backgroundColor: colors.ink, borderRadius: radius.pill, padding: 6, paddingRight: space.lg },
@@ -160,7 +160,7 @@ const st = StyleSheet.create({
   writeText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.text },
   typeRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1.5, borderColor: colors.voice, padding: 4, gap: 4 },
   input: { flex: 1, ...type.body, paddingVertical: 8 },
-  error: { backgroundColor: '#FDEDE8', borderRadius: radius.lg, padding: space.md, gap: space.sm, borderWidth: 1.5, borderColor: colors.danger },
+  error: { backgroundColor: colors.errorBg, borderRadius: radius.lg, padding: space.md, gap: space.sm, borderWidth: 1.5, borderColor: colors.danger },
   errorTop: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   errorIcon: { width: 30, height: 30, borderRadius: 15, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' },
   errorText: { ...type.bodyStrong, fontSize: 14, lineHeight: 19, flex: 1 },
@@ -169,4 +169,4 @@ const st = StyleSheet.create({
   errorMainText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.onPrimary },
   errorBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: space.md, height: 44 },
   errorBtnText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.primary },
-});
+}));

@@ -1,15 +1,17 @@
 import { ErrorBoundaryProps, router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, space, type } from '../theme/tokens';
+import { colors, space, themed, type } from '../theme/tokens';
 import { Torogoz } from './Torogoz';
 import { Button } from './ui';
+import { useTheme } from '../theme/ThemeProvider';
 
 /**
  * Si una pantalla falla, en vez de cerrarse la app se muestra esto: Togo avisa y se
  * puede reintentar o volver al inicio. Se usa como ErrorBoundary en src/app/_layout.tsx.
  */
 export function ErrorPantalla({ retry }: ErrorBoundaryProps) {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   return (
     <View style={st.wrap}>
       <Torogoz state="confused" size={120} />
@@ -21,7 +23,7 @@ export function ErrorPantalla({ retry }: ErrorBoundaryProps) {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   wrap: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.md },
   centro: { textAlign: 'center' },
-});
+}));

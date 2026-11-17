@@ -3,17 +3,19 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Icon, IconButton } from '@/components/ui';
+import { Button, Icon, IconButton, IconName } from '@/components/ui';
 import { useConversation } from '@/core/conversation/ConversationProvider';
-import { useSettings } from '@/core/settings';
+import { Settings, THEME_LABEL, useSettings } from '@/core/settings';
 import type { StabilizerConfig } from '@/core/signs/PredictionStabilizer';
 import { visionAvailability } from '@/core/signs/native';
 import * as stt from '@/core/voice/stt';
 import { speak } from '@/core/voice/tts';
 import { APP_VERSION } from '@/data/app';
-import { colors, fonts, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 export default function Ajustes() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const { settings, update, reset } = useSettings();
   const { live } = useConversation();
   const [advanced, setAdvanced] = useState(false);
@@ -56,6 +58,25 @@ export default function Ajustes() {
               style={st.nameInput}
               maxLength={30}
             />
+          </View>
+        </Section>
+
+        <Section title="Apariencia">
+          <Text style={type.small}>El modo oscuro cansa menos la vista de noche o en la calle.</Text>
+          <View style={st.segment} accessibilityRole="radiogroup">
+            {(['auto', 'light', 'dark'] as Settings['theme'][]).map((t) => (
+              <Pressable
+                key={t}
+                onPress={() => update({ theme: t })}
+                style={[st.segItem, settings.theme === t && st.segOn]}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: settings.theme === t }}
+                accessibilityLabel={THEME_LABEL[t]}
+              >
+                <Icon name={THEME_ICON[t]} size={20} color={settings.theme === t ? colors.onPrimary : colors.text} />
+                <Text style={[st.segText, settings.theme === t && { color: colors.onPrimary }]}>{THEME_LABEL[t]}</Text>
+              </Pressable>
+            ))}
           </View>
         </Section>
 
@@ -191,7 +212,9 @@ function Stepper(p: { label: string; hint?: string; value: number; min: number; 
   );
 }
 
-const st = StyleSheet.create({
+const THEME_ICON: Record<Settings['theme'], IconName> = { auto: 'theme-light-dark', light: 'white-balance-sunny', dark: 'weather-night' };
+
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
   content: { padding: space.lg, gap: space.lg, paddingBottom: space.xxl },
@@ -203,5 +226,9 @@ const st = StyleSheet.create({
   stepValue: { fontFamily: fonts.bodyBold, fontSize: 14, minWidth: 52, textAlign: 'center', color: colors.text },
   link: { flexDirection: 'row', alignItems: 'center', gap: space.md, minHeight: 44 },
   nameInput: { ...type.body, width: 140, backgroundColor: colors.surfaceAlt, borderRadius: radius.pill, paddingHorizontal: space.md, height: 40, textAlign: 'center' },
+  segment: { flexDirection: 'row', backgroundColor: colors.surfaceAlt, borderRadius: radius.pill, padding: 4, gap: 4 },
+  segItem: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 2, borderRadius: radius.pill, paddingVertical: space.sm, minHeight: 52 },
+  segOn: { backgroundColor: colors.primary },
+  segText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.text, textAlign: 'center' },
   advToggle: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.xs },
-});
+}));

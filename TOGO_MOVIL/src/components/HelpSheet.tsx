@@ -3,7 +3,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettings } from '../core/settings';
 import { speak } from '../core/voice/tts';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { Torogoz } from './Torogoz';
 import { Icon, IconName } from './ui';
 
@@ -142,7 +142,7 @@ export function useFirstTimeHelp(mode: Mode): [boolean, (v: boolean) => void] {
   return [open, set];
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.overlay },
   sheet: { backgroundColor: colors.bg, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: space.xl, paddingTop: space.sm, gap: space.md, maxHeight: '88%' },
   grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: colors.sand },
@@ -160,4 +160,4 @@ const st = StyleSheet.create({
   secondaryText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.text },
   primary: { flex: 1, alignItems: 'center', justifyContent: 'center', height: 50, borderRadius: radius.pill, backgroundColor: colors.primary },
   primaryText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.onPrimary },
-});
+}));

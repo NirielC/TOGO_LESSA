@@ -11,7 +11,8 @@ import { useConversation } from '@/core/conversation/ConversationProvider';
 import { useSettings } from '@/core/settings';
 import { tocar } from '@/core/tacto';
 import { VOICE_TIPS } from '@/data/tips';
-import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, palette, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /**
  * DAR VOZ (para quien no habla: persona sorda o con discapacidad del habla).
@@ -22,6 +23,7 @@ import { colors, fonts, palette, radius, space, type } from '@/theme/tokens';
  *   abajo   conversación + escuchar la respuesta
  */
 export default function Voz() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const conv = useConversation();
   const { settings } = useSettings();
   const [text, setText] = useState('');
@@ -78,8 +80,8 @@ export default function Voz() {
         </View>
 
         <View style={st.urgentesHead}>
-          <Icon name="alert-circle-outline" size={16} color={colors.live} />
-          <Text style={[type.label, { color: colors.live }]}>URGENTE</Text>
+          <Icon name="alert-circle-outline" size={16} color={colors.urgentIcon} />
+          <Text style={[type.label, { color: colors.urgentIcon }]}>URGENTE</Text>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={st.urgentesBox} contentContainerStyle={st.urgentes}>
           {URGENTES.map((p) => (
@@ -112,7 +114,7 @@ export default function Voz() {
                 tocar();
                 conv.sayTyped(p, 'phrase');
               }}
-              style={({ pressed }) => [st.phrase, { backgroundColor: PHRASE_COLORS[i % PHRASE_COLORS.length] }, pressed && { transform: [{ scale: 0.96 }] }]}
+              style={({ pressed }) => [st.phrase, { backgroundColor: phraseColor(i) }, pressed && { transform: [{ scale: 0.96 }] }]}
             >
               <Text style={st.phraseText}>{p}</Text>
             </Pressable>
@@ -131,11 +133,12 @@ export default function Voz() {
   );
 }
 
-const PHRASE_COLORS = ['#FCEFD2', colors.signSoft, colors.voiceSoft, '#FBE3D8'];
+/** Colores de las frases rápidas (se leen al dibujar: siguen al tema). */
+const phraseColor = (i: number) => [colors.toneSun, colors.signSoft, colors.voiceSoft, colors.toneCoral][i % 4];
 /** Frases para una urgencia: siempre a la vista, se dicen con un solo toque. */
 const URGENTES = ['Necesito ayuda, por favor', 'Llame a un médico', 'Me siento mal', 'Llame a mi familia', 'Llame a la policía'];
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   writeCard: { flexDirection: 'row', alignItems: 'flex-end', marginHorizontal: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, paddingVertical: 6, paddingLeft: space.md, paddingRight: 6, borderWidth: 2, borderColor: colors.voice, gap: space.sm },
   input: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 19, lineHeight: 26, color: colors.text, minHeight: 48, maxHeight: 130, paddingVertical: 8, textAlignVertical: 'center' },
@@ -145,7 +148,7 @@ const st = StyleSheet.create({
   urgentesHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: space.lg, marginTop: space.sm },
   urgentesBox: { flexGrow: 0, flexShrink: 0 },
   urgentes: { gap: space.sm, paddingHorizontal: space.lg, paddingVertical: space.xs, alignItems: 'center' },
-  urgente: { backgroundColor: '#FBE3D8', borderColor: colors.live, borderWidth: 1.5, borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 8 },
+  urgente: { backgroundColor: colors.urgentBg, borderColor: colors.urgentBorder, borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 8 },
   urgenteText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.text },
   phrasesHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: space.lg, marginTop: space.sm },
   edit: { fontFamily: fonts.bodyBold, color: colors.primary, fontSize: 13 },
@@ -153,4 +156,4 @@ const st = StyleSheet.create({
   phrases: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: space.md, paddingVertical: space.sm, gap: space.sm },
   phrase: { borderRadius: radius.lg, paddingHorizontal: space.md, paddingVertical: 10 },
   phraseText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.text },
-});
+}));

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
-import { colors, fonts, palette, radius, space } from '../theme/tokens';
+import { colors, fonts, palette, radius, space, themed } from '../theme/tokens';
 
 /**
  * Secreto: un héroe de 8 bits levantando la Trifuerza.
@@ -50,10 +50,10 @@ export function EasterEgg({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(13,43,69,0.85)', alignItems: 'center', justifyContent: 'center', padding: space.xl },
   card: { backgroundColor: '#0B1F33', borderRadius: radius.lg, padding: space.xl, alignItems: 'center', gap: space.md, borderWidth: 3, borderColor: palette.sun },
   title: { fontFamily: fonts.title, fontSize: 22, color: palette.sun, textAlign: 'center' },
   text: { fontFamily: fonts.bodyMedium, fontSize: 14, color: colors.onInk, textAlign: 'center' },
   close: { fontFamily: fonts.bodyBold, fontSize: 12, color: palette.lightSky },
-});
+}));

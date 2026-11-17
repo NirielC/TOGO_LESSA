@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ConversationProvider } from '@/core/conversation/ConversationProvider';
 import { Board } from '@/components/Board';
 import { SettingsProvider, useSettings } from '@/core/settings';
+import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 import { colors } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -21,15 +22,27 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <SettingsProvider>
-        <Gate fontsLoaded={fontsLoaded}>
-          <ConversationProvider>
-            <StatusBar style="dark" />
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'slide_from_right' }} />
-            <Board />
-          </ConversationProvider>
-        </Gate>
+        <ThemeProvider>
+          <Gate fontsLoaded={fontsLoaded}>
+            <ConversationProvider>
+              <Pantallas />
+            </ConversationProvider>
+          </Gate>
+        </ThemeProvider>
       </SettingsProvider>
     </SafeAreaProvider>
+  );
+}
+
+/** Las pantallas con el fondo y la barra de estado del tema (claro u oscuro). */
+function Pantallas() {
+  const theme = useTheme();
+  return (
+    <>
+      <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg }, animation: 'slide_from_right' }} />
+      <Board />
+    </>
   );
 }
 

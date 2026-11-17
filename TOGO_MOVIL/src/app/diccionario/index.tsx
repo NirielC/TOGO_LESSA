@@ -7,7 +7,8 @@ import { Torogoz } from '@/components/Torogoz';
 import { Icon, IconButton } from '@/components/ui';
 import { goBack } from '@/core/nav';
 import { meaningOf } from '@/core/signs/vocabulary';
-import { colors, fonts, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /**
  * DICCIONARIO LESSA: cada seña que la app reconoce, con su animación real.
@@ -16,6 +17,7 @@ import { colors, fonts, radius, space, type } from '@/theme/tokens';
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ¿?¡!,.]/g, '').toLowerCase();
 
 export default function Diccionario() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const [tab, setTab] = useState<'senas' | 'letras'>('senas');
   const [q, setQ] = useState('');
 
@@ -106,10 +108,10 @@ export default function Diccionario() {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
-  hero: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginHorizontal: space.lg, backgroundColor: '#FCEFD2', borderRadius: radius.lg, padding: space.md },
+  hero: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginHorizontal: space.lg, backgroundColor: colors.toneSun, borderRadius: radius.lg, padding: space.md },
   search: { flexDirection: 'row', alignItems: 'center', gap: space.sm, margin: space.lg, marginBottom: space.sm, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: space.lg, height: 48, borderWidth: 1, borderColor: colors.border },
   input: { flex: 1, ...type.body },
   tabs: { flexDirection: 'row', gap: space.sm, paddingHorizontal: space.lg },
@@ -122,4 +124,4 @@ const st = StyleSheet.create({
   cardTitle: { fontFamily: fonts.title, fontSize: 17, color: colors.text, textAlign: 'center' },
   letter: { fontFamily: fonts.title, fontSize: 24, color: colors.text },
   soon: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.md, padding: space.xl },
-});
+}));

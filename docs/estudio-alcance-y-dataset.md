@@ -102,6 +102,13 @@ por persona con 15 tomas cada una): el número de personas está bien. Conviene 
 subir a ~8 señas por persona**: el mismo tiempo de grabación da más personas por seña (≈50 en vez de 30),
 y eso es lo que más ayuda. La web ya ordena "las que más faltan", así que reparte sola.
 
+**Decisión (16-nov-2026):** se permiten **de 15 a 30 tomas por persona y seña**, sin obligación (se
+puede pausar cuando se quiera), para que cada aporte sea completo y no un "micro aporte". Irá con
+**logros y avance a la vista** (porcentaje, insignias, tipo logros de Steam) en la web y en la app,
+para que cada persona vea su aporte y los cambios que genera, sin sentirse obligada. Nota técnica:
+para que una persona con 30 tomas no pese más que una con 5, el entrenamiento debe igualar el peso
+por persona (todavía no está hecho en `train_unico.py`). Se sigue buscando el máximo de personas por seña.
+
 **Señas nuevas:** con el mismo criterio, cada seña nueva necesita unas 200 tomas de 40 o más personas
 antes de entrar al modelo. Sin eso, la mejor opción es que salga solo en el Diccionario y no se reconozca.
 

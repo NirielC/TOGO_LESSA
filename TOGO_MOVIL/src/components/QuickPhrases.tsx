@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, St
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useConversation } from '../core/conversation/ConversationProvider';
 import { useSettings } from '../core/settings';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { Icon, IconButton } from './ui';
 
 /**
@@ -83,7 +83,7 @@ export function QuickPhrases({ open, onClose }: { open: boolean; onClose: () => 
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.overlay },
   sheet: { backgroundColor: colors.bg, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: space.xl, paddingTop: space.sm, gap: space.sm, maxHeight: 620 },
   grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: colors.sand, marginBottom: space.xs },
@@ -93,4 +93,4 @@ const st = StyleSheet.create({
   itemText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.text, flex: 1 },
   addRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   input: { flex: 1, ...type.body, backgroundColor: colors.surface, borderRadius: radius.md, paddingHorizontal: space.lg, height: 48, borderWidth: 1, borderColor: colors.border },
-});
+}));

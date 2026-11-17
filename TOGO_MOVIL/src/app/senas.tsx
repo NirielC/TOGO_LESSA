@@ -13,7 +13,8 @@ import { MASCOT_TEXT } from '@/components/Torogoz';
 import { useConversation } from '@/core/conversation/ConversationProvider';
 import { QUALITY_TEXT } from '@/core/signs/engine';
 import { SIGN_TIPS } from '@/data/tips';
-import { colors, palette, space } from '@/theme/tokens';
+import { colors, palette, space, themed } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /**
  * LEER SEÑAS (para quien oye; también sirve con la cámara frontal para quien seña).
@@ -23,6 +24,7 @@ import { colors, palette, space } from '@/theme/tokens';
  *   abajo   micrófono: lo que dices aparece en grande para quien seña
  */
 export default function Senas() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const conv = useConversation();
   const [help, setHelp] = useFirstTimeHelp('senas');
 
@@ -61,7 +63,7 @@ export default function Senas() {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   camera: { flex: 1.3, marginHorizontal: space.md },
-});
+}));

@@ -8,7 +8,8 @@ import { ChannelTag, Icon, IconButton, IconName } from '@/components/ui';
 import { deleteSaved, loadSaved, SavedConversation } from '@/core/conversation/ConversationProvider';
 import type { Message } from '@/core/conversation/reducer';
 import { speak } from '@/core/voice/tts';
-import { colors, fonts, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /**
  * CONVERSACIONES GUARDADAS (se guardan a propósito, no hay historial automático).
@@ -23,6 +24,7 @@ const SOURCE: Record<Message['source'], { icon: IconName; tag: string; voice: bo
 };
 
 export default function Guardadas() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const [list, setList] = useState<SavedConversation[]>([]);
   const [open, setOpen] = useState<string | null>(null);
 
@@ -152,7 +154,7 @@ function Action({ icon, label, onPress, danger }: { icon: IconName; label: strin
 const hora = (t: number) => new Date(t).toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' });
 const fecha = (t: number) => `${new Date(t).toLocaleDateString('es-SV', { day: 'numeric', month: 'long' })}, ${hora(t)}`;
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
   count: { fontFamily: fonts.title, fontSize: 15, color: colors.onInk, backgroundColor: colors.primary, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 2, marginRight: space.sm },
@@ -175,4 +177,4 @@ const st = StyleSheet.create({
   actions: { flexDirection: 'row', gap: space.sm, justifyContent: 'center' },
   action: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surfaceAlt, borderRadius: radius.pill, paddingHorizontal: space.lg, height: 42 },
   actionText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.primary },
-});
+}));

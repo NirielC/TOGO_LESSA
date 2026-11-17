@@ -3,7 +3,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import { useConversation } from '../core/conversation/ConversationProvider';
 import type { DraftPart } from '../core/conversation/reducer';
 import { tocar } from '../core/tacto';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { Icon, IconButton } from './ui';
 
 /**
@@ -38,7 +38,7 @@ export function DraftBar() {
   const total = state.draft.reduce((n, p) => n + p.text.length, 0);
   const size = total > 90 ? 15 : total > 50 ? 17 : 20;
   const last = state.draft[count - 1];
-  const bg = glow.interpolate({ inputRange: [0, 1], outputRange: [colors.surface, '#FDF3D6'] });
+  const bg = glow.interpolate({ inputRange: [0, 1], outputRange: [colors.surface, colors.draftGlow] });
 
   return (
     <Animated.View style={[st.card, { backgroundColor: bg }]}>
@@ -99,7 +99,7 @@ function Part({ p, first, isLast, onRemove, onBackspace }: { p: DraftPart; first
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   card: { marginHorizontal: space.md, marginTop: space.sm, borderRadius: radius.lg, paddingTop: space.sm, paddingBottom: space.xs, borderWidth: 1.5, borderColor: colors.sign },
   head: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: space.md },
   label: { ...type.label, fontSize: 11, color: colors.signInk },
@@ -107,7 +107,7 @@ const st = StyleSheet.create({
   textBox: { maxHeight: 128, paddingHorizontal: space.md, marginTop: 2 },
   sentence: { fontFamily: fonts.bodyBold, color: colors.text },
   part: { color: colors.text },
-  spelled: { fontFamily: fonts.title, letterSpacing: 2, color: '#8A5A12' },
+  spelled: { fontFamily: fonts.title, letterSpacing: 2, color: colors.gold },
   newest: { color: colors.signInk, textDecorationLine: 'underline', textDecorationColor: colors.sign },
   x: { fontFamily: fonts.body, color: colors.textFaint, fontSize: 14 },
   sep: { color: colors.sign },
@@ -117,4 +117,4 @@ const st = StyleSheet.create({
   actions: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: space.md, gap: space.xs },
   send: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.primary, paddingHorizontal: space.lg, height: 40, borderRadius: radius.pill },
   sendText: { fontFamily: fonts.bodyBold, color: colors.onPrimary, fontSize: 15 },
-});
+}));

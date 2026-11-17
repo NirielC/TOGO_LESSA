@@ -6,7 +6,7 @@ import { useConversation } from '../core/conversation/ConversationProvider';
 import { useSettings } from '../core/settings';
 import { QUALITY_TEXT } from '../core/signs/engine';
 import { getVisionView } from '../core/signs/native';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { DevInjector } from './DevInjector';
 import { Torogoz } from './Torogoz';
 import { Button, Icon, IconButton } from './ui';
@@ -151,7 +151,7 @@ export function SignCamera({ style }: { style?: object }) {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   card: { backgroundColor: colors.ink, borderRadius: radius.xl, overflow: 'hidden' },
   frame: { borderRadius: radius.xl },
   sending: { position: 'absolute', left: space.md, right: space.md, bottom: space.md, backgroundColor: 'rgba(13,43,69,0.75)', borderRadius: radius.md, padding: space.sm, gap: 6 },
@@ -178,4 +178,4 @@ const st = StyleSheet.create({
   pauseTitle: { fontFamily: fonts.title, fontSize: 22, color: colors.onInk },
   pauseText: { ...type.small, color: colors.voice, textAlign: 'center' },
   devHint: { position: 'absolute', bottom: 8, alignSelf: 'center', ...type.small, color: colors.sand, fontSize: 11 },
-});
+}));

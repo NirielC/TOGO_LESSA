@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, fonts, palette } from '../theme/tokens';
+import { colors, fonts, palette, themed } from '../theme/tokens';
 import { LEMA, NOMBRE } from './togoArte';
 
 /**
@@ -35,11 +35,11 @@ export function Logo({ size = 44, tagline = true }: { size?: number; tagline?: b
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'flex-end', gap: 1 },
   word: { fontFamily: fonts.title },
   tagRow: { flexDirection: 'row', alignItems: 'center' },
   tagItem: { flexDirection: 'row', alignItems: 'center' },
   dot: { width: 5, height: 5, borderRadius: 3, marginHorizontal: 8 },
   tag: { fontFamily: fonts.bodyBold, letterSpacing: 2, color: colors.textMuted, textTransform: 'uppercase' },
-});
+}));

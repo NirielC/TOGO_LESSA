@@ -240,8 +240,8 @@ export const PIXEL_A = [
   '...TAQQQTTBBb...',
   '..NQQQQTTTbb....',
   '...RR.tTTTt.....',
-  '.RR.....D.D.....',
-  'NR.....DD.DD....',
+  '.RR....D..D.....',
+  'NR....DD..DD....',
 ];
 export const PIXEL_B = PIXEL_A.map((fila, y) => {
   if (y === 4) return '....HHDDDDDDD...';

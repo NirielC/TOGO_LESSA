@@ -10,10 +10,12 @@ import { urlColaborar } from '@/data/app';
 import { useSettings } from '@/core/settings';
 import { meaningOf } from '@/core/signs/vocabulary';
 import { speak } from '@/core/voice/tts';
-import { colors, fonts, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '@/theme/tokens';
+import { useTheme } from '@/theme/ThemeProvider';
 
 /** Ficha de una seña: animación real, controles para aprender y pistas medidas. */
 export default function SenaDetalle() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const { id } = useLocalSearchParams<{ id: string }>();
   const sign = useSign(id ?? '');
   const { settings, update } = useSettings();
@@ -115,7 +117,7 @@ function Hint({ icon, text }: { icon: IconName; text: string }) {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   head: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingVertical: space.sm },
   content: { padding: space.lg, gap: space.md, paddingBottom: space.xxl },
@@ -126,5 +128,5 @@ const st = StyleSheet.create({
   toggleText: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.text },
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, gap: space.sm },
   hint: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
-  tip: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: '#FCEFD2', borderRadius: radius.lg, padding: space.md },
-});
+  tip: { flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.toneSun, borderRadius: radius.lg, padding: space.md },
+}));

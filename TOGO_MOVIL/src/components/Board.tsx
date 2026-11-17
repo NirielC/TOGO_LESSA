@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useConversation } from '../core/conversation/ConversationProvider';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { Torogoz } from './Torogoz';
 import { Icon } from './ui';
+import { useTheme } from '../theme/ThemeProvider';
 
 /**
  * PIZARRA: lo que dijo la persona oyente, a pantalla completa y en letra
@@ -14,6 +15,7 @@ import { Icon } from './ui';
  * Mientras se escucha, muestra el texto en vivo; al terminar, el texto final.
  */
 export function Board() {
+  useTheme(); // se redibuja con los colores nuevos al cambiar el tema
   const conv = useConversation();
   const insets = useSafeAreaInsets();
   const [flipped, setFlipped] = useState(false);
@@ -57,7 +59,7 @@ export function Board() {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   wrap: { flex: 1, backgroundColor: colors.voiceSoft, paddingHorizontal: space.xl },
   top: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   label: { ...type.label, fontSize: 14, color: colors.voiceInk },
@@ -69,4 +71,4 @@ const st = StyleSheet.create({
   secondaryText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.text },
   primary: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 56, borderRadius: radius.pill, backgroundColor: colors.primary },
   primaryText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.onPrimary },
-});
+}));

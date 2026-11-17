@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
 import { Pressable, PressableProps, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { tocar } from '../core/tacto';
-import { colors, fonts, radius, space, touch, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, touch, type } from '../theme/tokens';
 
 export type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -20,7 +20,7 @@ export function Button({
   onPress,
   ...rest
 }: PressableProps & { label: string; icon?: IconName; variant?: Variant; style?: ViewStyle }) {
-  const v = VARIANTS[variant];
+  const v = VARIANTS[variant]();
   return (
     <Pressable
       accessibilityRole="button"
@@ -39,11 +39,12 @@ export function Button({
   );
 }
 
-const VARIANTS: Record<Variant, { bg: string; fg: string }> = {
-  primary: { bg: colors.primary, fg: colors.onPrimary },
-  ink: { bg: colors.ink, fg: colors.onInk },
-  soft: { bg: colors.surfaceAlt, fg: colors.text },
-  ghost: { bg: 'transparent', fg: colors.primary },
+// Se leen al dibujar (no en una constante): así siguen al modo claro u oscuro.
+const VARIANTS: Record<Variant, () => { bg: string; fg: string }> = {
+  primary: () => ({ bg: colors.primary, fg: colors.onPrimary }),
+  ink: () => ({ bg: colors.ink, fg: colors.onInk }),
+  soft: () => ({ bg: colors.surfaceAlt, fg: colors.text }),
+  ghost: () => ({ bg: 'transparent', fg: colors.primary }),
 };
 
 export function IconButton({
@@ -88,7 +89,7 @@ export function Card({ children, style }: { children: React.ReactNode; style?: V
   return <View style={[s.card, style]}>{children}</View>;
 }
 
-const s = StyleSheet.create({
+const s = themed(() => StyleSheet.create({
   btn: {
     minHeight: touch,
     paddingHorizontal: space.xl,
@@ -102,4 +103,4 @@ const s = StyleSheet.create({
   iconBtn: { width: touch, height: touch, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   tag: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   card: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg },
-});
+}));

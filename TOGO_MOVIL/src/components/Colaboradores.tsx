@@ -4,7 +4,7 @@ import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from '@/components/ui';
 import { COLABORA, urlColaborar } from '@/data/app';
 import incluidos from '@/data/colaboradores.json';
-import { colors, fonts, radius, space, type } from '@/theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '@/theme/tokens';
 
 /**
  * COLABORADORES: quienes aportaron tomas desde la plataforma web.
@@ -92,7 +92,7 @@ export function Colaboradores() {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   wrap: { backgroundColor: colors.surface, borderRadius: radius.xl, padding: space.lg, gap: space.md },
   invita: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   icono: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.live, alignItems: 'center', justifyContent: 'center' },
@@ -106,4 +106,4 @@ const st = StyleSheet.create({
   lista: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   chip: { backgroundColor: colors.signSoft, borderRadius: radius.pill, paddingHorizontal: space.md, paddingVertical: 6 },
   chipTexto: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.signInk },
-});
+}));

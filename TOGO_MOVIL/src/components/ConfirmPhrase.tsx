@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useConversation } from '../core/conversation/ConversationProvider';
-import { colors, fonts, radius, space, type } from '../theme/tokens';
+import { colors, fonts, radius, space, themed, type } from '../theme/tokens';
 import { Torogoz } from './Torogoz';
 import { Icon } from './ui';
 
@@ -50,7 +50,7 @@ export function ConfirmPhrase() {
   );
 }
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: colors.overlay, justifyContent: 'center', padding: space.lg },
   card: { backgroundColor: colors.bg, borderRadius: radius.xl, padding: space.xl, gap: space.lg },
   top: { alignItems: 'center', gap: space.sm },
@@ -65,4 +65,4 @@ const st = StyleSheet.create({
   yesText: { fontFamily: fonts.bodyBold, fontSize: 17, color: colors.onPrimary },
   flip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   flipText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.primary },
-});
+}));

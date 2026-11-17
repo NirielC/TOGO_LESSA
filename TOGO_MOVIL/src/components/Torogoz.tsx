@@ -3,7 +3,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, Ellipse, G, LinearGradient, Path, Stop } from 'react-native-svg';
 import type { Mascot } from '../core/conversation/ConversationProvider';
-import { colors, fonts, palette, radius } from '../theme/tokens';
+import { colors, fonts, palette, radius, themed } from '../theme/tokens';
 import { PixelTogo } from './PixelTogo';
 import { ALA, cabeza, CUERPO, extras, GRADIENTES, SOMBRA, type Forma } from './togoArte';
 
@@ -35,7 +35,7 @@ export const MASCOT_NAME = 'Togo';
 const TAP_LINES = ['¡Hola! Soy Togo', '¡Pío!', 'Seña con calma, te sigo', 'Juntos nos entendemos', '¡Cosquillas no!', 'Aquí estoy para ayudarte'];
 /** Pista del secreto: sale muy pocas veces (ver RARE_CHANCE). */
 export const SECRET_HINT = 'Psst… si me tocas 8 veces seguidas, viajo a los 80 👾';
-export const RARE_CHANCE = 0.06;
+export const RARE_CHANCE = 0.03;
 const RETRO_TAPS = 8;
 const RETRO_MS = 9000;
 
@@ -359,7 +359,7 @@ export const MASCOT_TEXT: Record<Mascot, string> = {
   listening: 'Togo escucha',
 };
 
-const st = StyleSheet.create({
+const st = themed(() => StyleSheet.create({
   bubble: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
@@ -367,7 +367,7 @@ const st = StyleSheet.create({
     paddingVertical: 6,
     marginBottom: 6,
     maxWidth: 260,
-    shadowColor: palette.deepOcean,
+    shadowColor: colors.shadow,
     shadowOpacity: 0.12,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
@@ -383,4 +383,4 @@ const st = StyleSheet.create({
     backgroundColor: colors.surface,
     transform: [{ rotate: '45deg' }],
   },
-});
+}));
