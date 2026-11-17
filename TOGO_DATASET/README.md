@@ -31,6 +31,7 @@ Señas y letras con movimiento deben entrenarse con la **misma** versión.
 | Prueba con persona no vista | `python tools/train_senas.py --por-persona` | Precisión dejando fuera a cada persona |
 | Diccionario de la app | `python tools/export_diccionario.py` | `TOGO_MOVIL/src/data/diccionario.json` |
 | Abecedario | `python tools/capture_abecedario.py` y luego `python tools/train_abecedario.py --instalar` | Modelos de letras + diccionario |
+| Modelo único (en prueba) | `python tools/train_unico.py --por-persona --comparar` | Señas + letras + "nada" en un solo modelo; ver `docs/modelo-unico.md` |
 
 Después de `--instalar`, recompilar la APK (ver `TOGO_MOVIL/README.md`).
 

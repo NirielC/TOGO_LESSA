@@ -7,6 +7,7 @@ import { PredictionStabilizer } from '../signs/PredictionStabilizer';
 import { meaningOf } from '../signs/vocabulary';
 import * as stt from '../voice/stt';
 import { speak, stopSpeaking, warmUp } from '../voice/tts';
+import { contexto, previousKeys } from './contexto';
 import { ConversationState, conversationReducer, draftText, initialConversation, Message, Turn } from './reducer';
 
 /**
@@ -16,6 +17,12 @@ import { ConversationState, conversationReducer, draftText, initialConversation,
  * Señas y letras llegan juntas del motor. Una letra solo cuenta si en ese
  * momento NO se está formando una seña (el modelo de señas no está seguro):
  * así no hace falta un "modo deletreo" que alguien tenga que activar.
+ *
+ * MODELO ÚNICO (si el teléfono tiene lessa_unico.tflite): señas y letras salen
+ * del mismo modelo, en un solo evento con su top-3. La capa de contexto
+ * (contexto.ts) lo reordena si el modelo duda y UN solo estabilizador decide;
+ * no hace falta la regla de los 600 ms. El modo deletreo (opcional) es una
+ * máscara en el motor: solo letras y "nada".
  */
 
 export type Mascot = 'sleeping' | 'attentive' | 'thinking' | 'celebrating' | 'confused' | 'listening';
@@ -41,6 +48,8 @@ export interface LiveUi {
   sendProgress: number;
   /** Momento de la última seña/letra aceptada (destello en la cámara). */
   lastCommitAt: number;
+  /** El motor usa el modelo único (señas + letras en un solo modelo). */
+  unico: boolean;
 }
 
 interface Ctx {
@@ -51,6 +60,9 @@ interface Ctx {
   mascot: Mascot;
   cameraOn: boolean;
   setCameraOn: (on: boolean) => void;
+  /** Modo deletreo del modelo único: solo letras (y "nada"). */
+  spelling: boolean;
+  setSpelling: (on: boolean) => void;
   /** Mensaje que se muestra en grande (pizarra). null = cerrada. */
   board: Message | null;
   showBoard: (m: Message | null) => void;
@@ -114,6 +126,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     hasLetters: false,
     sendProgress: 0,
     lastCommitAt: 0,
+    unico: false,
   });
   const [voice, setVoice] = useState<VoiceUi>({ active: false, partial: '', volume: 0, error: null });
   const [flash, setFlash] = useState<'celebrating' | 'confused' | null>(null);
@@ -132,6 +145,14 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
 
   const signStab = useRef(new PredictionStabilizer(settings.signs));
   const letterStab = useRef(new PredictionStabilizer(settings.letters));
+  // Modelo único: un solo estabilizador. Usa los ajustes de señas o de letras
+  // según lo que esté en primer lugar (se fijan en cada predicción).
+  const unicoStab = useRef(new PredictionStabilizer(settings.signs));
+  const [spelling, setSpellingState] = useState(false);
+  const setSpelling = useCallback((on: boolean) => {
+    unicoStab.current.reset();
+    setSpellingState(on);
+  }, []);
   useEffect(() => signStab.current.setConfig(settings.signs), [settings.signs]);
   useEffect(() => letterStab.current.setConfig(settings.letters), [settings.letters]);
 
@@ -187,7 +208,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       const waiting = s.turn === 'signer' && s.draft.length > 0 && e.hands === 0 && !s.pending;
       const elapsed = now - lastHandsAt.current;
       const sendProgress = waiting ? Math.min(1, elapsed / cfg.finalizeAfterMs) : 0;
-      patchLive({ quality: e.quality, hands: e.hands, fps: Math.round(e.fps), latencyMs: step(e.latencyMs, 10), hasLetters: !!e.hasLetters, sendProgress: step(sendProgress, 0.05) });
+      patchLive({ quality: e.quality, hands: e.hands, fps: Math.round(e.fps), latencyMs: step(e.latencyMs, 10), hasLetters: !!e.hasLetters, unico: !!e.unico, sendProgress: step(sendProgress, 0.05) });
       if (waiting && elapsed >= cfg.finalizeAfterMs) {
         dispatch({ type: 'finalize', at: now, confirm: cfg.confirmBeforeSpeak });
       }
@@ -195,6 +216,49 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     }
     // Turno de quien habla, o esperando "¿Quisiste decir…?": nada cuenta.
     if (e.type !== 'prediction' || s.turn !== 'signer' || s.pending) return;
+
+    if (e.mode === 'unico') {
+      const noSign = cfg.signs.noSignLabel;
+      const raw = e.top?.length
+        ? e.top
+        : [{ label: e.label, p: e.confidence, kind: e.label === noSign ? ('none' as const) : ('sign' as const) }];
+      // Sentido lógico: si el modelo duda, gana lo que tiene sentido después de lo anterior.
+      const { top } = contexto.rerank(raw, previousKeys(s.draft, s.messages));
+      const best = top[0];
+      const cfgKind = best.kind === 'letter' ? cfg.letters : cfg.signs;
+      unicoStab.current.setConfig({ ...cfgKind, noSignLabel: noSign });
+      const snap = unicoStab.current.push(
+        {
+          label: best.kind === 'none' ? noSign : best.label,
+          confidence: best.p,
+          margin: best.p - (top[1]?.p ?? 0),
+          handsVisible: e.handsVisible,
+        },
+        now,
+      );
+      const confident = best.kind !== 'none' && best.p >= cfgKind.confidenceThreshold;
+      const kindOf = (label: string) => top.find((c) => c.label === label)?.kind;
+      const text = (label: string) => (kindOf(label) === 'letter' ? label : meaningOf(label).text);
+      patchLive({ candidate: snap.candidate ? text(snap.candidate) : null, progress: step(snap.progress, 0.05) });
+
+      if (e.handsVisible && !confident && snap.state !== 'latched' && snap.state !== 'cooldown') {
+        if (!lowConfSince.current) lowConfSince.current = now;
+        else if (now - lowConfSince.current > 2500) {
+          showFlash('confused', 1500);
+          lowConfSince.current = 0;
+        }
+      } else lowConfSince.current = 0;
+
+      if (snap.committed) {
+        const letter = kindOf(snap.committed.label) === 'letter';
+        if (letter) dispatch({ type: 'letter', letter: snap.committed.label });
+        else dispatch({ type: 'sign', label: snap.committed.label, at: now });
+        patchLive({ lastCommitAt: now });
+        Haptics.selectionAsync().catch(() => {});
+        showFlash('celebrating', letter ? 500 : 900);
+      }
+      return;
+    }
 
     if (e.mode === 'signs') {
       const snap = signStab.current.push(
@@ -257,6 +321,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       voiceActive.current = false;
       setVoice((v) => ({ ...v, active: false, volume: 0, partial: '' }));
       signStab.current.reset();
+      unicoStab.current.reset();
       dispatch({ type: 'setTurn', turn: 'signer', at: Date.now() });
     }, 2500);
   }, []);
@@ -264,6 +329,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
   const backToSigner = useCallback(() => {
     signStab.current.reset();
     letterStab.current.reset();
+    unicoStab.current.reset();
     dispatch({ type: 'setTurn', turn: 'signer', at: Date.now() });
   }, []);
 
@@ -415,6 +481,8 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     mascot,
     cameraOn,
     setCameraOn,
+    spelling,
+    setSpelling,
     board,
     showBoard: setBoard,
     clearVoiceError: () => setVoice((v) => ({ ...v, error: null, needsLanguage: false })),
@@ -423,6 +491,7 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     confirmPending: () => dispatch({ type: 'confirmPending', at: Date.now() }),
     rejectPending: () => {
       signStab.current.reset();
+      unicoStab.current.reset();
       dispatch({ type: 'rejectPending' });
     },
     removePart: (id) => dispatch({ type: 'removePart', id }),

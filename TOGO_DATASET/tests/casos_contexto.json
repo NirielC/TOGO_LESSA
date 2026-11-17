@@ -1,0 +1,56 @@
+{
+  "_info": "Casos de la capa de contexto con la tabla de la app (TOGO_MOVIL/src/data/contexto.json). Los usan test_contexto.py y sirven para revisar contexto.ts (mismo resultado).",
+  "reordenar": [
+    {
+      "nombre": "después de 'mi nombre es', si duda entre seña y letra, gana la letra",
+      "previos": ["mi_nombre_es", "@sena"],
+      "top": [["si", 0.45, "sign"], ["S", 0.40, "letter"], ["hola", 0.10, "sign"]],
+      "primero": "S", "cambio": true
+    },
+    {
+      "nombre": "después de '¿cómo estás?' viene una respuesta",
+      "previos": ["como_estas", "@sena"],
+      "top": [["hola", 0.50, "sign"], ["estoy_bien", 0.40, "sign"], ["A", 0.05, "letter"]],
+      "primero": "estoy_bien", "cambio": true
+    },
+    {
+      "nombre": "si el modelo está seguro, no se toca",
+      "previos": ["mi_nombre_es", "@sena"],
+      "top": [["hola", 0.90, "sign"], ["A", 0.05, "letter"], ["B", 0.02, "letter"]],
+      "primero": "hola", "cambio": false
+    },
+    {
+      "nombre": "si lo más probable es 'nada', no se inventa una letra",
+      "previos": ["mi_nombre_es", "@sena"],
+      "top": [["nada", 0.50, "none"], ["A", 0.40, "letter"], ["si", 0.05, "sign"]],
+      "primero": "nada", "cambio": false
+    },
+    {
+      "nombre": "sin regla para lo anterior, no cambia",
+      "previos": ["ok_adios", "@sena"],
+      "top": [["hola", 0.50, "sign"], ["si", 0.40, "sign"], ["A", 0.05, "letter"]],
+      "primero": "hola", "cambio": false
+    },
+    {
+      "nombre": "si las dos opciones tienen sentido, el contexto no elige entre ellas",
+      "previos": ["como_estas", "@sena"],
+      "top": [["estoy_mal", 0.45, "sign"], ["estoy_bien", 0.40, "sign"], ["hola", 0.10, "sign"]],
+      "primero": "estoy_mal", "cambio": true
+    },
+    {
+      "nombre": "deletreando, la siguiente suele ser otra letra",
+      "previos": ["@letra"],
+      "top": [["si", 0.42, "sign"], ["I", 0.38, "letter"], ["nada", 0.10, "none"]],
+      "primero": "I", "cambio": true
+    }
+  ],
+  "claves": [
+    { "nombre": "frase nueva", "borrador": [], "mensaje": null, "claves": ["@inicio"] },
+    { "nombre": "después de una seña", "borrador": ["hola"], "mensaje": null, "claves": ["hola", "@sena"] },
+    { "nombre": "deletreando", "borrador": ["mi_nombre_es", "__letters"], "mensaje": null, "claves": ["@letra"] },
+    { "nombre": "la persona oyente preguntó", "borrador": [], "mensaje": ["voice", "Hola, ¿cómo estás?"], "claves": ["como_estas", "@voz"] },
+    { "nombre": "la persona oyente habló de otra cosa", "borrador": [], "mensaje": ["voice", "Buenas tardes"], "claves": ["@voz"] },
+    { "nombre": "'sí' dentro de otra palabra no cuenta", "borrador": [], "mensaje": ["voice", "casi listo"], "claves": ["@voz"] },
+    { "nombre": "después de un mensaje escrito", "borrador": [], "mensaje": ["typed", "¿Cómo estás?"], "claves": ["@inicio"] }
+  ]
+}

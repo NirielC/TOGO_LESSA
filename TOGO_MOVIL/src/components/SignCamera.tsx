@@ -53,6 +53,7 @@ export function SignCamera({ style }: { style?: object }) {
         active={active}
         facing={facing}
         letters
+        spelling={conv.spelling}
         showHands={settings.showHands}
         onPrediction={(e) => conv.ingest(e.nativeEvent)}
         onStatus={(e) => conv.ingest(e.nativeEvent)}
@@ -64,6 +65,8 @@ export function SignCamera({ style }: { style?: object }) {
   }
 
   const ok = conv.live.quality === 'ok';
+  // Modo deletreo: solo con el modelo único (una máscara sobre sus salidas).
+  const canSpell = !!Vision && conv.live.unico && conv.live.hasLetters;
 
   // Destello del borde cada vez que se acepta una seña o letra.
   const glow = useRef(new Animated.Value(0)).current;
@@ -91,7 +94,7 @@ export function SignCamera({ style }: { style?: object }) {
       )}
 
       {permission?.granted && conv.cameraOn && (
-        <View style={st.topRow} pointerEvents="none">
+        <View style={[st.topRow, canSpell && { right: 160 }]} pointerEvents="none">
           <View style={st.chip}>
             <View style={[st.dot, { backgroundColor: listening ? colors.voice : Vision && ok ? colors.live : colors.sand }]} />
             <Text style={st.chipText} numberOfLines={1}>{chip}</Text>
@@ -109,6 +112,16 @@ export function SignCamera({ style }: { style?: object }) {
 
       {permission?.granted && (
         <View style={st.corner}>
+          {canSpell && (
+            <IconButton
+              icon="alphabetical-variant"
+              label={conv.spelling ? 'Quitar modo deletreo' : 'Modo deletreo: solo letras'}
+              onPress={() => conv.setSpelling(!conv.spelling)}
+              color={conv.spelling ? colors.ink : colors.onInk}
+              bg={conv.spelling ? colors.celebrate : 'rgba(13,43,69,0.55)'}
+              size={20}
+            />
+          )}
           <IconButton
             icon="camera-flip-outline"
             label="Cambiar de cámara"

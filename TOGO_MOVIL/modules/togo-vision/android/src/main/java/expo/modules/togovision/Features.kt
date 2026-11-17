@@ -192,7 +192,11 @@ object Features {
     return out
   }
 
-  /** Espejo de un cuadro (258 o 384): invierte x, intercambia lados de la pose y las manos. */
+  /**
+   * Espejo de un cuadro (258, 384 o 447): invierte x, intercambia lados de la pose y las manos.
+   * En el modelo único, la parte de letra [384:447] se copia tal cual: letterFeatures()
+   * da lo mismo con una mano o con su reflejo (igual que mirror_features_unico()).
+   */
   fun mirrorFrame(f: FloatArray): FloatArray {
     val out = FloatArray(f.size)
     for (i in 0 until POSE_N) {
@@ -214,6 +218,21 @@ object Features {
         }
       }
     }
+    if (f.size > V3_DIM) System.arraycopy(f, V3_DIM, out, V3_DIM, f.size - V3_DIM)
+    return out
+  }
+
+  // ------------------------------------------------------------ modelo único
+  // Igual que build_features_unico() de togo_features.py:
+  //   [0:384]   el cuadro v3 (arriba)
+  //   [384:447] letterFeatures() del cuadro: la forma de la mano que deletrea (ceros sin mano)
+
+  const val UNICO_DIM = V3_DIM + HAND_DIM  // 447
+
+  fun unicoFrame(raw: FloatArray, width: Int, height: Int): FloatArray {
+    val out = FloatArray(UNICO_DIM)
+    System.arraycopy(v3Frame(raw, width, height), 0, out, 0, V3_DIM)
+    letterFeatures(raw, width, height)?.let { System.arraycopy(it, 0, out, V3_DIM, HAND_DIM) }
     return out
   }
 

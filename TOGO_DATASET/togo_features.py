@@ -255,3 +255,48 @@ def mirror_features_v3(feat):
     """Espejo de una secuencia v3 ya construida (para aumento de datos)."""
     f = np.asarray(feat, dtype=np.float32)
     return np.concatenate([mirror_sequence(f[:, :FRAME_DIM]), mirror_shape(f[:, FRAME_DIM:])], axis=1)
+
+
+# ------------------------------------------------------------ modelo único
+
+"""
+CARACTERÍSTICAS DEL MODELO ÚNICO (señas + letras + "nada" en un solo modelo).
+
+Por cuadro, 447 valores:
+    [  0:384]  las del modelo v3 (build_features_v3, con la mano dominante).
+    [384:447]  FORMA de la mano que deletrea: hand_letter_features() del cuadro
+               (la mano más grande, relativa a la muñeca, escala = palma, la
+               "Left" espejada para que siempre se vea como mano derecha).
+               Ceros si no hay mano. Es lo que veía el modelo de letras estáticas.
+
+Esta parte NO cambia con el espejo: hand_letter_features() ya da lo mismo con
+una mano o con su reflejo. Por eso mirror_features_unico() solo espeja [0:384].
+
+El teléfono (Features.unicoFrame) hace exactamente lo mismo.
+"""
+
+UNICO_DIM = V3_DIM + HAND_DIM   # 447
+
+
+def letter_features_seq(raw_seq, width, height):
+    """(T, 258) crudo -> (T, 63): hand_letter_features() de cada cuadro (ceros sin mano)."""
+    raw = np.asarray(raw_seq, dtype=np.float32)
+    out = np.zeros((len(raw), HAND_DIM), dtype=np.float32)
+    for t, cuadro in enumerate(raw):
+        f = hand_letter_features(cuadro, width, height)
+        if f is not None:
+            out[t] = f
+    return out
+
+
+def build_features_unico(raw_seq, width, height, canonical=True):
+    """(T, 258) crudo -> (T, 447) listo para el modelo único."""
+    return np.concatenate(
+        [build_features_v3(raw_seq, width, height, canonical), letter_features_seq(raw_seq, width, height)], axis=1
+    ).astype(np.float32)
+
+
+def mirror_features_unico(feat):
+    """Espejo de una secuencia del modelo único (la parte de letra no cambia)."""
+    f = np.asarray(feat, dtype=np.float32)
+    return np.concatenate([mirror_features_v3(f[:, :V3_DIM]), f[:, V3_DIM:]], axis=1)

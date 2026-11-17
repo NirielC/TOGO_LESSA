@@ -16,6 +16,8 @@ export interface TogoVisionProps extends ViewProps {
   showHands: boolean;
   /** Correr también el modelo de abecedario (si está instalado). */
   letters: boolean;
+  /** Modelo único: modo deletreo (solo letras y "nada"; una máscara, no otro modelo). */
+  spelling?: boolean;
   onPrediction?: (e: { nativeEvent: EnginePrediction }) => void;
   onStatus?: (e: { nativeEvent: EngineStatus }) => void;
   onEngineError?: (e: { nativeEvent: { message: string } }) => void;

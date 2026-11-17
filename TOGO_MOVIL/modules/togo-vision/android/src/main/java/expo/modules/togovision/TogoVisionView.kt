@@ -36,7 +36,8 @@ import kotlin.math.max
 
 /**
  * Vista nativa: vista previa de la cámara + manos dibujadas + reconocimiento.
- * Props desde JS: active, mode ("signs"|"letters"), showHands, facing ("back"|"front").
+ * Props desde JS: active, letters, spelling, showHands, facing ("back"|"front").
+ * Con el modelo único emite una predicción "unico" con su top-3 en vez de "signs"/"letters".
  * Eventos: onPrediction, onStatus (~4/s), onEngineError.
  */
 class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
@@ -66,6 +67,8 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
   private var active = false
   private var facingBack = true
   @Volatile var lettersEnabled = true
+  /** Modelo único: modo deletreo (máscara: solo letras y "nada"). */
+  @Volatile var spellingEnabled = false
   @Volatile var showHands = true
 
   // Métricas
@@ -196,7 +199,7 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
     if (eng == null || !eng.wantsFrame(now)) { img.close(); return }
     try {
       val bmp = toUprightBitmap(img)
-      val res = eng.process(bmp, now, lettersEnabled)
+      val res = eng.process(bmp, now, lettersEnabled, spellingEnabled)
       val done = SystemClock.elapsedRealtime()
       lastLatency = done - now
       frames++
@@ -214,6 +217,7 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
       val handsVisible = res.hands > 0 && eng.handsRecently()
       res.signs?.let { emitPrediction("signs", it, handsVisible, res.motion) }
       res.letter?.let { emitPrediction("letters", it, res.hands > 0, res.motion) }
+      res.top?.takeIf { it.isNotEmpty() }?.let { emitUnified(it, handsVisible, res.motion) }
 
       if (done - lastStatusAt >= 120) {  // ~8/s: manos abajo responde rápido
         lastStatusAt = done
@@ -224,6 +228,7 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
           "fps" to Math.round(fps * 10) / 10.0,
           "latencyMs" to lastLatency,
           "hasLetters" to eng.hasLetters,
+          "unico" to eng.isUnified,
         )
         post { onStatus(payload) }
       }
@@ -243,6 +248,23 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
       "margin" to p.margin.toDouble(),
       "handsVisible" to handsVisible,
       "motion" to motion.toDouble(),
+      "ts" to System.currentTimeMillis(),
+    )
+    post { onPrediction(payload) }
+  }
+
+  /** Modelo único: la 1.ª opción como siempre (label/confidence/margin) + el top-3 para la capa de contexto. */
+  private fun emitUnified(top: List<Candidate>, handsVisible: Boolean, motion: Float) {
+    val first = top[0]
+    val payload = mapOf(
+      "type" to "prediction",
+      "mode" to "unico",
+      "label" to first.label,
+      "confidence" to first.p.toDouble(),
+      "margin" to (first.p - (top.getOrNull(1)?.p ?: 0f)).toDouble(),
+      "handsVisible" to handsVisible,
+      "motion" to motion.toDouble(),
+      "top" to top.map { mapOf("label" to it.label, "p" to it.p.toDouble(), "kind" to it.kind) },
       "ts" to System.currentTimeMillis(),
     )
     post { onPrediction(payload) }

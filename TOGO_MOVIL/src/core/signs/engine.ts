@@ -6,7 +6,18 @@
  * etiqueta, confianza, margen, si hay manos y una pista de calidad. Los puntos
  * de las manos se dibujan del lado nativo, no cruzan el puente.
  */
-export type EngineMode = 'signs' | 'letters';
+/**
+ * signs/letters: los 3 modelos de antes (señas, letras quietas, letras con movimiento).
+ * unico: el modelo único (señas + letras + "nada"), con su top-3 en `top`.
+ */
+export type EngineMode = 'signs' | 'letters' | 'unico';
+
+/** Una de las opciones del modelo único. kind: seña, letra o "nada". */
+export interface EngineCandidate {
+  label: string;
+  p: number;
+  kind: 'sign' | 'letter' | 'none';
+}
 
 /** Guía de calidad en vivo. La calcula el motor con los landmarks. */
 export type Quality =
@@ -27,6 +38,8 @@ export interface EnginePrediction {
   handsVisible: boolean;
   /** Movimiento de las muñecas (anchos de hombro por frame, suavizado). */
   motion?: number;
+  /** Solo en modo 'unico': las 3 opciones más probables (ya con la máscara de deletreo). */
+  top?: EngineCandidate[];
   ts: number;
 }
 
@@ -39,6 +52,8 @@ export interface EngineStatus {
   latencyMs: number;
   /** El teléfono tiene modelo de abecedario instalado. */
   hasLetters?: boolean;
+  /** El teléfono usa el modelo único (lessa_unico.tflite) en vez de los 3 modelos. */
+  unico?: boolean;
 }
 
 export type EngineEvent = EnginePrediction | EngineStatus | { type: 'error'; message: string };

@@ -1,0 +1,26 @@
+{
+  "_info": [
+    "CAPA DE CONTEXTO (sentido lógico). La leen la app (src/core/conversation/contexto.ts) y TOGO_DATASET/togo_contexto.py.",
+    "Solo desempata: actúa cuando el modelo duda (top1 - top2 < margen_duda) y nunca cuando lo más probable es 'nada'.",
+    "Cada regla dice qué suele venir DESPUÉS de algo, con un apoyo de 0 a 1 (1 = muy esperado).",
+    "despues_de: una etiqueta del modelo (hola, como_estas...), una lista de ellas, o un grupo:",
+    "  @inicio = frase nueva sin nada antes · @voz = justo después de que habló la persona oyente",
+    "  @letra = después de una letra (deletreando) · @sena = después de cualquier seña",
+    "siguen: etiqueta -> apoyo; también vale @letra (cualquier letra) o @sena (cualquier seña).",
+    "Para sumar señas nuevas: agrega su etiqueta aquí. python -m unittest discover -s tests (en TOGO_DATASET) revisa que existan."
+  ],
+  "margen_duda": 0.25,
+  "fuerza": 1.5,
+  "no_tocar": ["nada"],
+  "reglas": [
+    { "despues_de": "@inicio", "siguen": { "hola": 1, "como_estas": 0.4, "mi_nombre_es": 0.4, "a_que_hora_es": 0.4 } },
+    { "despues_de": "hola", "siguen": { "como_estas": 1, "mi_nombre_es": 1, "a_que_hora_es": 0.4 } },
+    { "despues_de": "mi_nombre_es", "siguen": { "@letra": 1 } },
+    { "despues_de": "@letra", "siguen": { "@letra": 0.8 } },
+    { "despues_de": "como_estas", "siguen": { "estoy_bien": 1, "estoy_mal": 1, "estoy_mas_o_menos": 1 } },
+    { "despues_de": "a_que_hora_es", "siguen": { "por_la_tarde": 1, "si": 0.3 } },
+    { "despues_de": ["estoy_bien", "estoy_mal", "estoy_mas_o_menos"], "siguen": { "como_estas": 0.5, "ok_adios": 0.5 } },
+    { "despues_de": ["por_la_tarde", "si"], "siguen": { "ok_adios": 0.6 } },
+    { "despues_de": "@voz", "siguen": { "si": 0.5, "estoy_bien": 0.3, "estoy_mal": 0.3, "estoy_mas_o_menos": 0.3, "por_la_tarde": 0.3, "ok_adios": 0.3 } }
+  ]
+}
