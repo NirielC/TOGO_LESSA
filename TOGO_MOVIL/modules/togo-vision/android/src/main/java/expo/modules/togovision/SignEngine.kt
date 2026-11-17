@@ -8,11 +8,13 @@ import com.google.mediapipe.tasks.core.Delegate
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarker
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker
+import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult
 import org.json.JSONArray
 import org.json.JSONObject
 import org.tensorflow.lite.Interpreter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.util.concurrent.Executors
 
 /** Lo que el motor entrega por frame procesado. */
 data class FrameResult(
@@ -26,6 +28,8 @@ data class FrameResult(
   val motion: Float,
   /** Modelo único: sus 3 opciones (ya con la máscara de deletreo), cada STEP frames. */
   val top: List<Candidate>? = null,
+  /** Movimiento de toda la mano (dedos incluidos), suavizado: separa letra quieta de seña. */
+  val handMotion: Float = 0f,
 )
 
 data class Prediction(val label: String, val confidence: Float, val margin: Float)
@@ -53,7 +57,14 @@ data class Candidate(val label: String, val p: Float, val kind: String)
 class SignEngine(context: Context) {
   companion object {
     const val STEP = 3            // ventana deslizante: una predicción cada 3 frames (~150 ms)
-    const val MIN_FRAME_MS = 45L  // ~20 FPS, como los videos de entrenamiento
+    /** 20 cuadros por segundo, como los videos de entrenamiento. */
+    const val FRAME_MS = 50L
+    /**
+     * Un cuadro sirve si llega hasta 15 ms antes de su turno. Con la cámara a 30 fps
+     * (un cuadro cada 33 ms) así se toman ~20 por segundo; con una espera fija de 45 ms
+     * solo se tomaba uno de cada dos (15 por segundo, más lento que el entrenamiento).
+     */
+    const val FRAME_TOLERANCE_MS = 15L
   }
 
   private val pose: PoseLandmarker
@@ -82,8 +93,12 @@ class SignEngine(context: Context) {
   private val handHistory = ArrayDeque<Int>()
   private var sinceLast = 0
   private var lastTs = -1L
+  private var nextDue = -1L
+  /** La pose corre en su propio hilo mientras las manos corren en el del análisis. */
+  private val poseThread = Executors.newSingleThreadExecutor()
   private var prevNorm: FloatArray? = null
   private var motionEma = 0f
+  private var handMotionEma = 0f
 
   val isUnified: Boolean get() = unico != null
   val hasLetters: Boolean
@@ -150,22 +165,42 @@ class SignEngine(context: Context) {
   }
 
   /** Solo procesa si pasó el tiempo mínimo: el ritmo debe parecerse a los 20 FPS del dataset. */
-  fun wantsFrame(nowMs: Long): Boolean = lastTs < 0 || nowMs - lastTs >= MIN_FRAME_MS
+  fun wantsFrame(nowMs: Long): Boolean = nextDue < 0 || nowMs >= nextDue - FRAME_TOLERANCE_MS
 
-  fun process(bitmap: Bitmap, tsMs: Long, wantLetters: Boolean, spelling: Boolean = false): FrameResult {
+  /**
+   * @param onLandmarks se llama apenas están los puntos, ANTES de clasificar: así la
+   *   mano se dibuja sin esperar al modelo (menos retraso en pantalla).
+   */
+  fun process(
+    bitmap: Bitmap,
+    tsMs: Long,
+    wantLetters: Boolean,
+    spelling: Boolean = false,
+    onLandmarks: ((FloatArray) -> Unit)? = null,
+  ): FrameResult {
     val ts = if (tsMs <= lastTs) lastTs + 1 else tsMs
     lastTs = ts
-    val image = BitmapImageBuilder(bitmap).build()
-    val p = pose.detectForVideo(image, ts)
-    val h = hands.detectForVideo(image, ts)
+    // Turno del siguiente cuadro: cada 50 ms; si el teléfono se atrasó, se empieza de nuevo
+    // (no se intenta recuperar cuadros perdidos).
+    nextDue = if (nextDue < 0 || ts - nextDue > FRAME_MS) ts + FRAME_MS else nextDue + FRAME_MS
+    // Pose y manos a la vez, cada una en su hilo: el retraso es el del más lento, no la suma.
+    val poseImage = BitmapImageBuilder(bitmap).build()
+    val handImage = BitmapImageBuilder(bitmap).build()
+    val poseJob = poseThread.submit<PoseLandmarkerResult> { pose.detectForVideo(poseImage, ts) }
+    val h = hands.detectForVideo(handImage, ts)
+    val p = poseJob.get()
     val w = bitmap.width
     val hh = bitmap.height
 
     val raw = Features.rawFrame(p, h)
+    onLandmarks?.invoke(raw)
     val norm = Features.normalize(raw, w, hh)
     val nHands = Features.handsInFrame(raw)
 
-    prevNorm?.let { motionEma = 0.6f * motionEma + 0.4f * Features.wristMotion(it, norm) }
+    prevNorm?.let {
+      motionEma = 0.6f * motionEma + 0.4f * Features.wristMotion(it, norm)
+      handMotionEma = 0.6f * handMotionEma + 0.4f * Features.handMotion(it, norm)
+    }
     prevNorm = norm
 
     buffer.addLast(
@@ -206,7 +241,7 @@ class SignEngine(context: Context) {
       }
     }
 
-    return FrameResult(raw, w, hh, nHands, quality(raw, w, hh, nHands), signPred, letterPred, motionEma, top)
+    return FrameResult(raw, w, hh, nHands, quality(raw, w, hh, nHands), signPred, letterPred, motionEma, top, handMotionEma)
   }
 
   /**
@@ -239,11 +274,14 @@ class SignEngine(context: Context) {
     presence.clear()
     handHistory.clear()
     sinceLast = 0
+    nextDue = -1L
     prevNorm = null
     motionEma = 0f
+    handMotionEma = 0f
   }
 
   fun close() {
+    poseThread.shutdown()   // close() corre después del último cuadro: no queda nada en cola
     pose.close()
     hands.close()
     unico?.close()

@@ -77,6 +77,15 @@ class Contexto:
         return nuevo, True
 
 
+ESPERA_LETRAS = 0.8
+
+
+def espera_letras(previos, ctx=None):
+    """¿Lo de antes pide letras? (después de "mi nombre es" o deletreando). Como expectsLetters() en contexto.ts:
+    deletreando con la mano quieta, la app no deja que una seña interrumpa."""
+    return (ctx or Contexto()).apoyo("A", previos) >= ESPERA_LETRAS
+
+
 def normalizar(texto):
     """'¿Cómo estás?' -> 'como estas' (sin tildes, signos ni mayúsculas)."""
     import re

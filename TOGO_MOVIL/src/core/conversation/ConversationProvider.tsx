@@ -7,7 +7,7 @@ import { PredictionStabilizer } from '../signs/PredictionStabilizer';
 import { meaningOf } from '../signs/vocabulary';
 import * as stt from '../voice/stt';
 import { speak, stopSpeaking, warmUp } from '../voice/tts';
-import { contexto, previousKeys } from './contexto';
+import { contexto, expectsLetters, previousKeys } from './contexto';
 import { ConversationState, conversationReducer, draftText, initialConversation, Message, Turn } from './reducer';
 
 /**
@@ -23,6 +23,11 @@ import { ConversationState, conversationReducer, draftText, initialConversation,
  * (contexto.ts) lo reordena si el modelo duda y UN solo estabilizador decide;
  * no hace falta la regla de los 600 ms. El modo deletreo (opcional) es una
  * máscara en el motor: solo letras y "nada".
+ *
+ * LETRA QUIETA CONTRA SEÑA. Una letra se sostiene con la mano quieta; las señas
+ * llevan movimiento. Si se está deletreando (después de "Mi nombre es" o de una
+ * letra, según contexto.json) o una letra ya va a más de la mitad, una seña solo
+ * cuenta si la mano se mueve. Así una "E" sostenida no termina en "Sí".
  */
 
 export type Mascot = 'sleeping' | 'attentive' | 'thinking' | 'celebrating' | 'confused' | 'listening';
@@ -109,6 +114,14 @@ export async function deleteSaved(id: string) {
 }
 
 const NO_SPEECH = new Set(['no-speech', 'speech-timeout']);
+/**
+ * Mano quieta: movimiento de toda la mano (anchos de hombro por cuadro, suavizado) por
+ * debajo de esto. Una letra sostenida queda en ~0.01; asentir con el puño pasa de 0.03.
+ * Valor inicial: ajustarlo cuando haya tomas reales.
+ */
+const STILL_MOTION = 0.02;
+/** Una letra "tiene la palabra" si su confirmación va a más de esta fracción. */
+const LETTER_FLOOR = 0.5;
 /** Redondea a pasos (menos cambios = menos re-dibujos). */
 const step = (x: number, s: number) => Math.round(x / s) * s;
 
@@ -163,6 +176,8 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
   const lastHandsAt = useRef(0);
   const lowConfSince = useRef(0);
   const lastSign = useRef({ confident: false, at: 0 });
+  /** Cuánto lleva la letra que se está confirmando (para que una seña no se la robe). */
+  const letterFloor = useRef({ progress: 0, at: 0 });
   const flashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showFlash = (f: 'celebrating' | 'confused', ms = 900) => {
@@ -217,13 +232,23 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     // Turno de quien habla, o esperando "¿Quisiste decir…?": nada cuenta.
     if (e.type !== 'prediction' || s.turn !== 'signer' || s.pending) return;
 
+    // Mano quieta: sin dato de movimiento (simulador) se toma como en movimiento.
+    const still = (e.handMotion ?? e.motion ?? 1) < STILL_MOTION;
+    const prev = previousKeys(s.draft, s.messages);
+
     if (e.mode === 'unico') {
       const noSign = cfg.signs.noSignLabel;
-      const raw = e.top?.length
+      let raw = e.top?.length
         ? e.top
         : [{ label: e.label, p: e.confidence, kind: e.label === noSign ? ('none' as const) : ('sign' as const) }];
+      // Deletreando con la mano quieta, una seña no interrumpe (sin repartir de nuevo:
+      // la letra igual tiene que pasar su umbral).
+      if (still && expectsLetters(prev)) {
+        raw = raw.filter((c) => c.kind !== 'sign');
+        if (!raw.length) raw = [{ label: noSign, p: 0, kind: 'none' as const }];
+      }
       // Sentido lógico: si el modelo duda, gana lo que tiene sentido después de lo anterior.
-      const { top } = contexto.rerank(raw, previousKeys(s.draft, s.messages));
+      const { top } = contexto.rerank(raw, prev);
       const best = top[0];
       const cfgKind = best.kind === 'letter' ? cfg.letters : cfg.signs;
       unicoStab.current.setConfig({ ...cfgKind, noSignLabel: noSign });
@@ -261,16 +286,21 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
     }
 
     if (e.mode === 'signs') {
+      const letterAhead = letterFloor.current.progress >= LETTER_FLOOR && now - letterFloor.current.at < 500;
+      // La seña se calla (no avanza ni bloquea a las letras) con la mano quieta mientras se
+      // deletrea o una letra va adelante: "E" y "Sí" se parecen, pero "Sí" se mueve.
+      const muted = still && (letterAhead || expectsLetters(prev));
       const snap = signStab.current.push(
-        { label: e.label, confidence: e.confidence, margin: e.margin, handsVisible: e.handsVisible },
+        { label: e.label, confidence: e.confidence, margin: e.margin, handsVisible: e.handsVisible && !muted },
         now,
       );
-      const isSign = e.label !== cfg.signs.noSignLabel && e.confidence >= cfg.signs.confidenceThreshold;
+      const isSign = !muted && e.label !== cfg.signs.noSignLabel && e.confidence >= cfg.signs.confidenceThreshold;
       lastSign.current = { confident: isSign && e.handsVisible, at: now };
-      patchLive({ candidate: snap.candidate ? meaningOf(snap.candidate).text : null, progress: step(snap.progress, 0.05) });
+      if (!muted) patchLive({ candidate: snap.candidate ? meaningOf(snap.candidate).text : null, progress: step(snap.progress, 0.05) });
 
-      // "No te entendí": hay manos pero nada pasa el umbral durante 2.5 s.
-      if (e.handsVisible && !isSign && snap.state !== 'latched' && snap.state !== 'cooldown') {
+      // "No te entendí": hay manos pero nada pasa el umbral durante 2.5 s (si la seña está
+      // callada porque se deletrea, las letras se encargan: no es confusión).
+      if (e.handsVisible && !muted && !isSign && snap.state !== 'latched' && snap.state !== 'cooldown') {
         if (!lowConfSince.current) lowConfSince.current = now;
         else if (now - lowConfSince.current > 2500) {
           showFlash('confused', 1500);
@@ -294,9 +324,14 @@ export function ConversationProvider({ children }: { children: React.ReactNode }
       { label: e.label, confidence: e.confidence, margin: e.margin, handsVisible: e.handsVisible && !signBusy },
       now,
     );
+    letterFloor.current = { progress: snap.candidate ? snap.progress : 0, at: now };
     if (!signBusy && snap.candidate) patchLive({ candidate: snap.candidate, progress: step(snap.progress, 0.05) });
     if (snap.committed) {
       lowConfSince.current = 0;
+      // Como al confirmar una seña se reinician las letras: lo que la seña llevaba no
+      // sigue contando con la misma mano todavía en la letra.
+      signStab.current.reset();
+      letterFloor.current = { progress: 0, at: 0 };
       dispatch({ type: 'letter', letter: snap.committed.label });
       patchLive({ lastCommitAt: now });
       Haptics.selectionAsync().catch(() => {});

@@ -38,6 +38,8 @@ export interface EnginePrediction {
   handsVisible: boolean;
   /** Movimiento de las muñecas (anchos de hombro por frame, suavizado). */
   motion?: number;
+  /** Movimiento de toda la mano, dedos incluidos (misma unidad). Bajo = mano quieta (letra). */
+  handMotion?: number;
   /** Solo en modo 'unico': las 3 opciones más probables (ya con la máscara de deletreo). */
   top?: EngineCandidate[];
   ts: number;

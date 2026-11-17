@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from config import CLASSES, LETRAS  # noqa: E402
-from togo_contexto import GRUPOS_PREVIOS, GRUPOS_SIGUEN, TABLA_APP, Contexto, cargar_tabla, claves_previas, normalizar  # noqa: E402
+from togo_contexto import GRUPOS_PREVIOS, GRUPOS_SIGUEN, TABLA_APP, Contexto, cargar_tabla, claves_previas, espera_letras, normalizar  # noqa: E402
 
 CASOS = json.loads((Path(__file__).parent / "casos_contexto.json").read_text(encoding="utf-8"))
 # Textos de las señas como en TOGO_MOVIL/src/core/signs/vocabulary.ts (los que importan aquí).
@@ -90,6 +90,12 @@ class Claves(unittest.TestCase):
             with self.subTest(c["nombre"]):
                 msg = tuple(c["mensaje"]) if c["mensaje"] else None
                 self.assertEqual(claves_previas(c["borrador"], msg, TEXTOS), c["claves"])
+
+    def test_espera_letras(self):
+        self.assertTrue(espera_letras(["mi_nombre_es", "@sena"]))
+        self.assertTrue(espera_letras(["@letra"]))
+        self.assertFalse(espera_letras(["hola", "@sena"]))
+        self.assertFalse(espera_letras(["@inicio"]))
 
     def test_normalizar(self):
         self.assertEqual(normalizar("¿Cómo estás?"), "como estas")

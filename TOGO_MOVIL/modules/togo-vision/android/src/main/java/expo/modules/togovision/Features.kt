@@ -148,6 +148,28 @@ object Features {
     return if (n == 0) 0f else m / n
   }
 
+  /**
+   * Movimiento medio de los 21 puntos de cada mano entre dos frames normalizados (en
+   * anchos de hombro). A diferencia de wristMotion(), ve también los dedos: asentir con
+   * el puño ("Sí") mueve poco la muñeca pero mucho los nudillos; una letra sostenida, nada.
+   */
+  fun handMotion(a: FloatArray, b: FloatArray): Float {
+    var m = 0f
+    var n = 0
+    for (s in 0..1) {
+      val k = POSE_DIM + s * HAND_DIM
+      val pa = a[k] != 0f || a[k + 1] != 0f
+      val pb = b[k] != 0f || b[k + 1] != 0f
+      if (!(pa && pb)) continue
+      for (i in 0 until HAND_N) {
+        val o = k + i * 3
+        m += hypot(a[o] - b[o], a[o + 1] - b[o + 1])
+        n++
+      }
+    }
+    return if (n == 0) 0f else m / n
+  }
+
   fun shoulderWidthRatio(raw: FloatArray, width: Int, height: Int): Float {
     val dx = (raw[L_SHOULDER * 4] - raw[R_SHOULDER * 4]) * width
     val dy = (raw[L_SHOULDER * 4 + 1] - raw[R_SHOULDER * 4 + 1]) * height

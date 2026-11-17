@@ -82,6 +82,14 @@ export class ContextLayer {
 
 export const contexto = new ContextLayer(tabla as Table);
 
+/** ¿Lo de antes pide letras? (después de "Mi nombre es" o deletreando, según la tabla). */
+export function expectsLetters(prev: string[]): boolean {
+  return contexto.support({ label: '', kind: 'letter' }, prev) >= EXPECTS_LETTERS;
+}
+
+/** Apoyo de la tabla a "@letra" desde el cual se considera que se está deletreando. */
+const EXPECTS_LETTERS = 0.8;
+
 /** '¿Cómo estás?' -> 'como estas' (igual que normalizar() en Python). */
 export function normalize(s: string): string {
   return s

@@ -99,6 +99,10 @@ cámara ─► MediaPipe ─► cuadro 447 ─► ventana 40 ─► lessa_unico.
 - **`ConversationProvider.tsx`**: con eventos `mode: 'unico'`, aplica la capa de contexto y
   un solo `PredictionStabilizer`. Los umbrales siguen siendo los de *Ajustes › Avanzado*: los de
   señas si la 1.ª opción es una seña, los de DELETREO si es una letra.
+- **Letra quieta contra seña** (en los dos modos): el motor manda `handMotion`, que mide el movimiento de toda la
+  mano, dedos incluidos. Si se está deletreando según `contexto.json` (`expectsLetters`) y la mano está quieta
+  (`STILL_MOTION`), una seña no interrumpe. Con los 3 modelos, además, una letra que ya va a más de la
+  mitad no se la roba una seña. Ver `docs/estudio-alcance-y-dataset.md`, sección 5.
 
 Archivos tocados: `Features.kt` (`unicoFrame`, espejo de 447), `SignEngine.kt`,
 `TogoVisionView.kt` (evento `unico` con `top`, prop `spelling`), `TogoVisionModule.kt`,

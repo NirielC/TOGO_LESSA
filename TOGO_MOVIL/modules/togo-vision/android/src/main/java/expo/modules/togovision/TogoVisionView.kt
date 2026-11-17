@@ -14,6 +14,7 @@ import android.util.Range
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.OptIn
+import androidx.camera.core.Camera
 import androidx.camera.camera2.interop.Camera2CameraInfo
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.camera2.interop.ExperimentalCamera2Interop
@@ -62,6 +63,11 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
   private var executor: ExecutorService? = null
   @Volatile private var engine: SignEngine? = null
   private var provider: ProcessCameraProvider? = null
+  @Volatile private var camera: Camera? = null
+  /** Brillo medio del centro de la imagen (0-255) y compensación de exposición aplicada. */
+  @Volatile private var luma = 128f
+  private var exposureIndex = 0
+  private var lastExposureCheck = 0L
 
   // Props
   private var active = false
@@ -131,9 +137,9 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
         val p = future.get()
         provider = p
         val selector = if (facingBack) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
-        // Cuadros por segundo de la cámara: el máximo que acepte (hasta 60) y fijo,
-        // para que la vista previa no baje a 15 FPS con poca luz. El reconocimiento
-        // sigue tomando ~20 cuadros/s (como los videos de entrenamiento).
+        // Cuadros por segundo de la cámara: hasta 30 y que no baje de 20. Antes se pedían
+        // hasta 60 fijos y la cámara solo podía exponer 1/60 s: la imagen salía oscura
+        // aunque hubiera luz (sobre todo la frontal). El reconocimiento toma ~20 cuadros/s.
         val fpsRange = bestFpsRange(p, selector)
         val previewBuilder = Preview.Builder()
         fpsRange?.let { applyFps(previewBuilder, it) }
@@ -150,7 +156,9 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
         val analysis = analysisBuilder.build()
         analysis.setAnalyzer(executor!!) { img -> analyze(img) }
         p.unbindAll()
-        p.bindToLifecycle(owner, selector, previewUse, analysis)
+        camera = p.bindToLifecycle(owner, selector, previewUse, analysis)
+        exposureIndex = 0
+        luma = 128f
         fpsWindowStart = SystemClock.elapsedRealtime()
       } catch (e: Throwable) {
         Log.e(TAG, "Cámara", e)
@@ -165,9 +173,14 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
     val ranges = info?.let {
       Camera2CameraInfo.from(it).getCameraCharacteristic(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES)
     }
-    // Primero el tope más alto (máx. MAX_FPS); entre iguales, el que no baja (fijo).
-    ranges?.filter { it.upper <= MAX_FPS && it.lower >= MIN_FPS }
-      ?.maxWithOrNull(compareBy<Range<Int>>({ it.upper }, { it.lower }))
+    // 1.º: tope entre 24 y 30 y que no baje de 20 (lo que necesita el reconocimiento),
+    //     el que más pueda bajar: con poca luz la cámara expone más tiempo.
+    // 2.º (si no hay): el tope más alto hasta 30.
+    ranges?.let { rs ->
+      rs.filter { it.upper in MIN_FPS..MAX_FPS && it.lower >= MIN_ANALYSIS_FPS }
+        .minWithOrNull(compareBy<Range<Int>>({ it.lower }, { -it.upper }))
+        ?: rs.filter { it.upper <= MAX_FPS }.maxWithOrNull(compareBy<Range<Int>>({ it.upper }, { it.lower }))
+    }
   } catch (e: Throwable) {
     Log.w(TAG, "FPS", e)
     null
@@ -181,6 +194,7 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
   private fun stop() {
     try { provider?.unbindAll() } catch (_: Throwable) {}
     provider = null
+    camera = null
     overlay.clear()
     // El motor se cierra en su propio hilo, después del último frame en curso.
     // Se captura aquí para que un start() inmediato (p. ej. cambiar de cámara)
@@ -199,7 +213,16 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
     if (eng == null || !eng.wantsFrame(now)) { img.close(); return }
     try {
       val bmp = toUprightBitmap(img)
-      val res = eng.process(bmp, now, lettersEnabled, spellingEnabled)
+      if (now - lastExposureCheck >= EXPOSURE_CHECK_MS) {
+        lastExposureCheck = now
+        luma = centerLuma(bmp)
+        adjustExposure(luma)
+      }
+      val mirrored = !facingBack
+      // La mano se dibuja apenas están los puntos, sin esperar a que el modelo clasifique.
+      val res = eng.process(bmp, now, lettersEnabled, spellingEnabled) { raw ->
+        if (showHands) overlay.update(raw, bmp.width, bmp.height, mirrored) else overlay.clear()
+      }
       val done = SystemClock.elapsedRealtime()
       lastLatency = done - now
       frames++
@@ -209,21 +232,20 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
         fpsWindowStart = done
       }
 
-      if (showHands) overlay.update(res.raw, res.width, res.height, !facingBack) else overlay.clear()
-
       // Una seña solo cuenta si hay manos AHORA y en la mayor parte de la ventana.
       // Antes bastaba con haberlas visto hace poco: por eso seguía diciendo
       // frases con las manos fuera del cuadro.
       val handsVisible = res.hands > 0 && eng.handsRecently()
-      res.signs?.let { emitPrediction("signs", it, handsVisible, res.motion) }
-      res.letter?.let { emitPrediction("letters", it, res.hands > 0, res.motion) }
-      res.top?.takeIf { it.isNotEmpty() }?.let { emitUnified(it, handsVisible, res.motion) }
+      res.signs?.let { emitPrediction("signs", it, handsVisible, res.motion, res.handMotion) }
+      res.letter?.let { emitPrediction("letters", it, res.hands > 0, res.motion, res.handMotion) }
+      res.top?.takeIf { it.isNotEmpty() }?.let { emitUnified(it, handsVisible, res.motion, res.handMotion) }
 
       if (done - lastStatusAt >= 120) {  // ~8/s: manos abajo responde rápido
         lastStatusAt = done
         val payload = mapOf(
           "type" to "status",
-          "quality" to res.quality,
+          // Muy oscuro aun con la exposición al máximo: se pide más luz.
+          "quality" to (if (luma < LOW_LIGHT_LUMA) "low_light" else res.quality),
           "hands" to res.hands,
           "fps" to Math.round(fps * 10) / 10.0,
           "latencyMs" to lastLatency,
@@ -239,7 +261,7 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
     }
   }
 
-  private fun emitPrediction(mode: String, p: Prediction, handsVisible: Boolean, motion: Float) {
+  private fun emitPrediction(mode: String, p: Prediction, handsVisible: Boolean, motion: Float, handMotion: Float) {
     val payload = mapOf(
       "type" to "prediction",
       "mode" to mode,
@@ -248,13 +270,14 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
       "margin" to p.margin.toDouble(),
       "handsVisible" to handsVisible,
       "motion" to motion.toDouble(),
+      "handMotion" to handMotion.toDouble(),
       "ts" to System.currentTimeMillis(),
     )
     post { onPrediction(payload) }
   }
 
   /** Modelo único: la 1.ª opción como siempre (label/confidence/margin) + el top-3 para la capa de contexto. */
-  private fun emitUnified(top: List<Candidate>, handsVisible: Boolean, motion: Float) {
+  private fun emitUnified(top: List<Candidate>, handsVisible: Boolean, motion: Float, handMotion: Float) {
     val first = top[0]
     val payload = mapOf(
       "type" to "prediction",
@@ -264,10 +287,49 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
       "margin" to (first.p - (top.getOrNull(1)?.p ?: 0f)).toDouble(),
       "handsVisible" to handsVisible,
       "motion" to motion.toDouble(),
+      "handMotion" to handMotion.toDouble(),
       "top" to top.map { mapOf("label" to it.label, "p" to it.p.toDouble(), "kind" to it.kind) },
       "ts" to System.currentTimeMillis(),
     )
     post { onPrediction(payload) }
+  }
+
+  /**
+   * Brillo automático: si el centro de la imagen (donde está la persona) sale oscuro,
+   * se sube la compensación de exposición un paso; si sale muy claro, se baja. Hasta
+   * +2 EV: más, y la imagen se llena de ruido. Corre cada EXPOSURE_CHECK_MS.
+   */
+  private fun adjustExposure(l: Float) {
+    val cam = camera ?: return
+    try {
+      val state = cam.cameraInfo.exposureState
+      if (!state.isExposureCompensationSupported) return
+      val step = state.exposureCompensationStep.toFloat()
+      val maxIdx = if (step > 0f) minOf(state.exposureCompensationRange.upper, (2f / step).toInt()) else 0
+      val target = when {
+        l < DARK_LUMA && exposureIndex < maxIdx -> exposureIndex + 1
+        l > BRIGHT_LUMA && exposureIndex > 0 -> exposureIndex - 1
+        else -> return
+      }
+      exposureIndex = target
+      cam.cameraControl.setExposureCompensationIndex(target)
+    } catch (e: Throwable) {
+      Log.w(TAG, "Exposición", e)
+    }
+  }
+
+  /** Brillo medio (0-255) del 60% central de la imagen, con 256 muestras. */
+  private fun centerLuma(b: Bitmap): Float {
+    val x0 = b.width / 5
+    val y0 = b.height / 5
+    val w = b.width * 3 / 5
+    val h = b.height * 3 / 5
+    var sum = 0f
+    for (j in 0 until 16) for (i in 0 until 16) {
+      val c = b.getPixel(x0 + i * w / 16, y0 + j * h / 16)
+      sum += 0.299f * Color.red(c) + 0.587f * Color.green(c) + 0.114f * Color.blue(c)
+    }
+    return sum / 256f
   }
 
   private fun emitError(message: String) {
@@ -285,8 +347,16 @@ class TogoVisionView(context: Context, appContext: AppContext) : ExpoView(contex
 
   companion object {
     private const val TAG = "TogoVision"
-    private const val MAX_FPS = 60
+    private const val MAX_FPS = 30
     private const val MIN_FPS = 24
+    /** El reconocimiento necesita 20 cuadros por segundo. */
+    private const val MIN_ANALYSIS_FPS = 20
+    private const val EXPOSURE_CHECK_MS = 400L
+    /** Brillo medio deseado del centro: entre 85 y 150 (de 255). */
+    private const val DARK_LUMA = 85f
+    private const val BRIGHT_LUMA = 150f
+    /** Por debajo de esto se muestra "Necesito más luz". */
+    private const val LOW_LIGHT_LUMA = 45f
   }
 }
 
@@ -372,7 +442,7 @@ class HandOverlay(context: Context) : View(context) {
   }
 
   companion object {
-    private const val SMOOTH = 0.45f  // fracción del camino por cuadro de pantalla
+    private const val SMOOTH = 0.7f  // fracción del camino por cuadro de pantalla (antes 0.45: se sentía atrasado)
     private val CONNECTIONS = listOf(
       0 to 1, 1 to 2, 2 to 3, 3 to 4,
       0 to 5, 5 to 6, 6 to 7, 7 to 8,

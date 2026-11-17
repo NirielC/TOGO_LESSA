@@ -28,6 +28,8 @@ export interface Settings {
   // --- Avanzado ---
   signs: StabilizerConfig;
   letters: StabilizerConfig;
+  /** Versión de los valores de reconocimiento (para actualizar los guardados viejos). */
+  recognitionRev: number;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -56,7 +58,7 @@ export const DEFAULT_SETTINGS: Settings = {
   signs: {
     confidenceThreshold: 0.82,
     minTopMargin: 0.2,
-    stabilityFrames: 4, // ventanas seguidas (~0.6 s sostenida)
+    stabilityFrames: 3, // ventanas seguidas (~0.45 s sostenida; antes 4)
     cooldownMs: 1000, // pausa tras aceptar una seña
     releaseOnNoSignFrames: 4,
     noSignLabel: NO_SIGN_LABEL,
@@ -64,11 +66,12 @@ export const DEFAULT_SETTINGS: Settings = {
   letters: {
     confidenceThreshold: 0.75,
     minTopMargin: 0.2,
-    stabilityFrames: 5, // una letra debe sostenerse; las transiciones no cuentan
+    stabilityFrames: 4, // una letra debe sostenerse; las transiciones no cuentan (antes 5)
     cooldownMs: 400,
     releaseOnNoSignFrames: 3,
     noSignLabel: '_nada',
   },
+  recognitionRev: 2,
 };
 
 const KEY = 'togo.settings.v2';
@@ -101,12 +104,20 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       .then((saved) => {
         if (!saved) return;
         // Mezcla con los valores por defecto: un ajuste nuevo no queda undefined.
-        setSettings({
+        const next: Settings = {
           ...DEFAULT_SETTINGS,
           ...saved,
           signs: { ...DEFAULT_SETTINGS.signs, ...saved.signs },
           letters: { ...DEFAULT_SETTINGS.letters, ...saved.letters },
-        });
+        };
+        // Rev. 2: confirmar más rápido (señas 4 -> 3 ventanas, letras 5 -> 4). Los ajustes
+        // guardados traen los valores viejos; si nadie los cambió a mano, se actualizan.
+        if ((saved.recognitionRev ?? 1) < 2) {
+          if (next.signs.stabilityFrames === 4) next.signs = { ...next.signs, stabilityFrames: 3 };
+          if (next.letters.stabilityFrames === 5) next.letters = { ...next.letters, stabilityFrames: 4 };
+          next.recognitionRev = 2;
+        }
+        setSettings(next);
       })
       .catch(() => {})
       .finally(() => setReady(true));
